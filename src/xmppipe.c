@@ -37,9 +37,9 @@ int xmppipe_presence_init(xmppipe_state_t *);
 void event_loop(xmppipe_state_t *);
 int handle_stdin(xmppipe_state_t *, int, char *, size_t);
 
-void xmppipe_mucjoin(xmppipe_state_t *);
-void xmppipe_mucunlock(xmppipe_state_t *);
-void xmppipe_mucsubject(xmppipe_state_t *, char *);
+void xmppipe_muc_join(xmppipe_state_t *);
+void xmppipe_muc_unlock(xmppipe_state_t *);
+void xmppipe_muc_subject(xmppipe_state_t *, char *);
 void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *);
 void xmppipe_ping(xmppipe_state_t *);
 
@@ -147,7 +147,7 @@ main(int argc, char **argv)
     xmpp_initialize();
 
     log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG);
-    state->ctx = xmpp_ctx_new(NULL, (state->verbose > 0 ? log : NULL));
+    state->ctx = xmpp_ctx_new(NULL, (state->verbose > 1 ? log : NULL));
 
     conn = xmpp_conn_new(state->ctx);
     state->conn = conn;
@@ -158,20 +158,20 @@ main(int argc, char **argv)
     xmpp_connect_client(conn, NULL, 0, handle_connection, state);
 
     if (xmppipe_connect_init(state) < 0)
-        goto ERR;
+        goto XMPPIPE_ERR;
 
     if (xmppipe_muc_init(state) < 0)
-        goto ERR;
+        goto XMPPIPE_ERR;
 
     if (xmppipe_presence_init(state) < 0)
-        goto ERR;
+        goto XMPPIPE_ERR;
 
     if (state->subject)
-        xmppipe_mucsubject(state, state->subject);
+        xmppipe_muc_subject(state, state->subject);
 
     event_loop(state);
 
-ERR:
+XMPPIPE_ERR:
     xmpp_conn_release(conn);
     xmpp_ctx_free(state->ctx);
     xmpp_shutdown();
@@ -241,8 +241,8 @@ xmppipe_muc_init(xmppipe_state_t *state)
     xmpp_stanza_release(presence);
 
     if (state->out) {
-        xmppipe_mucjoin(state);
-        xmppipe_mucunlock(state);
+        xmppipe_muc_join(state);
+        xmppipe_muc_unlock(state);
         state->status = XMPPIPE_S_MUC_WAITJOIN;
     }
 
@@ -282,7 +282,7 @@ event_loop(xmppipe_state_t *state)
             goto XMPPIPE_EXIT;
 
         if (eof)
-            goto POLL;
+            goto XMPPIPE_POLL;
 
         switch (handle_stdin(state, fd, buf, state->bufsz-1)) {
             case -1:
@@ -302,7 +302,7 @@ event_loop(xmppipe_state_t *state)
 
         state->interval += state->poll;
 
-POLL:
+XMPPIPE_POLL:
         if (state->interval > state->keepalive) {
             xmppipe_ping(state);
             state->interval = 0;
@@ -472,8 +472,8 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         state->out = xmppipe_conference(state->room, state->mucservice);
         state->mucjid = xmppipe_mucjid(state->out, state->resource);
 
-        xmppipe_mucjoin(state);
-        xmppipe_mucunlock(state);
+        xmppipe_muc_join(state);
+        xmppipe_muc_unlock(state);
 
         return 0;
     }
@@ -662,7 +662,7 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 }
 
     void
-xmppipe_mucjoin(xmppipe_state_t *state)
+xmppipe_muc_join(xmppipe_state_t *state)
 {
     xmpp_stanza_t *presence = NULL;
     xmpp_stanza_t *x = NULL;
@@ -682,7 +682,7 @@ xmppipe_mucjoin(xmppipe_state_t *state)
 }
 
     void
-xmppipe_mucunlock(xmppipe_state_t *state)
+xmppipe_muc_unlock(xmppipe_state_t *state)
 {
     xmpp_stanza_t *iq = NULL;
     xmpp_stanza_t *q= NULL;
@@ -711,7 +711,7 @@ xmppipe_mucunlock(xmppipe_state_t *state)
 }
 
     void
-xmppipe_mucsubject(xmppipe_state_t *state, char *buf)
+xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
 {
     xmpp_stanza_t *message = NULL;
     xmpp_stanza_t *subject= NULL;
