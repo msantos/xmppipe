@@ -30,6 +30,8 @@ int handle_disco_info(xmpp_conn_t * const, xmpp_stanza_t * const,
 int handle_version(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_message(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_presence(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
+int handle_presence_error(xmpp_conn_t * const, xmpp_stanza_t * const,
+        void * const);
 
 int xmppipe_connect_init(xmppipe_state_t *);
 int xmppipe_muc_init(xmppipe_state_t *);
@@ -202,6 +204,8 @@ xmppipe_muc_init(xmppipe_state_t *state)
     xmpp_stanza_t *iq = NULL;
     xmpp_stanza_t *query = NULL;
 
+    xmpp_handler_add(state->conn, handle_presence_error,
+            "http://jabber.org/protocol/muc", "presence", "error", state);
     xmpp_handler_add(state->conn, handle_presence,
             "http://jabber.org/protocol/muc#user", "presence", NULL, state);
     xmpp_handler_add(state->conn, handle_version,
@@ -606,6 +610,43 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     free(eto);
 
     return 1;
+}
+
+    int
+handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
+        void * const userdata)
+{
+    xmppipe_state_t *state = userdata;
+    xmpp_stanza_t *error = NULL;
+
+    char *from = NULL;
+    char *to = NULL;
+    char *code = NULL;
+    char *text = NULL;
+
+    from = xmpp_stanza_get_attribute(stanza, "from");
+    to = xmpp_stanza_get_attribute(stanza, "to");
+
+    if (!from || !to)
+        return 1;
+
+    /* Check error is to our JID (user@example.org/binding) */
+    if (XMPPIPE_STRNEQ(to, xmpp_conn_get_bound_jid(conn)))
+        return 1;
+
+    /* Check error is from our resource in the MUC (room@example.org/nick) */
+    if (XMPPIPE_STRNEQ(from, state->mucjid))
+        return 1;
+
+    error = xmpp_stanza_get_child_by_name(stanza, "error");
+    if (!error)
+        return 1;
+
+    code = xmpp_stanza_get_attribute(error, "code");
+    text = xmpp_stanza_get_text(xmpp_stanza_get_child_by_name(error, "text"));
+
+    errx(EXIT_FAILURE, "%s: %s", code ? code : "no error code specified",
+            text ? text : "no description");
 }
 
 
