@@ -145,7 +145,9 @@ main(int argc, char **argv)
         state->mucjid = xmppipe_mucjid(state->out, state->resource);
     }
 
-    encode_init();
+    if (xmppipe_encode_init() < 0)
+        errx(EXIT_FAILURE, "xmppipe_encode_init");
+
     xmpp_initialize();
 
     log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG);
@@ -366,7 +368,7 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
         if ((state->opt & XMPPIPE_OPT_DISCARD) && state->occupants == 0) {
             if (state->opt & XMPPIPE_OPT_DISCARD_TO_STDOUT) {
                 char *enc = NULL;
-                enc = encode(buf);
+                enc = xmppipe_encode(buf);
                 (void)printf("!:%s\n", enc);
                 free(enc);
             }
@@ -598,9 +600,9 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (state->status == XMPPIPE_S_READY_AVAIL && state->occupants == 0)
         state->status = XMPPIPE_S_READY_EMPTY;
 
-    etype = encode(type);
-    efrom = encode(from);
-    eto = encode(to);
+    etype = xmppipe_encode(type);
+    efrom = xmppipe_encode(from);
+    eto = xmppipe_encode(to);
 
     (void)printf("p:%s:%s:%s\n", etype, efrom, eto);
     state->interval = 0;
@@ -687,9 +689,9 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (!message)
         return 1;
 
-    etype = encode(type);
-    efrom = encode(from);
-    emessage = encode(message);
+    etype = xmppipe_encode(type);
+    efrom = xmppipe_encode(from);
+    emessage = xmppipe_encode(message);
 
     (void)printf("m:%s:%s:%s\n", etype, efrom, emessage);
     state->interval = 0;
@@ -782,11 +784,15 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf)
     xmpp_stanza_t *message = NULL;
     xmpp_stanza_t *body = NULL;
     xmpp_stanza_t *text = NULL;
+    char *id = NULL;
+
+    id = xmppipe_id_alloc();
 
     message = xmpp_stanza_new(state->ctx);
     xmpp_stanza_set_name(message, "message");
     xmpp_stanza_set_type(message, type);
     xmpp_stanza_set_attribute(message, "to", to);
+    xmpp_stanza_set_id(message, id);
 
     body = xmpp_stanza_new(state->ctx);
     xmpp_stanza_set_name(body, "body");
@@ -799,6 +805,7 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf)
 
     xmpp_send(state->conn, message);
     xmpp_stanza_release(message);
+    free(id);
 }
 
     void

@@ -14,36 +14,17 @@
  */
 #include "xmppipe.h"
 
-static unsigned char rfc3986[256];
+#include <uuid/uuid.h>
 
-    int
-xmppipe_encode_init()
-{
-    int i = 0;
-
-    for (i = 0; i < 256; i++)
-        rfc3986[i] = isalnum(i) || i == '~' || i == '-' || i == '.' || i == '_'
-            ? i : 0;
-
-    return 0;
-}
     char *
-xmppipe_encode(const char *s)
+xmppipe_id_alloc()
 {
-    // XXX overflow
-    size_t len = strlen(s);
-    char *buf = xmppipe_calloc(1, len * 3 + 1);
-    char *p = buf;
-    int n = 0;
+    uuid_t uu = {0};
+    char *out = NULL;
 
-    for (; *s; s++) {
-        // XXX signed
-        unsigned char c = *s;
-        n = rfc3986[c]
-            ? sprintf(p, "%c", rfc3986[c])
-            : sprintf(p, "%%%02X", c);
-        p += n;
-    }
+    out = xmppipe_calloc(1,37);
+    uuid_generate(uu);
+    uuid_unparse(uu, out);
 
-    return buf;
+    return out;
 }

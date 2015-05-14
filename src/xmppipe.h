@@ -73,8 +73,9 @@ typedef struct {
 } xmppipe_state_t;
 
 
-void encode_init();
-char *encode(const char *);
+int xmppipe_encode_init();
+char *xmppipe_encode(const char *);
+char *xmppipe_id_alloc();
 int xmppipe_set_nonblock(int fd);
 
 char *xmppipe_servername(char *);
