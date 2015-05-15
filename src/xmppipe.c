@@ -55,6 +55,7 @@ main(int argc, char **argv)
     char *pass = NULL;
 
     int ch = 0;
+    int exit_status = 0;
 
     state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
@@ -162,20 +163,19 @@ main(int argc, char **argv)
     xmpp_connect_client(conn, NULL, 0, handle_connection, state);
 
     if (xmppipe_connect_init(state) < 0)
-        goto XMPPIPE_ERR;
+        errx(EXIT_FAILURE, "connection failed");
 
     if (xmppipe_muc_init(state) < 0)
-        goto XMPPIPE_ERR;
+        errx(EXIT_FAILURE, "failed to join MUC");
 
     if (xmppipe_presence_init(state) < 0)
-        goto XMPPIPE_ERR;
+        errx(EXIT_FAILURE, "publishing presence failed");
 
     if (state->subject)
         xmppipe_muc_subject(state, state->subject);
 
     event_loop(state);
 
-XMPPIPE_ERR:
     xmpp_conn_release(conn);
     xmpp_ctx_free(state->ctx);
     xmpp_shutdown();
