@@ -53,9 +53,10 @@ main(int argc, char **argv)
     xmpp_log_t *log = NULL;
     char *jid = NULL;
     char *pass = NULL;
+    char *addr = NULL;
+    u_int16_t port = 0;
 
     int ch = 0;
-    int exit_status = 0;
 
     state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
@@ -67,7 +68,7 @@ main(int argc, char **argv)
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
-    while ( (ch = getopt(argc, argv, "dDehk:m:o:P:p:r:sS:u:v")) != -1) {
+    while ( (ch = getopt(argc, argv, "a:dDehk:m:o:P:p:r:sS:u:v")) != -1) {
         switch (ch) {
             case 'u':
                 /* username/jid */
@@ -81,6 +82,16 @@ main(int argc, char **argv)
                 /* output/muc */
                 state->room = xmppipe_strdup(optarg);
                 break;
+            case 'a': {
+                /* address:port */
+                char *p = NULL;
+                addr = xmppipe_strdup(optarg);
+                p = strchr(addr, ':');
+                if (p) {
+                    *p++ = '\0';
+                    port = (u_int16_t)atoi(p);
+                }
+            }
             case 'r':
                 state->resource = xmppipe_strdup(optarg);
                 break;
@@ -160,7 +171,7 @@ main(int argc, char **argv)
     xmpp_conn_set_jid(conn, jid);
     xmpp_conn_set_pass(conn, pass);
 
-    xmpp_connect_client(conn, NULL, 0, handle_connection, state);
+    xmpp_connect_client(conn, addr, port, handle_connection, state);
 
     if (xmppipe_connect_init(state) < 0)
         errx(EXIT_FAILURE, "connection failed");
@@ -842,6 +853,7 @@ usage(xmppipe_state_t *state)
             "   -r <resource>   resource (aka MUC nick)\n"
             "   -o <output>     MUC room to send stdout\n"
             "   -S <subject>    set MUC subject\n"
+            "   -a <addr:port>  set XMPP server address (port is optional)\n"
 
             "   -d              discard stdin when MUC is empty\n"
             "   -D              discard stdin and print to local stdout\n"
