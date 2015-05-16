@@ -64,6 +64,7 @@ main(int argc, char **argv)
     state->bufsz = 4097;
     state->poll = 10;
     state->keepalive = 60 * 1000;
+    state->keepalive_limit = 3;
 
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
