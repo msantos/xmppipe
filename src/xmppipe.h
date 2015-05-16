@@ -21,7 +21,7 @@
 
 #include <strophe.h>
 
-#define XMPPIPE_VERSION "0.4.0"
+#define XMPPIPE_VERSION "0.5.0"
 
 #define XMPPIPE_STREQ(a,b)      !strcmp((a),(b))
 #define XMPPIPE_STRNEQ(a,b)     strcmp((a),(b))
@@ -52,6 +52,7 @@ enum {
 typedef struct {
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
+    int handled;
 
     char *room;         /* room, room@conference.xmpp.example.com */
     char *server;       /* xmpp.example.com */
@@ -69,6 +70,14 @@ typedef struct {
     u_int32_t keepalive_limit; /* number of keepalives without a reply */
     u_int32_t interval; /* time since last keepalive (milliseconds) */
     size_t bufsz;       /* size of read buffer */
+
+    int sm_enabled;     /* stanzas: iq, message, presence */
+
+    u_int32_t sm_request; /* count of sent stanzas */
+    u_int32_t sm_request_interval; /* request ack every interval stanzas */
+
+    u_int32_t sm_ack_recv;  /* count of stanzas received from server */
+    u_int32_t sm_ack_sent;  /* count of stanzas sent from client from server */
 
     int opt;
     int verbose;
