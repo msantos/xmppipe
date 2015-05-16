@@ -68,7 +68,7 @@ main(int argc, char **argv)
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
-    while ( (ch = getopt(argc, argv, "a:dDehk:m:o:P:p:r:sS:u:v")) != -1) {
+    while ( (ch = getopt(argc, argv, "a:dDehk:K:m:o:P:p:r:sS:u:v")) != -1) {
         switch (ch) {
             case 'u':
                 /* username/jid */
@@ -106,6 +106,10 @@ main(int argc, char **argv)
                 /* keepalives */
                 state->keepalive = (u_int32_t)atoi(optarg) * 1000;
                 break;
+            case 'K':
+                /* number of keepalive without a reply */
+                state->keepalive_limit = (u_int32_t)atoi(optarg);
+                break;
             case 'm':
                 /* read buffer size */
                 state->bufsz = (size_t)atoi(optarg);
@@ -141,7 +145,7 @@ main(int argc, char **argv)
     if (state->bufsz < 3 || state->bufsz >= 0xffff)
         usage(state);
 
-    if (state->keepalive == 0)
+    if (state->keepalive == 0 || state->keepalive_limit < 1)
         usage(state);
 
     state->server = xmppipe_servername(jid);
@@ -324,6 +328,9 @@ XMPPIPE_POLL:
             xmppipe_ping(state);
             state->interval = 0;
         }
+
+        if (state->keepalive_fail > state->keepalive_limit)
+            errx(EXIT_FAILURE, "no response to keepalives");
 
         xmpp_run_once(state->ctx, state->poll);
 
@@ -715,6 +722,15 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     return 1;
 }
 
+    int
+handle_ping_reply(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
+        void * const userdata)
+{
+    xmppipe_state_t *state = userdata;
+    state->keepalive_fail = 0;
+    return 0;
+}
+
     void
 xmppipe_muc_join(xmppipe_state_t *state)
 {
@@ -828,7 +844,7 @@ xmppipe_ping(xmppipe_state_t *state)
     iq = xmpp_stanza_new(state->ctx);
     xmpp_stanza_set_name(iq, "iq");
     xmpp_stanza_set_type(iq, "get");
-    xmpp_stanza_set_id(iq, "c2s1"); /* XXX set unique id */
+    xmpp_stanza_set_id(iq, "c2s1");
     xmpp_stanza_set_attribute(iq, "from", xmpp_conn_get_bound_jid(state->conn));
 
     ping = xmpp_stanza_new(state->ctx);
@@ -839,6 +855,9 @@ xmppipe_ping(xmppipe_state_t *state)
 
     xmpp_send(state->conn, iq);
     xmpp_stanza_release(iq);
+
+    state->keepalive_fail++;
+    xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 }
 
     static void
@@ -861,6 +880,7 @@ usage(xmppipe_state_t *state)
             "   -s              exit when MUC is empty\n"
 
             "   -k <ms>         periodically send a keepalive\n"
+            "   -K <count>      number of keepalive failures before exiting\n"
             "   -m <size>       size of read buffer\n"
             "   -P <ms>         poll delay\n"
             "   -v              verbose\n",

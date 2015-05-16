@@ -65,7 +65,9 @@ typedef struct {
     int occupants;
     u_int32_t poll;     /* milliseconds */
     u_int32_t keepalive; /* periodically send a keepalive (milliseconds) */
-    u_int32_t interval;  /* time since last keepalive (milliseconds) */
+    u_int32_t keepalive_fail;  /* number of consecutive keepalives without a reply */
+    u_int32_t keepalive_limit; /* number of keepalives without a reply */
+    u_int32_t interval; /* time since last keepalive (milliseconds) */
     size_t bufsz;       /* size of read buffer */
 
     int opt;
