@@ -158,7 +158,7 @@ main(int argc, char **argv)
     if (state->bufsz < 3 || state->bufsz >= 0xffff)
         usage(state);
 
-    if (state->keepalive == 0 || state->keepalive_limit < 1)
+    if (state->keepalive_limit < 1)
         usage(state);
 
     state->server = xmppipe_servername(jid);
@@ -385,7 +385,7 @@ event_loop(xmppipe_state_t *state)
         state->interval += state->poll;
 
 XMPPIPE_POLL:
-        if (state->interval > state->keepalive) {
+        if (state->keepalive > 0 && state->interval > state->keepalive) {
             xmppipe_ping(state);
             state->interval = 0;
         }
