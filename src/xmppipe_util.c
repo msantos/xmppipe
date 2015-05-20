@@ -92,8 +92,10 @@ xmppipe_servername(char *jid)
     char *p = strchr(buf, '@');
     char *q;
 
-    if (!p)
+    if (!p) {
+        free(buf);
         return NULL;
+    }
 
     *p++ = '\0';
 
