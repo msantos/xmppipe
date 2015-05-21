@@ -188,10 +188,11 @@ main(int argc, char **argv)
     xmpp_conn_set_jid(conn, jid);
     xmpp_conn_set_pass(conn, pass);
 
-    xmpp_connect_client(conn, addr, port, handle_connection, state);
+    if (xmpp_connect_client(conn, addr, port, handle_connection, state) < 0)
+        errx(EXIT_FAILURE, "connection failed");
 
     if (xmppipe_connect_init(state) < 0)
-        errx(EXIT_FAILURE, "connection failed");
+        errx(EXIT_FAILURE, "XMPP connection failed");
 
     if (xmppipe_stream_init(state) < 0)
         errx(EXIT_FAILURE, "enabling stream management failed");
