@@ -98,3 +98,13 @@ char *xmppipe_getenv(const char *);
 char *xmppipe_strdup(const char *);
 void *xmppipe_malloc(size_t);
 void *xmppipe_calloc(size_t, size_t);
+
+xmpp_stanza_t *xmppipe_stanza_new(xmpp_ctx_t *);
+void xmppipe_stanza_set_attribute(xmpp_stanza_t * const, const char * const,
+        const char * const);
+void xmppipe_stanza_set_id(xmpp_stanza_t * const, const char * const);
+void xmppipe_stanza_set_name(xmpp_stanza_t *, const char * const);
+void xmppipe_stanza_set_ns(xmpp_stanza_t * const, const char * const);
+void xmppipe_stanza_set_text(xmpp_stanza_t *, const char * const);
+void xmppipe_stanza_set_type(xmpp_stanza_t * const, const char * const);
+void xmppipe_stanza_add_child(xmpp_stanza_t *, xmpp_stanza_t *);

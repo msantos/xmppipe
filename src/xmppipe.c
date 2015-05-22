@@ -56,7 +56,6 @@ void xmppipe_ping(xmppipe_state_t *);
 main(int argc, char **argv)
 {
     xmppipe_state_t *state = NULL;
-    xmpp_conn_t *conn = NULL;
     xmpp_log_t *log = NULL;
     char *jid = NULL;
     char *pass = NULL;
@@ -180,15 +179,19 @@ main(int argc, char **argv)
     xmpp_initialize();
 
     log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG);
+
     state->ctx = xmpp_ctx_new(NULL, (state->verbose > 1 ? log : NULL));
+    if (!state->ctx)
+        errx(EXIT_FAILURE, "could not allocate context");
 
-    conn = xmpp_conn_new(state->ctx);
-    state->conn = conn;
+    state->conn = xmpp_conn_new(state->ctx);
+    if (!state->conn)
+        errx(EXIT_FAILURE, "could not allocate connection");
 
-    xmpp_conn_set_jid(conn, jid);
-    xmpp_conn_set_pass(conn, pass);
+    xmpp_conn_set_jid(state->conn, jid);
+    xmpp_conn_set_pass(state->conn, pass);
 
-    if (xmpp_connect_client(conn, addr, port, handle_connection, state) < 0)
+    if (xmpp_connect_client(state->conn, addr, port, handle_connection, state) < 0)
         errx(EXIT_FAILURE, "connection failed");
 
     if (xmppipe_connect_init(state) < 0)
@@ -209,7 +212,7 @@ main(int argc, char **argv)
     event_loop(state);
 
     xmppipe_stream_close(state);
-    xmpp_conn_release(conn);
+    (void)xmpp_conn_release(state->conn);
     xmpp_ctx_free(state->ctx);
     xmpp_shutdown();
 
@@ -241,11 +244,11 @@ xmppipe_stream_init(xmppipe_state_t *state)
         return 0;
 
     /* <enable xmlns='urn:xmpp:sm:3'/> */
-    enable = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(enable, "enable");
-    xmpp_stanza_set_ns(enable, "urn:xmpp:sm:3");
+    enable = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(enable, "enable");
+    xmppipe_stanza_set_ns(enable, "urn:xmpp:sm:3");
     xmpp_send(state->conn, enable);
-    xmpp_stanza_release(enable);
+    (void)xmpp_stanza_release(enable);
 
     xmpp_handler_add(state->conn, handle_sm_enabled,
             "urn:xmpp:sm:3", "enabled", NULL, state);
@@ -289,28 +292,28 @@ xmppipe_muc_init(xmppipe_state_t *state)
                 "http://jabber.org/protocol/disco#info", "iq", "result",
                 state);
 
-        iq = xmpp_stanza_new(state->ctx);
-        xmpp_stanza_set_name(iq, "iq");
-        xmpp_stanza_set_type(iq, "get");
-        xmpp_stanza_set_attribute(iq, "to", state->server);
+        iq = xmppipe_stanza_new(state->ctx);
+        xmppipe_stanza_set_name(iq, "iq");
+        xmppipe_stanza_set_type(iq, "get");
+        xmppipe_stanza_set_attribute(iq, "to", state->server);
 
-        query = xmpp_stanza_new(state->ctx);
-        xmpp_stanza_set_name(query, "query");
-        xmpp_stanza_set_ns(query, "http://jabber.org/protocol/disco#items");
+        query = xmppipe_stanza_new(state->ctx);
+        xmppipe_stanza_set_name(query, "query");
+        xmppipe_stanza_set_ns(query, "http://jabber.org/protocol/disco#items");
 
-        xmpp_stanza_add_child(iq, query);
+        xmppipe_stanza_add_child(iq, query);
 
         xmppipe_send(state, iq);
-        xmpp_stanza_release(iq);
+        (void)xmpp_stanza_release(iq);
 
         state->status = XMPPIPE_S_MUC_SERVICE_LOOKUP;
     }
 
     /* Send initial <presence/> so that we appear online to contacts */
-    presence = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(presence, "presence");
+    presence = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(presence, "presence");
     xmppipe_send(state, presence);
-    xmpp_stanza_release(presence);
+    (void)xmpp_stanza_release(presence);
 
     if (state->out) {
         xmppipe_muc_join(state);
@@ -527,13 +530,13 @@ handle_sm_request(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     (void)snprintf(h, sizeof(h), "%u", state->sm_ack_recv);
 
     /* <a xmlns='urn:xmpp:sm:3' h='1'/> */
-    a = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(a, "a");
-    xmpp_stanza_set_ns(a, "urn:xmpp:sm:3");
-    xmpp_stanza_set_attribute(a, "h", h);
+    a = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(a, "a");
+    xmppipe_stanza_set_ns(a, "urn:xmpp:sm:3");
+    xmppipe_stanza_set_attribute(a, "h", h);
 
     xmpp_send(state->conn, a);
-    xmpp_stanza_release(a);
+    (void)xmpp_stanza_release(a);
 
     return 1;
 }
@@ -602,19 +605,19 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         if (!jid)
             continue;
 
-        iq = xmpp_stanza_new(ctx);
-        xmpp_stanza_set_name(iq, "iq");
-        xmpp_stanza_set_type(iq, "get");
-        xmpp_stanza_set_attribute(iq, "to", jid);
+        iq = xmppipe_stanza_new(ctx);
+        xmppipe_stanza_set_name(iq, "iq");
+        xmppipe_stanza_set_type(iq, "get");
+        xmppipe_stanza_set_attribute(iq, "to", jid);
 
-        reply = xmpp_stanza_new(ctx);
-        xmpp_stanza_set_name(reply, "query");
-        xmpp_stanza_set_ns(reply, "http://jabber.org/protocol/disco#info");
+        reply = xmppipe_stanza_new(ctx);
+        xmppipe_stanza_set_name(reply, "query");
+        xmppipe_stanza_set_ns(reply, "http://jabber.org/protocol/disco#info");
 
-        xmpp_stanza_add_child(iq, reply);
+        xmppipe_stanza_add_child(iq, reply);
 
         xmppipe_send(state, iq);
-        xmpp_stanza_release(iq);
+        (void)xmpp_stanza_release(iq);
     }
 
     return 0;
@@ -669,40 +672,40 @@ handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmppipe_state_t *state = userdata;
     xmpp_ctx_t *ctx = state->ctx;
 
-    reply = xmpp_stanza_new(ctx);
-    xmpp_stanza_set_name(reply, "iq");
-    xmpp_stanza_set_type(reply, "result");
-    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-    xmpp_stanza_set_attribute(reply, "to",
+    reply = xmppipe_stanza_new(ctx);
+    xmppipe_stanza_set_name(reply, "iq");
+    xmppipe_stanza_set_type(reply, "result");
+    xmppipe_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    xmppipe_stanza_set_attribute(reply, "to",
             xmpp_stanza_get_attribute(stanza, "from"));
 
-    query = xmpp_stanza_new(ctx);
-    xmpp_stanza_set_name(query, "query");
+    query = xmppipe_stanza_new(ctx);
+    xmppipe_stanza_set_name(query, "query");
     ns = xmpp_stanza_get_ns(xmpp_stanza_get_children(stanza));
     if (ns) {
-        xmpp_stanza_set_ns(query, ns);
+        xmppipe_stanza_set_ns(query, ns);
     }
 
-    name = xmpp_stanza_new(ctx);
-    xmpp_stanza_set_name(name, "name");
-    xmpp_stanza_add_child(query, name);
+    name = xmppipe_stanza_new(ctx);
+    xmppipe_stanza_set_name(name, "name");
+    xmppipe_stanza_add_child(query, name);
 
-    text = xmpp_stanza_new(ctx);
-    xmpp_stanza_set_text(text, "xmppipe");
-    xmpp_stanza_add_child(name, text);
+    text = xmppipe_stanza_new(ctx);
+    xmppipe_stanza_set_text(text, "xmppipe");
+    xmppipe_stanza_add_child(name, text);
 
-    version = xmpp_stanza_new(ctx);
-    xmpp_stanza_set_name(version, "version");
-    xmpp_stanza_add_child(query, version);
+    version = xmppipe_stanza_new(ctx);
+    xmppipe_stanza_set_name(version, "version");
+    xmppipe_stanza_add_child(query, version);
 
-    text = xmpp_stanza_new(ctx);
-    xmpp_stanza_set_text(text, XMPPIPE_VERSION);
-    xmpp_stanza_add_child(version, text);
+    text = xmppipe_stanza_new(ctx);
+    xmppipe_stanza_set_text(text, XMPPIPE_VERSION);
+    xmppipe_stanza_add_child(version, text);
 
-    xmpp_stanza_add_child(reply, query);
+    xmppipe_stanza_add_child(reply, query);
 
     xmppipe_send(state, reply);
-    xmpp_stanza_release(reply);
+    (void)xmpp_stanza_release(reply);
     return 1;
 }
 
@@ -892,18 +895,18 @@ xmppipe_muc_join(xmppipe_state_t *state)
     xmpp_stanza_t *presence = NULL;
     xmpp_stanza_t *x = NULL;
 
-    presence = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(presence, "presence");
-    xmpp_stanza_set_attribute(presence, "to", state->mucjid);
+    presence = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(presence, "presence");
+    xmppipe_stanza_set_attribute(presence, "to", state->mucjid);
 
-    x = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(x, "x");
-    xmpp_stanza_set_ns(x, "http://jabber.org/protocol/muc");
+    x = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(x, "x");
+    xmppipe_stanza_set_ns(x, "http://jabber.org/protocol/muc");
 
-    xmpp_stanza_add_child(presence, x);
+    xmppipe_stanza_add_child(presence, x);
 
     xmppipe_send(state, presence);
-    xmpp_stanza_release(presence);
+    (void)xmpp_stanza_release(presence);
 }
 
     void
@@ -913,26 +916,26 @@ xmppipe_muc_unlock(xmppipe_state_t *state)
     xmpp_stanza_t *q= NULL;
     xmpp_stanza_t *x = NULL;
 
-    iq = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(iq, "iq");
-    xmpp_stanza_set_attribute(iq, "to", state->out);
-    xmpp_stanza_set_attribute(iq, "id", "create1");
-    xmpp_stanza_set_attribute(iq, "type", "set");
+    iq = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(iq, "iq");
+    xmppipe_stanza_set_attribute(iq, "to", state->out);
+    xmppipe_stanza_set_attribute(iq, "id", "create1");
+    xmppipe_stanza_set_attribute(iq, "type", "set");
 
-    q = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(q, "query");
-    xmpp_stanza_set_ns(q, "http://jabber.org/protocol/muc#owner");
+    q = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(q, "query");
+    xmppipe_stanza_set_ns(q, "http://jabber.org/protocol/muc#owner");
 
-    x = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(x, "x");
-    xmpp_stanza_set_ns(x, "jabber:x:data");
-    xmpp_stanza_set_attribute(x, "type", "submit");
+    x = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(x, "x");
+    xmppipe_stanza_set_ns(x, "jabber:x:data");
+    xmppipe_stanza_set_attribute(x, "type", "submit");
 
-    xmpp_stanza_add_child(q, x);
-    xmpp_stanza_add_child(iq, q);
+    xmppipe_stanza_add_child(q, x);
+    xmppipe_stanza_add_child(iq, q);
 
     xmppipe_send(state, iq);
-    xmpp_stanza_release(iq);
+    (void)xmpp_stanza_release(iq);
 }
 
     void
@@ -942,22 +945,22 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
     xmpp_stanza_t *subject= NULL;
     xmpp_stanza_t *text= NULL;
 
-    message = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(message, "message");
-    xmpp_stanza_set_attribute(message, "to", state->out);
-    xmpp_stanza_set_attribute(message, "type", "groupchat");
+    message = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(message, "message");
+    xmppipe_stanza_set_attribute(message, "to", state->out);
+    xmppipe_stanza_set_attribute(message, "type", "groupchat");
 
-    subject = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(subject, "subject");
+    subject = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(subject, "subject");
 
-    text = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_text(text, buf);
+    text = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_text(text, buf);
 
-    xmpp_stanza_add_child(subject, text);
-    xmpp_stanza_add_child(message, subject);
+    xmppipe_stanza_add_child(subject, text);
+    xmppipe_stanza_add_child(message, subject);
 
     xmppipe_send(state, message);
-    xmpp_stanza_release(message);
+    (void)xmpp_stanza_release(message);
 }
 
     void
@@ -970,23 +973,23 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf)
 
     id = xmppipe_id_alloc();
 
-    message = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(message, "message");
-    xmpp_stanza_set_type(message, type);
-    xmpp_stanza_set_attribute(message, "to", to);
-    xmpp_stanza_set_id(message, id);
+    message = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(message, "message");
+    xmppipe_stanza_set_type(message, type);
+    xmppipe_stanza_set_attribute(message, "to", to);
+    xmppipe_stanza_set_id(message, id);
 
-    body = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(body, "body");
+    body = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(body, "body");
 
-    text = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_text(text, buf);
+    text = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_text(text, buf);
 
-    xmpp_stanza_add_child(body, text);
-    xmpp_stanza_add_child(message, body);
+    xmppipe_stanza_add_child(body, text);
+    xmppipe_stanza_add_child(message, body);
 
     xmppipe_send(state, message);
-    xmpp_stanza_release(message);
+    (void)xmpp_stanza_release(message);
     free(id);
 }
 
@@ -996,20 +999,20 @@ xmppipe_ping(xmppipe_state_t *state)
     xmpp_stanza_t *iq = NULL;
     xmpp_stanza_t *ping = NULL;
 
-    iq = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(iq, "iq");
-    xmpp_stanza_set_type(iq, "get");
-    xmpp_stanza_set_id(iq, "c2s1");
-    xmpp_stanza_set_attribute(iq, "from", xmpp_conn_get_bound_jid(state->conn));
+    iq = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(iq, "iq");
+    xmppipe_stanza_set_type(iq, "get");
+    xmppipe_stanza_set_id(iq, "c2s1");
+    xmppipe_stanza_set_attribute(iq, "from", xmpp_conn_get_bound_jid(state->conn));
 
-    ping = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(ping, "ping");
-    xmpp_stanza_set_ns(ping, "urn:xmpp:ping");
+    ping = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(ping, "ping");
+    xmppipe_stanza_set_ns(ping, "urn:xmpp:ping");
 
-    xmpp_stanza_add_child(iq, ping);
+    xmppipe_stanza_add_child(iq, ping);
 
     xmppipe_send(state, iq);
-    xmpp_stanza_release(iq);
+    (void)xmpp_stanza_release(iq);
 
     state->keepalive_fail++;
     xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
@@ -1030,12 +1033,12 @@ xmppipe_send(xmppipe_state_t *state, xmpp_stanza_t *const stanza)
     if (state->sm_request % state->sm_request_interval != 0)
         return;
 
-    r = xmpp_stanza_new(state->ctx);
-    xmpp_stanza_set_name(r, "r");
-    xmpp_stanza_set_ns(r, "urn:xmpp:sm:3");
+    r = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(r, "r");
+    xmppipe_stanza_set_ns(r, "urn:xmpp:sm:3");
     xmpp_send(state->conn, r);
 
-    xmpp_stanza_release(r);
+    (void)xmpp_stanza_release(r);
 }
 
     void

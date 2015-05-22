@@ -85,6 +85,75 @@ xmppipe_calloc(size_t nmemb, size_t size)
     return buf;
 }
 
+    xmpp_stanza_t *
+xmppipe_stanza_new(xmpp_ctx_t *ctx)
+{
+    xmpp_stanza_t *s = xmpp_stanza_new(ctx);
+
+    if (!s)
+        err(3, "allocation failure");
+
+    return s;
+}
+
+    void
+xmppipe_stanza_set_attribute(xmpp_stanza_t * const stanza,
+        const char * const key, const char * const value)
+{
+    if (xmpp_stanza_set_attribute(stanza, key, value) < 0)
+        err(3, "allocation failure");
+}
+
+    void
+xmppipe_stanza_set_id(xmpp_stanza_t * const stanza, const char * const id)
+{
+    if (xmpp_stanza_set_id(stanza, id) < 0)
+        err(3, "allocation failure");
+}
+
+    void
+xmppipe_stanza_set_name(xmpp_stanza_t *stanza, const char * const name)
+{
+    switch (xmpp_stanza_set_name(stanza, name)) {
+        case 0:
+            return;
+        case XMPP_EMEM:
+            err(3, "allocation failure");
+        case XMPP_EINVOP:
+            err(4, "invalid operation");
+        default:
+            err(5, "unknown error");
+    }
+}
+
+    void
+xmppipe_stanza_set_ns(xmpp_stanza_t * const stanza, const char * const ns)
+{
+    if (xmpp_stanza_set_ns(stanza, ns) < 0)
+        err(3, "allocation failure");
+}
+
+    void
+xmppipe_stanza_set_text(xmpp_stanza_t *stanza, const char * const text)
+{
+    if (xmpp_stanza_set_text(stanza, text) < 0)
+        err(3, "allocation failure");
+}
+
+    void
+xmppipe_stanza_set_type(xmpp_stanza_t * const stanza, const char * const type)
+{
+    if (xmpp_stanza_set_type(stanza, type) < 0)
+        err(3, "allocation failure");
+}
+
+    void
+xmppipe_stanza_add_child(xmpp_stanza_t * stanza, xmpp_stanza_t * child)
+{
+    if (xmpp_stanza_add_child(stanza, child) < 0)
+        err(3, "allocation failure");
+}
+
     char *
 xmppipe_servername(char *jid)
 {
