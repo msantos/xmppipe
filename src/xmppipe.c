@@ -667,24 +667,45 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         void * const userdata)
 {
-    xmpp_stanza_t *reply, *query, *name, *version, *text;
-    char *ns;
+    xmpp_stanza_t *reply = NULL;
+    xmpp_stanza_t *query = NULL;
+    xmpp_stanza_t *name = NULL;
+    xmpp_stanza_t *version = NULL;
+    xmpp_stanza_t *text = NULL;
+    xmpp_stanza_t *child = NULL;
+
+    char *ns = NULL;
+    char *id = NULL;
+    char *from = NULL;
+
     xmppipe_state_t *state = userdata;
     xmpp_ctx_t *ctx = state->ctx;
 
     reply = xmppipe_stanza_new(ctx);
     xmppipe_stanza_set_name(reply, "iq");
     xmppipe_stanza_set_type(reply, "result");
-    xmppipe_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-    xmppipe_stanza_set_attribute(reply, "to",
-            xmpp_stanza_get_attribute(stanza, "from"));
+
+    id = xmpp_stanza_get_attribute(stanza, "from");
+    if (!id)
+        return 1;
+
+    xmppipe_stanza_set_id(reply, id);
+
+    from = xmpp_stanza_get_attribute(stanza, "from");
+    xmppipe_stanza_set_attribute(reply, "to",  from);
 
     query = xmppipe_stanza_new(ctx);
     xmppipe_stanza_set_name(query, "query");
-    ns = xmpp_stanza_get_ns(xmpp_stanza_get_children(stanza));
-    if (ns) {
-        xmppipe_stanza_set_ns(query, ns);
+
+    child = xmpp_stanza_get_children(stanza);
+    if (!child) {
+        (void)xmpp_stanza_release(query);
+        return 1;
     }
+
+    ns = xmpp_stanza_get_ns(child);
+    if (ns)
+        xmppipe_stanza_set_ns(query, ns);
 
     name = xmppipe_stanza_new(ctx);
     xmppipe_stanza_set_name(name, "name");
@@ -706,6 +727,7 @@ handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     xmppipe_send(state, reply);
     (void)xmpp_stanza_release(reply);
+
     return 1;
 }
 
@@ -796,6 +818,7 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 {
     xmppipe_state_t *state = userdata;
     xmpp_stanza_t *error = NULL;
+    xmpp_stanza_t *child = NULL;
 
     char *from = NULL;
     char *to = NULL;
@@ -821,7 +844,9 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         return 1;
 
     code = xmpp_stanza_get_attribute(error, "code");
-    text = xmpp_stanza_get_text(xmpp_stanza_get_child_by_name(error, "text"));
+    child = xmpp_stanza_get_child_by_name(error, "text");
+    if (child)
+        text = xmpp_stanza_get_text(child);
 
     errx(EXIT_FAILURE, "%s: %s", code ? code : "no error code specified",
             text ? text : "no description");
@@ -832,6 +857,7 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         void * const userdata)
 {
+    xmpp_stanza_t *child = NULL;
     xmppipe_state_t *state = userdata;
 
     char *message = NULL;
@@ -858,10 +884,11 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (!xmpp_stanza_get_child_by_name(stanza, "body"))
         return 1;
 
-    message = xmpp_stanza_get_text(
-            xmpp_stanza_get_child_by_name(stanza, "body")
-            );
+    child = xmpp_stanza_get_child_by_name(stanza, "body");
+    if (!child)
+        return 1;
 
+    message = xmpp_stanza_get_text(child);
     if (!message)
         return 1;
 
