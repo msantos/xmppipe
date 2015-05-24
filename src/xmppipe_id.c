@@ -22,7 +22,7 @@ xmppipe_id_alloc()
     uuid_t uu = {0};
     char *out = NULL;
 
-    out = xmppipe_calloc(1,37);
+    out = xmppipe_calloc(37,1);
     uuid_generate(uu);
     uuid_unparse(uu, out);
 

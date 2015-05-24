@@ -21,10 +21,12 @@
 
 #include <strophe.h>
 
-#define XMPPIPE_VERSION "0.5.0"
+#define XMPPIPE_VERSION "0.6.0"
 
 #define XMPPIPE_STREQ(a,b)      !strcmp((a),(b))
 #define XMPPIPE_STRNEQ(a,b)     strcmp((a),(b))
+
+#define BASE64_LENGTH(n)        ((((n) + 2) / 3) * 4)
 
 enum {
     XMPPIPE_S_DISCONNECTED,
@@ -81,11 +83,13 @@ typedef struct {
 
     int opt;
     int verbose;
+    int encode;         /* base64 encode/decode data to MUC */
 } xmppipe_state_t;
 
 
-int xmppipe_encode_init();
-char *xmppipe_encode(const char *);
+int xmppipe_fmt_init();
+char *xmppipe_fmt(const char *);
+char *xmppipe_nfmt(const char *, size_t);
 char *xmppipe_id_alloc();
 int xmppipe_set_nonblock(int fd);
 
@@ -108,3 +112,7 @@ void xmppipe_stanza_set_ns(xmpp_stanza_t * const, const char * const);
 void xmppipe_stanza_set_text(xmpp_stanza_t *, const char * const);
 void xmppipe_stanza_set_type(xmpp_stanza_t * const, const char * const);
 void xmppipe_stanza_add_child(xmpp_stanza_t *, xmpp_stanza_t *);
+
+int b64_ntop(u_char const *src, size_t srclength, char *target,
+        size_t targsize);
+int b64_pton(char const *src, u_char *target, size_t targsize);

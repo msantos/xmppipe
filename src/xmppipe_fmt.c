@@ -17,7 +17,7 @@
 static unsigned char rfc3986[256];
 
     int
-xmppipe_encode_init()
+xmppipe_fmt_init()
 {
     int i = 0;
 
@@ -27,18 +27,17 @@ xmppipe_encode_init()
 
     return 0;
 }
+
     char *
-xmppipe_encode(const char *s)
+xmppipe_nfmt(const char *s, size_t len)
 {
-    // XXX overflow
-    size_t len = strlen(s);
-    char *buf = xmppipe_calloc(1, len * 3 + 1);
+    char *buf = xmppipe_calloc(len * 3 + 1, 1);
     char *p = buf;
     int n = 0;
+    int i = 0;
 
-    for (; *s; s++) {
-        // XXX signed
-        unsigned char c = *s;
+    for (i = 0; i < len; i++) {
+        unsigned char c = s[i];
         n = rfc3986[c]
             ? sprintf(p, "%c", rfc3986[c])
             : sprintf(p, "%%%02X", c);
@@ -46,4 +45,10 @@ xmppipe_encode(const char *s)
     }
 
     return buf;
+}
+
+    char *
+xmppipe_fmt(const char *s)
+{
+    return xmppipe_nfmt(s, strlen(s));
 }

@@ -14,6 +14,7 @@
  */
 #include "xmppipe.h"
 
+#include <resolv.h>
 #include <sys/select.h>
 #include <sys/types.h>
 
@@ -48,7 +49,7 @@ void xmppipe_stream_close(xmppipe_state_t *);
 void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
 void xmppipe_muc_subject(xmppipe_state_t *, char *);
-void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *);
+void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *, size_t);
 void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 void xmppipe_ping(xmppipe_state_t *);
 
@@ -76,7 +77,7 @@ main(int argc, char **argv)
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
-    while ( (ch = getopt(argc, argv, "a:dDehI:k:K:m:o:P:p:r:sS:u:v")) != -1) {
+    while ( (ch = getopt(argc, argv, "a:dDehI:k:K:m:o:P:p:r:sS:u:vx")) != -1) {
         switch (ch) {
             case 'u':
                 /* username/jid */
@@ -108,6 +109,9 @@ main(int argc, char **argv)
                 break;
             case 'v':
                 state->verbose++;
+                break;
+            case 'x':
+                state->encode = 1;
                 break;
 
             case 'I':
@@ -154,7 +158,8 @@ main(int argc, char **argv)
     if (!jid)
         usage(state);
 
-    if (state->bufsz < 3 || state->bufsz >= 0xffff)
+    if (state->bufsz < 3 || state->bufsz >= 0xffff
+            || (state->encode && BASE64_LENGTH(state->bufsz) + 1 > 0xffff))
         usage(state);
 
     if (state->keepalive_limit < 1)
@@ -173,8 +178,8 @@ main(int argc, char **argv)
         state->mucjid = xmppipe_mucjid(state->out, state->resource);
     }
 
-    if (xmppipe_encode_init() < 0)
-        errx(EXIT_FAILURE, "xmppipe_encode_init");
+    if (xmppipe_fmt_init() < 0)
+        errx(EXIT_FAILURE, "xmppipe_fmt_init");
 
     xmpp_initialize();
 
@@ -350,7 +355,7 @@ event_loop(xmppipe_state_t *state)
     if (xmppipe_set_nonblock(fd) < 0)
         return;
 
-    buf = xmppipe_calloc(1, state->bufsz);
+    buf = xmppipe_calloc(state->bufsz, 1);
 
     for ( ; ; ) {
         if (state->status == XMPPIPE_S_DISCONNECTED)
@@ -444,21 +449,21 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
         if (n == 0)
             return 0;
 
-        if (state->verbose)
+        if (state->verbose > 2)
             (void)fprintf(stderr, "STDIN:%s\n", buf);
 
         /* read and discard the data */
         if ((state->opt & XMPPIPE_OPT_DISCARD) && state->occupants == 0) {
             if (state->opt & XMPPIPE_OPT_DISCARD_TO_STDOUT) {
                 char *enc = NULL;
-                enc = xmppipe_encode(buf);
+                enc = xmppipe_fmt(buf);
                 (void)printf("!:%s\n", enc);
                 free(enc);
             }
             return 2;
         }
 
-        xmppipe_send_message(state, state->out, "groupchat", buf);
+        xmppipe_send_message(state, state->out, "groupchat", buf, n);
         state->interval = 0;
         return 3;
     }
@@ -798,9 +803,9 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (state->status == XMPPIPE_S_READY_AVAIL && state->occupants == 0)
         state->status = XMPPIPE_S_READY_EMPTY;
 
-    etype = xmppipe_encode(type);
-    efrom = xmppipe_encode(from);
-    eto = xmppipe_encode(to);
+    etype = xmppipe_fmt(type);
+    efrom = xmppipe_fmt(from);
+    eto = xmppipe_fmt(to);
 
     (void)printf("p:%s:%s:%s\n", etype, efrom, eto);
     state->interval = 0;
@@ -892,9 +897,22 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (!message)
         return 1;
 
-    etype = xmppipe_encode(type);
-    efrom = xmppipe_encode(from);
-    emessage = xmppipe_encode(message);
+    if (state->encode) {
+        /* Does not need to be NULL terminated, buf is passed with length */
+        size_t len = strlen(message) * 3 / 4;
+        char *buf = xmppipe_calloc(len, 1);
+        size_t n = b64_pton(message, (u_char *)buf, len);
+        if (n < 0)
+            errx(EXIT_FAILURE, "invalid base64 message");
+        emessage = xmppipe_nfmt(buf,n);
+        free(buf);
+    }
+    else {
+        emessage = xmppipe_fmt(message);
+    }
+
+    etype = xmppipe_fmt(type);
+    efrom = xmppipe_fmt(from);
 
     (void)printf("m:%s:%s:%s\n", etype, efrom, emessage);
     state->interval = 0;
@@ -991,7 +1009,8 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
 }
 
     void
-xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf)
+xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf,
+        size_t len)
 {
     xmpp_stanza_t *message = NULL;
     xmpp_stanza_t *body = NULL;
@@ -1010,7 +1029,18 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf)
     xmppipe_stanza_set_name(body, "body");
 
     text = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_text(text, buf);
+
+    if (state->encode) {
+        size_t b64len = BASE64_LENGTH(len) + 1; /* Include trailing NULL */
+        char *b64 = xmppipe_calloc(b64len, 1);
+        if (b64_ntop((u_char *)buf, len, b64, b64len) < 0)
+            errx(EXIT_FAILURE, "encode: invalid input: %u/%u", len, b64len);
+        xmppipe_stanza_set_text(text, b64);
+        free(b64);
+    }
+    else {
+        xmppipe_stanza_set_text(text, buf);
+    }
 
     xmppipe_stanza_add_child(body, text);
     xmppipe_stanza_add_child(message, body);
@@ -1093,6 +1123,7 @@ usage(xmppipe_state_t *state)
             "   -D              discard stdin and print to local stdout\n"
             "   -e              ignore stdin EOF\n"
             "   -s              exit when MUC is empty\n"
+            "   -x              base64 encode/decode data\n"
 
             "   -I <interval>   request stream management status ever interval messages\n"
             "   -k <ms>         periodically send a keepalive\n"
