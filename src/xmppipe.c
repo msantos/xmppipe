@@ -1034,7 +1034,7 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf,
         size_t b64len = BASE64_LENGTH(len) + 1; /* Include trailing NULL */
         char *b64 = xmppipe_calloc(b64len, 1);
         if (b64_ntop((u_char *)buf, len, b64, b64len) < 0)
-            errx(EXIT_FAILURE, "encode: invalid input: %u/%u", len, b64len);
+            errx(EXIT_FAILURE, "encode: invalid input: %zu/%zu", len, b64len);
         xmppipe_stanza_set_text(text, b64);
         free(b64);
     }
