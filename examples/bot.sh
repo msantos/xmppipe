@@ -29,14 +29,10 @@ bot() {
         OFS=$IFS
         IFS=:
         set -- $line
-        if [ "$#" -ne "4" ]; then
-            continue
-        fi
         if [ "$1" = "p" ]; then
             decode "$line" 1>&2
             echo 1>&2
-        fi
-        if [ "$1" = "m" ]; then
+        elif [ "$1" = "m" ]; then
             USER="$(decode ${3#*%2F})"
             IFS=$OFS
             MSG="$(decode $4)"
