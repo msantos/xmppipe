@@ -555,6 +555,10 @@ handle_sm_ack(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     u_int32_t ack = 0;
 
     h = xmpp_stanza_get_attribute(stanza, "h");
+
+    if (!h)
+        return 1;
+
     ack = (u_int32_t)atoi(h); /* XXX */
 
     if (state->verbose)
@@ -602,8 +606,13 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
             item = xmpp_stanza_get_next(item)) {
         xmpp_stanza_t *iq, *reply;
         char *jid = NULL;
+        char *name = NULL;
 
-        if (XMPPIPE_STRNEQ(xmpp_stanza_get_name(item), "item"))
+        name = xmpp_stanza_get_name(item);
+        if (!name)
+            continue;
+
+        if (XMPPIPE_STRNEQ(name, "item"))
             continue;
 
         jid = xmpp_stanza_get_attribute(item, "jid");
@@ -648,11 +657,21 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     for (child = xmpp_stanza_get_children(query); child != NULL;
             child = xmpp_stanza_get_next(child)) {
-        if (XMPPIPE_STRNEQ(xmpp_stanza_get_name(child), "feature"))
+        char *feature = NULL;
+        char *var = NULL;
+
+        feature = xmpp_stanza_get_name(child);
+        if (!feature)
             continue;
 
-        if (XMPPIPE_STRNEQ(xmpp_stanza_get_attribute(child, "var"),
-                    "http://jabber.org/protocol/muc"))
+        if (XMPPIPE_STRNEQ(feature, "feature"))
+            continue;
+
+        var = xmpp_stanza_get_attribute(child, "var");
+        if (!var)
+            continue;
+
+        if (XMPPIPE_STRNEQ(var, "http://jabber.org/protocol/muc"))
             continue;
 
         state->mucservice = xmppipe_strdup(from);
@@ -697,6 +716,9 @@ handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmppipe_stanza_set_id(reply, id);
 
     from = xmpp_stanza_get_attribute(stanza, "from");
+    if (!from)
+        return 1;
+
     xmppipe_stanza_set_attribute(reply, "to",  from);
 
     query = xmppipe_stanza_new(ctx);
@@ -877,8 +899,10 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         return 1;
 
     from = xmpp_stanza_get_attribute(stanza, "from");
-    type = xmpp_stanza_get_type(stanza);
+    if (!from)
+        return 1;
 
+    type = xmpp_stanza_get_type(stanza);
     if (!type)
         return 1;
 
