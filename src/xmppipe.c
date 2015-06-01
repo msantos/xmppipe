@@ -73,11 +73,13 @@ main(int argc, char **argv)
     state->keepalive = 60 * 1000;
     state->keepalive_limit = 3;
     state->sm_request_interval = 1;
+    state->sm_fc = 15;
+    state->sm_unacked = 5;
 
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
-    while ( (ch = getopt(argc, argv, "a:dDehI:k:K:m:o:P:p:r:sS:u:vx")) != -1) {
+    while ( (ch = getopt(argc, argv, "a:c:dDehI:k:K:m:o:P:p:r:sS:u:U:vx")) != -1) {
         switch (ch) {
             case 'u':
                 /* username/jid */
@@ -114,6 +116,10 @@ main(int argc, char **argv)
                 state->encode = 1;
                 break;
 
+            case 'c':
+                /* XEP-0198: stream management flow control */
+                state->sm_fc = (u_int32_t)atoi(optarg);
+                break;
             case 'I':
                 /* XEP-0198: stream management request interval */
                 state->sm_request_interval = (u_int32_t)atoi(optarg);
@@ -133,6 +139,10 @@ main(int argc, char **argv)
             case 'P':
                 /* poll delay */
                 state->poll = (u_int32_t)atoi(optarg);
+                break;
+            case 'U':
+                /* XEP-0198: stream management unacked requests */
+                state->sm_unacked = (u_int32_t)atoi(optarg);
                 break;
 
             case 'd':
@@ -361,6 +371,16 @@ event_loop(xmppipe_state_t *state)
         if (state->status == XMPPIPE_S_DISCONNECTED)
             goto XMPPIPE_EXIT;
 
+        if (state->sm_enabled &&
+                ( (state->sm_request_unack > state->sm_unacked)
+                 || (state->sm_request - state->sm_ack_sent > state->sm_fc))) {
+            if (state->verbose)
+                (void)fprintf(stderr, "WAIT: request=%u ack_sent=%u unack=%u\n",
+                        state->sm_request, state->sm_ack_sent,
+                        state->sm_request_unack);
+            goto XMPPIPE_POLL;
+        }
+
         if (eof) {
             if (state->opt & XMPPIPE_OPT_EOF)
                 goto XMPPIPE_POLL;
@@ -564,6 +584,8 @@ handle_sm_ack(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (state->verbose)
         (void)fprintf(stderr, "SM: request=%u ack=%u last=%u\n",
                 state->sm_request, ack, state->sm_ack_sent);
+
+    state->sm_request_unack = 0;
 
     /* Number of stanzas received by server exceeds the number sent by
      * the client.
@@ -1118,6 +1140,7 @@ xmppipe_send(xmppipe_state_t *state, xmpp_stanza_t *const stanza)
     xmppipe_stanza_set_name(r, "r");
     xmppipe_stanza_set_ns(r, "urn:xmpp:sm:3");
     xmpp_send(state->conn, r);
+    state->sm_request_unack++;
 
     (void)xmpp_stanza_release(r);
 }
@@ -1150,7 +1173,7 @@ usage(xmppipe_state_t *state)
             "   -x              base64 encode/decode data\n"
 
             "   -I <interval>   request stream management status ever interval messages\n"
-            "   -k <ms>         periodically send a keepalive\n"
+            "   -k <seconds>    periodically send a keepalive\n"
             "   -K <count>      number of keepalive failures before exiting\n"
             "   -m <size>       size of read buffer\n"
             "   -P <ms>         poll delay\n"

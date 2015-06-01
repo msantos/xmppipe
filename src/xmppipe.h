@@ -76,10 +76,14 @@ typedef struct {
     int sm_enabled;     /* stanzas: iq, message, presence */
 
     u_int32_t sm_request; /* count of sent stanzas */
+    u_int32_t sm_request_unack; /* count of unacknowledged stream management requests */
     u_int32_t sm_request_interval; /* request ack every interval stanzas */
 
     u_int32_t sm_ack_recv;  /* count of stanzas received from server */
-    u_int32_t sm_ack_sent;  /* count of stanzas sent from client from server */
+    u_int32_t sm_ack_sent;  /* server's count of stanzas we've sent */
+
+    u_int32_t sm_unacked;
+    u_int32_t sm_fc;
 
     int opt;
     int verbose;
