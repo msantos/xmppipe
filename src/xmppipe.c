@@ -79,7 +79,7 @@ main(int argc, char **argv)
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
-    while ( (ch = getopt(argc, argv, "a:c:dDehI:k:K:m:o:P:p:r:sS:u:U:vx")) != -1) {
+    while ( (ch = getopt(argc, argv, "a:b:c:dDehI:k:K:o:P:p:r:sS:u:U:vx")) != -1) {
         switch (ch) {
             case 'u':
                 /* username/jid */
@@ -94,15 +94,16 @@ main(int argc, char **argv)
                 state->room = xmppipe_strdup(optarg);
                 break;
             case 'a': {
-                /* address:port */
-                char *p = NULL;
-                addr = xmppipe_strdup(optarg);
-                p = strchr(addr, ':');
-                if (p) {
-                    *p++ = '\0';
-                    port = (u_int16_t)atoi(p);
+                    /* address:port */
+                    char *p = NULL;
+                    addr = xmppipe_strdup(optarg);
+                    p = strchr(addr, ':');
+                    if (p) {
+                        *p++ = '\0';
+                        port = (u_int16_t)atoi(p);
+                    }
                 }
-            }
+                break;
             case 'r':
                 state->resource = xmppipe_strdup(optarg);
                 break;
@@ -116,6 +117,10 @@ main(int argc, char **argv)
                 state->encode = 1;
                 break;
 
+            case 'b':
+                /* read buffer size */
+                state->bufsz = (size_t)atoi(optarg);
+                break;
             case 'c':
                 /* XEP-0198: stream management flow control */
                 state->sm_fc = (u_int32_t)atoi(optarg);
@@ -131,10 +136,6 @@ main(int argc, char **argv)
             case 'K':
                 /* XEP-0199: number of keepalive without a reply */
                 state->keepalive_limit = (u_int32_t)atoi(optarg);
-                break;
-            case 'm':
-                /* read buffer size */
-                state->bufsz = (size_t)atoi(optarg);
                 break;
             case 'P':
                 /* poll delay */
@@ -210,7 +211,7 @@ main(int argc, char **argv)
         errx(EXIT_FAILURE, "connection failed");
 
     if (xmppipe_connect_init(state) < 0)
-        errx(EXIT_FAILURE, "XMPP connection failed");
+        errx(EXIT_FAILURE, "XMPP handshake failed");
 
     if (xmppipe_stream_init(state) < 0)
         errx(EXIT_FAILURE, "enabling stream management failed");
@@ -1172,10 +1173,10 @@ usage(xmppipe_state_t *state)
             "   -s              exit when MUC is empty\n"
             "   -x              base64 encode/decode data\n"
 
+            "   -b <size>       size of read buffer\n"
             "   -I <interval>   request stream management status ever interval messages\n"
             "   -k <seconds>    periodically send a keepalive\n"
             "   -K <count>      number of keepalive failures before exiting\n"
-            "   -m <size>       size of read buffer\n"
             "   -P <ms>         poll delay\n"
             "   -v              verbose\n",
             __progname
