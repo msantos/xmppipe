@@ -68,7 +68,7 @@ main(int argc, char **argv)
     state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
     state->status = XMPPIPE_S_CONNECTING;
-    state->bufsz = 4097;
+    state->bufsz = 2049;
     state->poll = 10;
     state->keepalive = 60 * 1000;
     state->keepalive_limit = 3;
