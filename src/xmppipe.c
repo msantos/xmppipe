@@ -33,6 +33,7 @@ int handle_message(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_presence(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_presence_error(xmpp_conn_t * const, xmpp_stanza_t * const,
         void * const);
+int handle_ping_reply(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_request(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_enabled(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_ack(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
@@ -298,6 +299,7 @@ xmppipe_muc_init(xmppipe_state_t *state)
     xmpp_handler_add(state->conn, handle_version,
             "jabber:iq:version", "iq", NULL, state);
     xmpp_handler_add(state->conn, handle_message, NULL, "message", NULL, state);
+    xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 
     /* Discover the MUC service */
     if (!state->out) {
@@ -978,7 +980,7 @@ handle_ping_reply(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 {
     xmppipe_state_t *state = userdata;
     state->keepalive_fail = 0;
-    return 0;
+    return 1;
 }
 
     void
@@ -1119,7 +1121,6 @@ xmppipe_ping(xmppipe_state_t *state)
     (void)xmpp_stanza_release(iq);
 
     state->keepalive_fail++;
-    xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 }
 
     void
