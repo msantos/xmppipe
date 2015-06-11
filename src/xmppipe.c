@@ -815,7 +815,7 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
                 item = xmpp_stanza_get_next(item)) {
             char *name = xmpp_stanza_get_name(item);
 
-            if (XMPPIPE_STREQ(name, "status")) {
+            if (name && XMPPIPE_STREQ(name, "status")) {
                 code = xmpp_stanza_get_attribute(item, "code");
                 if (code && XMPPIPE_STREQ(code, "110")) {
                     /* Check for nick conflict */

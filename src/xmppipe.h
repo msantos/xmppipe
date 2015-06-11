@@ -21,7 +21,7 @@
 
 #include <strophe.h>
 
-#define XMPPIPE_VERSION "0.6.0"
+#define XMPPIPE_VERSION "0.6.1"
 
 #define XMPPIPE_STREQ(a,b)      !strcmp((a),(b))
 #define XMPPIPE_STRNEQ(a,b)     strcmp((a),(b))
