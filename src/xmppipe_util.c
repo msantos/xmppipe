@@ -47,7 +47,7 @@ xmppipe_strdup(const char *s)
 {
     char *buf = NULL;
 
-    if (!*s)
+    if (!s)
         errx(2, "invalid string");
 
     buf = strdup(s);
