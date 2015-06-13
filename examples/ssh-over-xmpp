@@ -1,0 +1,68 @@
+#!/bin/bash
+
+## Tunnel ssh over an XMPP MUC
+##
+## Server (system with access to the SSH and XMPP server):
+##
+##  # ssh-over-xmpp server <conference> <IP address> <port>
+##  ssh-over-xmpp server sshxmpp 1.2.3.4 22
+##
+## Client (system with access to the XMPP server):
+##
+##  ssh -o ProxyCommand="ssh-over-xmpp client sshxmpp" 127.0.0.1
+##
+
+#set -x
+set -e
+set -u
+set -o pipefail
+
+PROGNAME=$0
+TMPDIR=/tmp/sshxmpp.$$
+out=$TMPDIR/out
+
+atexit() {
+    rm -rf $TMPDIR
+}
+
+decode() {
+    while read line; do
+        OFS=$IFS
+        IFS=:
+        set -- $line
+        [ "$1" = "m" ] && printf '%b' "${4//%/\\x}"
+        IFS=$OFS
+    done
+}
+
+server() {
+    CONNECT=0
+    xmppipe -e -r server -o $1 -b 1024 -x < /dev/null | \
+    while read line; do
+        case $line in
+            p*)
+                CONNECT=$((CONNECT + 1))
+                if [ "$CONNECT" -gt "1" ]; then
+                    exec "$PROGNAME" session $@
+                fi
+                ;;
+            *) ;;
+        esac
+    done > /dev/null
+
+}
+
+session(){
+    mkdir -p $TMPDIR
+    trap atexit 0
+
+    mkfifo $out
+
+    nc $2 $3 < $out | xmppipe -P 1 -r session -o $1 -b 1024 -x -s | decode > $out
+}
+
+client() {
+    xmppipe -P 1 -r client -o $1 -b 1024 -x -s | decode
+}
+
+$@
