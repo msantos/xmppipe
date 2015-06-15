@@ -58,11 +58,11 @@ session(){
 
     mkfifo $out
 
-    nc $2 $3 < $out | xmppipe -P 1 -r session -o $1 -b 1024 -x -s | decode > $out
+    nc $2 $3 < $out | xmppipe -P 100 -r session -o $1 -x -s | decode > $out
 }
 
 client() {
-    xmppipe -P 1 -r client -o $1 -b 1024 -x -s | decode
+    xmppipe -P 100 -r client -o $1 -x -s | decode
 }
 
 $@
