@@ -512,6 +512,7 @@ handle_connection(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
             state->status = XMPPIPE_S_DISCONNECTED;
             if (state->verbose)
                 fprintf(stderr, "DEBUG: disconnected\n");
+            errx(EXIT_FAILURE, "handle_connection: disconnected");
     }
 }
 
