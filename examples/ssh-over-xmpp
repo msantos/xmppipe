@@ -30,7 +30,7 @@ decode() {
         OFS=$IFS
         IFS=:
         set -- $line
-        [ "$1" = "m" ] && printf '%b' "${4//%/\\x}"
+        [ "$1" = "m" ] && printf '%b' "${!#//%/\\x}"
         IFS=$OFS
     done
 }

@@ -35,7 +35,7 @@ bot() {
         elif [ "$1" = "m" ]; then
             USER="$(decode ${3#*%2F})"
             IFS=$OFS
-            MSG="$(decode $4)"
+            MSG="$(decode ${!#})"
             case $MSG in
                 *"has set the subject to:"*) ;;
                 "sudo make me a sandwich")

@@ -916,9 +916,11 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     char *message = NULL;
     char *type = NULL;
     char *from = NULL;
+    char *to = NULL;
 
     char *etype = NULL;
     char *efrom = NULL;
+    char *eto = NULL;
     char *emessage = NULL;
 
     if (xmpp_stanza_get_child_by_name(stanza, "delay"))
@@ -926,6 +928,10 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     from = xmpp_stanza_get_attribute(stanza, "from");
     if (!from)
+        return 1;
+
+    to = xmpp_stanza_get_attribute(stanza, "to");
+    if (!to)
         return 1;
 
     type = xmpp_stanza_get_type(stanza);
@@ -963,13 +969,15 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     etype = xmppipe_fmt(type);
     efrom = xmppipe_fmt(from);
+    eto = xmppipe_fmt(to);
 
-    (void)printf("m:%s:%s:%s\n", etype, efrom, emessage);
+    (void)printf("m:%s:%s:%s:%s\n", etype, efrom, eto, emessage);
     state->interval = 0;
 
     free(message);
     free(etype);
     free(efrom);
+    free(eto);
     free(emessage);
 
     return 1;
