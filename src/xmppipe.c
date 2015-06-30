@@ -958,8 +958,6 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         size_t len = strlen(message) * 3 / 4;
         char *buf = xmppipe_calloc(len, 1);
         size_t n = b64_pton(message, (u_char *)buf, len);
-        if (n < 0)
-            errx(EXIT_FAILURE, "invalid base64 message");
         emessage = xmppipe_nfmt(buf,n);
         free(buf);
     }
