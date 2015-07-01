@@ -14,9 +14,10 @@
  */
 #include "xmppipe.h"
 
-#include <resolv.h>
 #include <sys/select.h>
 #include <sys/types.h>
+#include <netinet/in.h>
+#include <resolv.h>
 
 extern char *__progname;
 

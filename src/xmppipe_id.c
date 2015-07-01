@@ -14,17 +14,33 @@
  */
 #include "xmppipe.h"
 
+#if defined(__linux__)
 #include <uuid/uuid.h>
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#include <uuid.h>
+#endif
 
     char *
 xmppipe_id_alloc()
 {
-    uuid_t uu = {0};
+    uuid_t uuid = {0};
     char *out = NULL;
 
+#if defined(__linux__) || defined(__sunos__) || (defined(__APPLE__) && defined(__MACH__))
     out = xmppipe_calloc(37,1);
-    uuid_generate(uu);
-    uuid_unparse(uu, out);
+    uuid_generate(uuid);
+    uuid_unparse(uuid, out);
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+    uint32_t status = 0;
+
+    uuid_create(&uuid, &status);
+    if (status != uuid_s_ok)
+        return NULL;
+
+    uuid_to_string(&uuid, &out, &status);
+    if (status != uuid_s_ok)
+        return NULL;
+#endif
 
     return out;
 }
