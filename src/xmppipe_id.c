@@ -14,7 +14,7 @@
  */
 #include "xmppipe.h"
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__sunos__) || (defined(__APPLE__) && defined(__MACH__))
 #include <uuid/uuid.h>
 #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 #include <uuid.h>
