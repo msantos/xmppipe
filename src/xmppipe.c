@@ -168,7 +168,7 @@ main(int argc, char **argv)
         }
     }
 
-    if (!jid)
+    if (jid == NULL)
         usage(state);
 
     if (state->bufsz < 3 || state->bufsz >= 0xffff
@@ -180,10 +180,10 @@ main(int argc, char **argv)
 
     state->server = xmppipe_servername(jid);
 
-    if (!state->room)
+    if (state->room == NULL)
         state->room = xmppipe_roomname("stdout");
 
-    if (!state->resource)
+    if (state->resource == NULL)
         state->resource = xmppipe_strdup("xmppipe");
 
     if (strchr(state->room, '@')) {
@@ -199,11 +199,11 @@ main(int argc, char **argv)
     log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG);
 
     state->ctx = xmpp_ctx_new(NULL, (state->verbose > 1 ? log : NULL));
-    if (!state->ctx)
+    if (state->ctx == NULL)
         errx(EXIT_FAILURE, "could not allocate context");
 
     state->conn = xmpp_conn_new(state->ctx);
-    if (!state->conn)
+    if (state->conn == NULL)
         errx(EXIT_FAILURE, "could not allocate connection");
 
     xmpp_conn_set_jid(state->conn, jid);
@@ -303,7 +303,7 @@ xmppipe_muc_init(xmppipe_state_t *state)
     xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 
     /* Discover the MUC service */
-    if (!state->out) {
+    if (state->out == NULL) {
         xmpp_handler_add(state->conn, handle_disco_items,
                 "http://jabber.org/protocol/disco#items", "iq", "result",
                 state);
@@ -525,7 +525,7 @@ handle_null(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     char *name = NULL;
 
     name = xmpp_stanza_get_name(stanza);
-    if (!name)
+    if (name == NULL)
         return 1;
 
     if (XMPPIPE_STREQ(name, "iq")
@@ -581,7 +581,7 @@ handle_sm_ack(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     h = xmpp_stanza_get_attribute(stanza, "h");
 
-    if (!h)
+    if (h == NULL)
         return 1;
 
     ack = (u_int32_t)atoi(h); /* XXX */
@@ -626,7 +626,7 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     query = xmpp_stanza_get_child_by_name(stanza, "query");
 
-    if (!query)
+    if (query == NULL)
         return 1;
 
     for (item = xmpp_stanza_get_children(query); item != NULL;
@@ -636,14 +636,14 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         char *name = NULL;
 
         name = xmpp_stanza_get_name(item);
-        if (!name)
+        if (name == NULL)
             continue;
 
         if (XMPPIPE_STRNEQ(name, "item"))
             continue;
 
         jid = xmpp_stanza_get_attribute(item, "jid");
-        if (!jid)
+        if (jid == NULL)
             continue;
 
         iq = xmppipe_stanza_new(ctx);
@@ -674,12 +674,12 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     from = xmpp_stanza_get_attribute(stanza, "from");
 
-    if (!from)
+    if (from == NULL)
         return 1;
 
     query = xmpp_stanza_get_child_by_name(stanza, "query");
 
-    if (!query)
+    if (query == NULL)
         return 1;
 
     for (child = xmpp_stanza_get_children(query); child != NULL;
@@ -688,14 +688,14 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         char *var = NULL;
 
         feature = xmpp_stanza_get_name(child);
-        if (!feature)
+        if (feature == NULL)
             continue;
 
         if (XMPPIPE_STRNEQ(feature, "feature"))
             continue;
 
         var = xmpp_stanza_get_attribute(child, "var");
-        if (!var)
+        if (var == NULL)
             continue;
 
         if (XMPPIPE_STRNEQ(var, "http://jabber.org/protocol/muc"))
@@ -737,13 +737,13 @@ handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmppipe_stanza_set_type(reply, "result");
 
     id = xmpp_stanza_get_attribute(stanza, "from");
-    if (!id)
+    if (id == NULL)
         return 1;
 
     xmppipe_stanza_set_id(reply, id);
 
     from = xmpp_stanza_get_attribute(stanza, "from");
-    if (!from)
+    if (from == NULL)
         return 1;
 
     xmppipe_stanza_set_attribute(reply, "to",  from);
@@ -752,7 +752,7 @@ handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmppipe_stanza_set_name(query, "query");
 
     child = xmpp_stanza_get_children(stanza);
-    if (!child) {
+    if (child == NULL) {
         (void)xmpp_stanza_release(query);
         return 1;
     }
@@ -807,7 +807,7 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     from = xmpp_stanza_get_attribute(stanza, "from");
     to = xmpp_stanza_get_attribute(stanza, "to");
 
-    if (!from || !to)
+    if (from == NULL || to == NULL)
         return 1;
 
     x = xmpp_stanza_get_child_by_name(stanza, "x");
@@ -836,10 +836,10 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     type = xmpp_stanza_get_attribute(stanza, "type");
 
-    if (!type)
+    if (type == NULL)
         type = "available";
 
-    if (!me && XMPPIPE_STREQ(type, "available")) {
+    if (me != 0 && XMPPIPE_STREQ(type, "available")) {
         state->occupants++;
     }
     else if (XMPPIPE_STREQ(type, "unavailable") && (state->occupants > 0)) {
@@ -882,7 +882,7 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     from = xmpp_stanza_get_attribute(stanza, "from");
     to = xmpp_stanza_get_attribute(stanza, "to");
 
-    if (!from || !to)
+    if (from == NULL || to == NULL)
         return 1;
 
     /* Check error is to our JID (user@example.org/binding) */
@@ -894,7 +894,7 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         return 1;
 
     error = xmpp_stanza_get_child_by_name(stanza, "error");
-    if (!error)
+    if (error == NULL)
         return 1;
 
     code = xmpp_stanza_get_attribute(error, "code");
@@ -928,30 +928,27 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         return 1;
 
     from = xmpp_stanza_get_attribute(stanza, "from");
-    if (!from)
+    if (from == NULL)
         return 1;
 
     to = xmpp_stanza_get_attribute(stanza, "to");
-    if (!to)
+    if (to == NULL)
         return 1;
 
     type = xmpp_stanza_get_type(stanza);
-    if (!type)
+    if (type == NULL)
         return 1;
 
     /* Check if the message is from us */
     if (XMPPIPE_STREQ(type, "groupchat") && XMPPIPE_STREQ(from, state->mucjid))
         return 1;
 
-    if (!xmpp_stanza_get_child_by_name(stanza, "body"))
-        return 1;
-
     child = xmpp_stanza_get_child_by_name(stanza, "body");
-    if (!child)
+    if (child == NULL)
         return 1;
 
     message = xmpp_stanza_get_text(child);
-    if (!message)
+    if (message == NULL)
         return 1;
 
     if (state->encode) {
@@ -1140,7 +1137,7 @@ xmppipe_send(xmppipe_state_t *state, xmpp_stanza_t *const stanza)
 
     xmpp_send(state->conn, stanza);
 
-    if (!state->sm_enabled)
+    if (state->sm_enabled == 0)
         return;
 
     if (state->sm_request % state->sm_request_interval != 0)

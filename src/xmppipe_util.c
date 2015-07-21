@@ -36,7 +36,7 @@ xmppipe_getenv(const char *s)
 {
     char *p = getenv(s);
 
-    if (!p)
+    if (p == NULL)
         return NULL;
 
     return xmppipe_strdup(p);
@@ -47,11 +47,11 @@ xmppipe_strdup(const char *s)
 {
     char *buf = NULL;
 
-    if (!s)
+    if (s == NULL)
         errx(2, "invalid string");
 
     buf = strdup(s);
-    if (!buf)
+    if (buf == NULL)
         err(3, "allocation failure");
 
     return buf;
@@ -66,7 +66,7 @@ xmppipe_malloc(size_t size)
         errx(2, "invalid size: %zd", size);
 
     buf = malloc(size);
-    if (!buf)
+    if (buf == NULL)
         err(3, "allocation failure");
 
     return buf;
@@ -77,9 +77,8 @@ xmppipe_calloc(size_t nmemb, size_t size)
 {
     char *buf = NULL;
 
-    /* XXX overflow */
     buf = calloc(nmemb, size);
-    if (!buf)
+    if (buf == NULL)
         err(3, "allocation failure");
 
     return buf;
@@ -90,7 +89,7 @@ xmppipe_stanza_new(xmpp_ctx_t *ctx)
 {
     xmpp_stanza_t *s = xmpp_stanza_new(ctx);
 
-    if (!s)
+    if (s == NULL)
         err(3, "allocation failure");
 
     return s;
@@ -161,7 +160,7 @@ xmppipe_servername(char *jid)
     char *p = strchr(buf, '@');
     char *q;
 
-    if (!p) {
+    if (p == NULL) {
         free(buf);
         return NULL;
     }
