@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2016, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -34,7 +34,7 @@ xmppipe_nfmt(const char *s, size_t len)
     char *buf = xmppipe_calloc(len * 3 + 1, 1);
     char *p = buf;
     int n = 0;
-    int i = 0;
+    size_t i = 0;
 
     for (i = 0; i < len; i++) {
         unsigned char c = s[i];
