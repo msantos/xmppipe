@@ -67,7 +67,7 @@ xmppipe_malloc(size_t size)
 
     buf = malloc(size);
     if (buf == NULL)
-        err(3, "xmppipe_malloc");
+        err(3, "xmppipe_malloc: %zu", size);
 
     return buf;
 }
@@ -79,7 +79,7 @@ xmppipe_calloc(size_t nmemb, size_t size)
 
     buf = calloc(nmemb, size);
     if (buf == NULL)
-        err(3, "xmppipe_calloc");
+        err(3, "xmppipe_calloc: %zu/%zu", nmemb, size);
 
     return buf;
 }
