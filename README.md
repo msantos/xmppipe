@@ -1,13 +1,13 @@
 xmppipe: stdio over XMPP
 ========================
 
-xmppipe can be used in a shell pipeline to redirect stdin/stdout to an XMPP
-MUC (XEP-0045). xmppipe supports flow control using stream management
+xmppipe redirects stdin/stdout in a shell pipeline to an XMPP MUC
+(XEP-0045). xmppipe supports flow control using stream management
 (XEP-0198) and can optionally deal with overload by acting as a circuit
 breaker or discarding messages.
 
-To support line oriented tools like grep, sed and awk, the message body
-is percent escaped.
+xmppipe works with line oriented tools like grep, sed and awk by
+outputting each message as a newline terminated, percent escaped string.
 
 Usage
 -----
@@ -17,6 +17,22 @@ Usage
     XMPPIPE_USERNAME=me@example.com
     XMPPIPE_PASSWORD="password"
     xmppipe -o muc
+
+Requirements
+------------
+
+* [libstrophe](https://github.com/strophe/libstrophe)
+
+* Linux: libuuid
+
+~~~
+apt-get install uuid-dev
+~~~
+
+Build
+-----
+
+    $ make
 
 Options
 -------
@@ -74,8 +90,8 @@ Options
 -v
 :   Increase verbosity
 
-Decoding Percent Escaped
-------------------------
+Decoding Percent Escaped Strings
+--------------------------------
 
 Using bash:
 
@@ -155,7 +171,7 @@ xmppipe "$@" <$in >$out
 
 ### SSH over XMPP
 
-See examples/ssh-over-xmpp:
+See [examples/ssh-over-xmpp](https://github.com/msantos/xmppipe/blob/master/examples/ssh-over-xmpp):
 
 ~~~
 # Server: has access to the destination SSH server
@@ -166,9 +182,23 @@ ssh-over-xmpp server sshxmpp 1.2.3.4 22
 ssh -o ProxyCommand="ssh-over-xmpp client sshxmpp" 127.0.0.1
 ~~~
 
-### Mirror a shell
+### Stream Events from Riemann
 
-### Mirror a shell to a web page
+This example will stream events from a query to an XMPP MUC using
+[Riemann's](https://github.com/riemann/riemann) SSE interface. The events
+are written to a named pipe to avoid buffering.
+
+~~~
+mkfifo riemann
+curl -s --get --data subscribe=true \
+    --data-urlencode 'query=(service ~= "^example")' \
+    http://example.com:80/index < /dev/null > riemann &
+xmppipe -o "muc" -d -vv -S "riemann events" < riemann
+~~~
+
+### Mirror a terminal session
+
+### Mirror a terminal session to a web page
 
 Environment Variables
 ---------------------
