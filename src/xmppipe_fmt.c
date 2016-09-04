@@ -33,15 +33,17 @@ xmppipe_nfmt(const char *s, size_t len)
 {
     char *buf = xmppipe_calloc(len * 3 + 1, 1);
     char *p = buf;
-    int n = 0;
     size_t i = 0;
 
     for (i = 0; i < len; i++) {
         unsigned char c = s[i];
-        n = rfc3986[c]
-            ? sprintf(p, "%c", rfc3986[c])
-            : sprintf(p, "%%%02X", c);
-        p += n;
+        if (rfc3986[c]) {
+            *p = c;
+            p++;
+        }
+        else {
+            p += sprintf(p, "%%%02X", c);
+        }
     }
 
     return buf;
