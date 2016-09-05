@@ -6,8 +6,9 @@ xmppipe redirects stdin/stdout in a shell pipeline to an XMPP MUC
 (XEP-0198) and can optionally deal with overload by acting as a circuit
 breaker or discarding messages.
 
-xmppipe works with line oriented tools like grep, sed and awk by
-outputting each message as a newline terminated, percent escaped string.
+xmppipe works with line oriented tools like grep, sed and
+awk by outputting each message as a newline terminated,
+[percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding) string.
 
 Usage
 -----
@@ -90,7 +91,7 @@ Options
 -v
 :   Increase verbosity
 
-Decoding Percent Escaped Strings
+Decoding Percent-Encoded Strings
 --------------------------------
 
 Using bash:
@@ -173,7 +174,7 @@ xmppipe "$@" <$in >$out
 
 See [examples/ssh-over-xmpp](https://github.com/msantos/xmppipe/blob/master/examples/ssh-over-xmpp):
 
-~~~
+~~~ shell
 # Server: has access to the destination SSH server
 # ssh-over-xmpp server <conference> <IP address> <port>
 ssh-over-xmpp server sshxmpp 1.2.3.4 22
@@ -188,7 +189,7 @@ This example will stream events from a query to an XMPP MUC using
 [Riemann's](https://github.com/riemann/riemann) SSE interface. The events
 are written to a named pipe to avoid buffering.
 
-~~~
+~~~ shell
 mkfifo riemann
 curl -s --get --data subscribe=true \
     --data-urlencode 'query=(service ~= "^example")' \
@@ -219,7 +220,7 @@ Each message is terminated by a new line. Message fields are separated by
 
 Example:
 
-    p:available:test%40muc.example.com%2Fxmppipe:occupant%40example.com%2F1234
+    p:available:test@muc.example.com/xmppipe:occupant@example.com/1234
 
 ### Message
 
@@ -227,8 +228,8 @@ Example:
 
 Example:
 
-    m:groupchat:test%40muc.example.com%2Fmobile:user1%40example.com%2F1234:Hello
-    m:chat:user1%40example.com%2Fmobile:user2%40example.com:Message%20goes%20here
+    m:groupchat:test@muc.example.com/mobile:user1@example.com/1234:Hello
+    m:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here
 
 TODO
 ----

@@ -22,7 +22,9 @@ xmppipe_fmt_init()
     int i = 0;
 
     for (i = 0; i < 256; i++)
-        rfc3986[i] = isalnum(i) || i == '~' || i == '-' || i == '.' || i == '_'
+        rfc3986[i] = isalnum(i)
+            || i == '~' || i == '-' || i == '.' || i == '_'
+            || i == '@' || i == '/'
             ? i : 0;
 
     return 0;
