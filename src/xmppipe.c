@@ -482,6 +482,7 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
                 char *enc = NULL;
                 enc = xmppipe_fmt(buf);
                 (void)printf("!:%s\n", enc);
+                (void)fflush(stdout);
                 free(enc);
             }
             return 2;
@@ -857,6 +858,8 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     eto = xmppipe_fmt(to);
 
     (void)printf("p:%s:%s:%s\n", etype, efrom, eto);
+    (void)fflush(stdout);
+
     state->interval = 0;
 
     free(etype);
@@ -968,6 +971,8 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     eto = xmppipe_fmt(to);
 
     (void)printf("m:%s:%s:%s:%s\n", etype, efrom, eto, emessage);
+    (void)fflush(stdout);
+
     state->interval = 0;
 
     free(message);
