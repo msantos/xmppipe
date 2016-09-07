@@ -1185,7 +1185,7 @@ usage(xmppipe_state_t *state)
             "   -x              base64 encode/decode data\n"
 
             "   -b <size>       size of read buffer\n"
-            "   -I <interval>   request stream management status ever interval messages\n"
+            "   -I <interval>   request stream management status every interval messages\n"
             "   -k <seconds>    periodically send a keepalive\n"
             "   -K <count>      number of keepalive failures before exiting\n"
             "   -P <ms>         poll delay\n"

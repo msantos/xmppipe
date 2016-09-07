@@ -4,7 +4,7 @@ xmppipe: stdio over XMPP
 xmppipe redirects stdin/stdout in a shell pipeline to an XMPP MUC
 (XEP-0045). xmppipe supports flow control using stream management
 (XEP-0198) and can optionally deal with overload by acting as a circuit
-breaker or discarding messages.
+breaker or by discarding messages.
 
 xmppipe works with line oriented tools like grep, sed and
 awk by outputting each message as a newline terminated,
@@ -77,7 +77,7 @@ Options
 :   Size of read buffer
 
 -I *interval*
-:   Request stream management status ever interval messages
+:   Request stream management status every interval messages
 
 -k *seconds* 
 :   Periodically send a keepalive
