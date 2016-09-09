@@ -467,11 +467,8 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
     if (FD_ISSET(fd, &rfds)) {
         n = read(fd, buf, len);
 
-        if (n < 0)
-            return -1;
-
-        if (n == 0)
-            return 0;
+        if (n <= 0)
+            return n;
 
         if (state->verbose > 2)
             (void)fprintf(stderr, "STDIN:%s\n", buf);
