@@ -10,6 +10,9 @@ xmppipe works with line oriented tools like grep, sed and
 awk by outputting each message as a newline terminated,
 [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding) string.
 
+xmppipe can be used in shell scripts to quickly write interactive bots
+for monitoring systems or for sending alerts.
+
 Usage
 -----
 
@@ -230,6 +233,11 @@ Example:
 
     m:groupchat:test@muc.example.com/mobile:user1@example.com/1234:Hello
     m:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here
+
+Compatibility
+-------------
+
+Tested with ejabberd and mongooseim.
 
 TODO
 ----
