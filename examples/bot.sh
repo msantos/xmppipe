@@ -1,11 +1,16 @@
 #!/bin/bash
 
-#set -x
-set -e
-set -u
+set -o errexit
+set -o nounset
 set -o pipefail
 
 trap cleanup 0
+
+BOT_DEBUG=${BOT_DEBUG-""}
+
+if [ "$BOT_DEBUG" ]; then
+set -x
+fi
 
 TMPDIR=$(mktemp -d)
 
@@ -24,9 +29,9 @@ decode() {
 }
 
 bot() {
-    DEBUG=0
+    local DEBUG=0
+    OFS=$IFS
     while read line; do
-        OFS=$IFS
         IFS=:
         set -- $line
         if [ "$1" = "p" ]; then
@@ -55,11 +60,7 @@ bot() {
                     exit 0
                     ;;
                 debug)
-                    if [ "$DEBUG" = "0" ]; then
-                        DEBUG=1
-                    else
-                        DEBUG=0
-                    fi
+                    DEBUG=$(( DEBUG ? 0 : 1 ))
                     ;;
                 *)
                     if [ "$DEBUG" == "0" ]; then
@@ -70,7 +71,6 @@ bot() {
                     ;;
             esac
         fi
-        IFS=$OFS
     done < $out
 }
 
