@@ -99,8 +99,10 @@ Decoding Percent-Encoded Strings
 
 Using bash:
 
-~~~
-printf '%b' "${1//%/\\x}"
+~~~ shell
+decode() {
+    printf '%b' "${1//%/\\x}"
+}
 ~~~
 
 Examples
@@ -200,7 +202,42 @@ curl -s --get --data subscribe=true \
 xmppipe -o "muc" -d -vv -S "riemann events" < riemann
 ~~~
 
-### Mirror a terminal session
+### Mirror a terminal session using script(1)
+
+* user
+
+~~~ shell
+#!/bin/bash
+
+MUC=console
+
+TMPDIR=$(mktemp -d)
+FIFO=$TMPDIR/console
+mkfifo $FIFO
+
+stty cols 80 rows 24
+(cat $FIFO | xmppipe -r user -o $MUC -x) > /dev/null 2> $TMPDIR/stderr &
+script -q -f $FIFO
+~~~
+
+* viewers
+
+~~~ shell
+#!/bin/bash
+
+decode() {
+    printf '%b' "${1//%/\\x}"
+}
+
+stty cols 80 rows 24
+xmppipe -r viewer -o console -x | while read l; do
+    IFS=:
+    set -- $l
+    if [ "$1" = "m" ]; then
+        decode $5
+    fi
+done
+~~~
 
 ### Mirror a terminal session to a web page
 
