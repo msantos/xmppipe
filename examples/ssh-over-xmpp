@@ -12,13 +12,16 @@
 ##  ssh -o ProxyCommand="ssh-over-xmpp client sshxmpp" 127.0.0.1
 ##
 
-#set -x
-set -e
-set -u
+set -o errexit
+set -o nounset
 set -o pipefail
 
+if [ "$DEBUG" ]; then
+set -x
+fi
+
 PROGNAME=$0
-TMPDIR=/tmp/sshxmpp.$$
+TMPDIR=$(mktemp -d)
 out=$TMPDIR/out
 
 atexit() {
@@ -49,7 +52,6 @@ server() {
             *) ;;
         esac
     done > /dev/null
-
 }
 
 session(){
