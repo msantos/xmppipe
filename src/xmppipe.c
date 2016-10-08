@@ -85,19 +85,23 @@ main(int argc, char **argv)
         switch (ch) {
             case 'u':
                 /* username/jid */
+                free(jid);
                 jid = xmppipe_strdup(optarg);
                 break;
             case 'p':
                 /* password */
+                free(pass);
                 pass = xmppipe_strdup(optarg);
                 break;
             case 'o':
                 /* output/muc */
+                free(state->room);
                 state->room = xmppipe_strdup(optarg);
                 break;
             case 'a': {
                     /* address:port */
                     char *p = NULL;
+                    free(addr);
                     addr = xmppipe_strdup(optarg);
                     p = strchr(addr, ':');
                     if (p) {
@@ -107,9 +111,11 @@ main(int argc, char **argv)
                 }
                 break;
             case 'r':
+                free(state->resource);
                 state->resource = xmppipe_strdup(optarg);
                 break;
             case 'S':
+                free(state->subject);
                 state->subject = xmppipe_strdup(optarg);
                 break;
             case 'v':
