@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2016, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1080,6 +1080,10 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf,
     char *id = NULL;
 
     id = xmppipe_id_alloc();
+
+    if (id == NULL) {
+        errx(EXIT_FAILURE, "unable to allocate message id");
+    }
 
     message = xmppipe_stanza_new(state->ctx);
     xmppipe_stanza_set_name(message, "message");
