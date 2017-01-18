@@ -526,7 +526,7 @@ handle_null(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         void * const userdata)
 {
     xmppipe_state_t *state = userdata;
-    char *name = NULL;
+    const char *name = NULL;
 
     name = xmpp_stanza_get_name(stanza);
     if (name == NULL)
@@ -580,7 +580,7 @@ handle_sm_ack(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         void * const userdata)
 {
     xmppipe_state_t *state = userdata;
-    char *h = NULL;
+    const char *h = NULL;
     u_int32_t ack = 0;
 
     h = xmpp_stanza_get_attribute(stanza, "h");
@@ -636,8 +636,8 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     for (item = xmpp_stanza_get_children(query); item != NULL;
             item = xmpp_stanza_get_next(item)) {
         xmpp_stanza_t *iq, *reply;
-        char *jid = NULL;
-        char *name = NULL;
+        const char *jid = NULL;
+        const char *name = NULL;
 
         name = xmpp_stanza_get_name(item);
         if (name == NULL)
@@ -673,7 +673,7 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         void * const userdata)
 {
     xmpp_stanza_t *query, *child;
-    char *from = NULL;
+    const char *from = NULL;
     xmppipe_state_t *state = userdata;
 
     from = xmpp_stanza_get_attribute(stanza, "from");
@@ -688,8 +688,8 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     for (child = xmpp_stanza_get_children(query); child != NULL;
             child = xmpp_stanza_get_next(child)) {
-        char *feature = NULL;
-        char *var = NULL;
+        const char *feature = NULL;
+        const char *var = NULL;
 
         feature = xmpp_stanza_get_name(child);
         if (feature == NULL)
@@ -729,9 +729,9 @@ handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmpp_stanza_t *text = NULL;
     xmpp_stanza_t *child = NULL;
 
-    char *ns = NULL;
-    char *id = NULL;
-    char *from = NULL;
+    const char *ns = NULL;
+    const char *id = NULL;
+    const char *from = NULL;
 
     xmppipe_state_t *state = userdata;
     xmpp_ctx_t *ctx = state->ctx;
@@ -797,10 +797,10 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmpp_stanza_t *x = NULL;
     xmpp_stanza_t *item = NULL;
 
-    char *from = NULL;
-    char *to = NULL;
-    char *type = NULL;
-    char *code = NULL;
+    const char *from = NULL;
+    const char *to = NULL;
+    const char *type = NULL;
+    const char *code = NULL;
 
     char *efrom = NULL;
     char *eto = NULL;
@@ -819,7 +819,7 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (x) {
         for (item = xmpp_stanza_get_children(x); item != NULL;
                 item = xmpp_stanza_get_next(item)) {
-            char *name = xmpp_stanza_get_name(item);
+            const char *name = xmpp_stanza_get_name(item);
 
             if (name && XMPPIPE_STREQ(name, "status")) {
                 code = xmpp_stanza_get_attribute(item, "code");
@@ -880,10 +880,10 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmpp_stanza_t *error = NULL;
     xmpp_stanza_t *child = NULL;
 
-    char *from = NULL;
-    char *to = NULL;
-    char *code = NULL;
-    char *text = NULL;
+    const char *from = NULL;
+    const char *to = NULL;
+    const char *code = NULL;
+    const char *text = NULL;
 
     from = xmpp_stanza_get_attribute(stanza, "from");
     to = xmpp_stanza_get_attribute(stanza, "to");
@@ -921,9 +921,9 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmppipe_state_t *state = userdata;
 
     char *message = NULL;
-    char *type = NULL;
-    char *from = NULL;
-    char *to = NULL;
+    const char *type = NULL;
+    const char *from = NULL;
+    const char *to = NULL;
 
     char *etype = NULL;
     char *efrom = NULL;
