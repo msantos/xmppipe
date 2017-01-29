@@ -221,6 +221,10 @@ main(int argc, char **argv)
     if (xmppipe_connect_init(state) < 0)
         errx(EXIT_FAILURE, "XMPP handshake failed");
 
+    if (xmppipe_sandbox_init(state) < 0) {
+        err(EXIT_FAILURE, "sandbox failed");
+    }
+
     if (xmppipe_stream_init(state) < 0)
         errx(EXIT_FAILURE, "enabling stream management failed");
 

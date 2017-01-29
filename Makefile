@@ -10,6 +10,9 @@ else ifeq ($(UNAME_SYS), Darwin)
 	LDFLAGS += -lresolv
 endif
 
+XMPPIPE_SANDBOX ?= XMPPIPE_SANDBOX_NULL
+CFLAGS += -D$(XMPPIPE_SANDBOX)
+
 all:
 	$(CC) -g -Wall $(CFLAGS) -o xmppipe src/*.c $(LDFLAGS) -lstrophe
 
