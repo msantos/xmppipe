@@ -4,6 +4,8 @@ UNAME_SYS := $(shell uname -s)
 ifeq ($(UNAME_SYS), Linux)
 	LDFLAGS += -luuid -lresolv -Wl,-Bsymbolic-functions -Wl,-z,relro
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -fno-strict-aliasing
+else ifeq ($(UNAME_SYS), OpenBSD)
+	XMPPIPE_SANDBOX ?= XMPPIPE_SANDBOX_PLEDGE
 else ifeq ($(UNAME_SYS), SunOS)
 	LDFLAGS += -luuid -lresolv
 else ifeq ($(UNAME_SYS), Darwin)
