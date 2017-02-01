@@ -118,6 +118,7 @@ void xmppipe_stanza_set_type(xmpp_stanza_t * const, const char * const);
 void xmppipe_stanza_add_child(xmpp_stanza_t *, xmpp_stanza_t *);
 
 int xmppipe_sandbox_init(xmppipe_state_t *state);
+int xmppipe_conn_fd(xmppipe_state_t *state);
 
 int b64_ntop(u_char const *src, size_t srclength, char *target,
         size_t targsize);

@@ -12,39 +12,37 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_SANDBOX_RLIMIT
-#include <sys/time.h>
-#include <sys/resource.h>
-
 #include "xmppipe.h"
 
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <fcntl.h>
+
+/* Retrieve the XMPP socket opened by libstrophe.
+ *
+ * Ideally getting the XMPP socket would be as simple as:
+ *
+ * state->conn->sock
+ *
+ * But xmpp_conn_t is defined as an opaque type.
+ *
+ * The alternative is hardcoding the offsets based on the libstrophe version.
+ */
     int
-xmppipe_sandbox_init(xmppipe_state_t *state)
+xmppipe_conn_fd(xmppipe_state_t *state)
 {
-    struct rlimit rl_zero = {0};
-    struct rlimit rl_nofile = {0};
+    int fd = 0;
+    struct rlimit rl = {0};
 
-    rl_zero.rlim_cur = 0;
-    rl_zero.rlim_max = 0;
-
-    rl_nofile.rlim_cur = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
-    rl_nofile.rlim_max = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
-
-#ifdef RLIMIT_NPROC
-    if (setrlimit(RLIMIT_NPROC, &rl_zero) < 0)
+    if (getrlimit(RLIMIT_NOFILE, &rl) < 0)
         return -1;
-#endif
 
-#ifdef RLIMIT_NOFILE
-    if (rl_nofile.rlim_cur == (rlim_t)-1) {
-        int fd = xmppipe_conn_fd(state);
-        if (fd < 0) return -1;
-        rl_nofile.rlim_cur = rl_nofile.rlim_max = fd + 1;
+    for (fd = STDERR_FILENO+1; fd < rl.rlim_cur; fd++) {
+        if (fcntl(fd, F_GETFD, 0) < 0)
+            continue;
+
+        return fd;
     }
-    if (setrlimit(RLIMIT_NOFILE, &rl_nofile) < 0)
-        return -1;
-#endif
 
-	return 0;
+    return -1;
 }
-#endif
