@@ -1180,8 +1180,8 @@ xmppipe_stream_close(xmppipe_state_t *state)
     static void
 usage(xmppipe_state_t *state)
 {
-    (void)fprintf(stderr, "%s %s\n",
-            __progname, XMPPIPE_VERSION);
+    (void)fprintf(stderr, "%s %s (%s)\n",
+            __progname, XMPPIPE_VERSION, XMPPIPE_SANDBOX);
     (void)fprintf(stderr,
             "usage: %s <options>\n"
             "   -u <jid>        username (aka JID)\n"

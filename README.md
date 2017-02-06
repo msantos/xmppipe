@@ -38,6 +38,35 @@ Build
 
     $ make
 
+Sandboxing
+----------
+
+xmppipe restricts itself to the operations necessary for interacting
+with stdio. The restrictions are enforced after the XMPP connection
+is established so the TLS handshake and initial XMPP handshake are
+not sandboxed.
+
+The limitations depend on the platform. By default:
+
+* Linux: seccomp(2)
+
+* OpenBSD: pledge(2)
+
+* FreeBSD: capsicum(4)
+
+* other: setrlimit(2)
+
+
+Selecting the sandbox can be done at compile time. For example, to use
+the "rlimit" sandbox:
+
+    XMPPIPE_SANDBOX=XMPPIPE_SANDBOX_RLIMIT make
+
+If a sandbox is interfering with normal operation, please open an issue.
+To disable the sandbox, compile using the "null" sandbox:
+
+    XMPPIPE_SANDBOX=XMPPIPE_SANDBOX_NULL make
+
 Options
 -------
 
@@ -316,12 +345,6 @@ TODO
 
 * sandbox
 
-  After connecting to the XMPP server, xmppipe reads from stdin, writes
-  to stdout and read/writes from the network socket.
-
-  Drop additional capabilities using OS-specific sandboxes:
-
-  * OpenBSD: pledge(2)
-  * Linux: BPF syscall filtering using prctl(2) or seccomp(2)
-  * FreeBSD: capabilities using capsicum(4)
-  * any: setrlimit(2)
+  Strengthen the sandbox restrictions:
+  * policy for TLS handshake
+  * policy for initial XMPP handshake
