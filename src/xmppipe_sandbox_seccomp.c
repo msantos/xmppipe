@@ -123,11 +123,17 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #ifdef __NR_gettimeofday
         SC_ALLOW(gettimeofday),
 #endif
+#ifdef __NR_getuid
+        SC_ALLOW(getuid),
+#endif
 #ifdef __NR_getuid32
         SC_ALLOW(getuid32),
 #endif
 #ifdef __NR_ioctl
         SC_ALLOW(ioctl),
+#endif
+#ifdef __NR_mmap
+        SC_ALLOW(mmap),
 #endif
 
 #ifdef __NR_poll
@@ -141,6 +147,9 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #endif
 #ifdef __NR_select
         SC_ALLOW(select),
+#endif
+#ifdef __NR_stat
+        SC_ALLOW(stat),
 #endif
 #ifdef __NR_stat64
         SC_ALLOW(stat64),
