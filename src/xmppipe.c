@@ -457,7 +457,6 @@ XMPPIPE_EXIT:
     int
 handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
 {
-    int nfds = 1;
     fd_set rfds;
     struct timeval tv = {0};
     ssize_t n = 0;
@@ -469,7 +468,7 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
 
-    rv = select(nfds+1, &rfds, NULL, NULL, &tv);
+    rv = select(fd+1, &rfds, NULL, NULL, &tv);
 
     if (rv < 0) {
         warn("select");
