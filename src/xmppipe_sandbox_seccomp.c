@@ -135,6 +135,12 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #ifdef __NR_mmap
         SC_ALLOW(mmap),
 #endif
+#ifdef __NR_munmap
+        SC_ALLOW(munmap),
+#endif
+#ifdef __NR_mprotect
+        SC_ALLOW(mprotect),
+#endif
 
 #ifdef __NR_poll
         SC_ALLOW(poll),
