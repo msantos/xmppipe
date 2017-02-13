@@ -966,7 +966,12 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         /* Does not need to be NULL terminated, buf is passed with length */
         size_t len = strlen(message) * 3 / 4;
         char *buf = xmppipe_calloc(len, 1);
-        size_t n = b64_pton(message, (u_char *)buf, len);
+        int n = b64_pton(message, (u_char *)buf, len);
+        if (n <= 0 || n > len) {
+            /* Not a base64 message */
+            free(buf);
+            return 1;
+        }
         emessage = xmppipe_nfmt(buf,n);
         free(buf);
     }
