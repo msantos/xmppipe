@@ -90,6 +90,9 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #ifdef __NR_open
         SC_DENY(open, EACCES),
 #endif
+#ifdef __NR_close
+        SC_DENY(close, EBADF),
+#endif
 
         /* Syscalls to allow */
 #ifdef __NR_brk
