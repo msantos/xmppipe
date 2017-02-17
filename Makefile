@@ -1,3 +1,5 @@
+.PHONY: all static clean test
+
 RM=rm
 
 UNAME_SYS := $(shell uname -s)
@@ -35,3 +37,6 @@ static:
 
 clean:
 	-@$(RM) xmppipe
+
+test:
+	PATH=.:$$PATH bats test
