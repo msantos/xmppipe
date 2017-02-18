@@ -37,3 +37,8 @@
         'test123: &(*)_+' &
     xmppipe -r user2 -o xmppipe-test-2 -s | egrep "^m:groupchat:[^/]+/user1:[^:]+:test123%3A%20%26%28%2A%29_%2B%0A"
 }
+
+@test "send/receive message: base64 stdin" {
+    (sleep 10; echo 'test123: ~!@#$' | xmppipe -x -o xmppipe-test-1 -r user1 -u "$XMPPIPE_TEST_USERNAME" -p "$XMPPIPE_TEST_PASSWORD") &
+    xmppipe -x -o xmppipe-test-1 -s | egrep "^m:groupchat:[^/]+/user1:[^:]+:test123%3A%20~%21@%23%24%0A"
+}

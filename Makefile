@@ -39,4 +39,4 @@ clean:
 	-@$(RM) xmppipe
 
 test:
-	PATH=.:$$PATH bats test
+	-@PATH=.:$$PATH bats test
