@@ -1,9 +1,20 @@
 #!/usr/bin/env bats
 
-[ "$XMPPIPE_USERNAME" ]
-[ "$XMPPIPE_PASSWORD" ]
-[ "$XMPPIPE_TEST_USERNAME" ]
-[ "$XMPPIPE_TEST_PASSWORD" ]
+if [ ! "$XMPPIPE_USERNAME" ] || [ ! "$XMPPIPE_PASSWORD" ] ||
+   [ ! "$XMPPIPE_TEST_USERNAME" ] || [ ! "$XMPPIPE_TEST_PASSWORD" ]; then
+cat << EOF
+Please ensure the following environment variables are set to valid
+XMPP accounts:
+
+XMPPIPE_USERNAME=${XMPPIPE_USERNAME-<unset>}
+XMPPIPE_PASSWORD=${XMPPIPE_PASSWORD-<unset>}
+XMPPIPE_TEST_USERNAME=${XMPPIPE_TEST_USERNAME-<unset>}
+XMPPIPE_TEST_PASSWORD=${XMPPIPE_TEST_PASSWORD-<unset>}
+
+EOF
+
+   exit 1
+fi
 
 @test "enter MUC" {
     xmppipe < /dev/null | grep -q "^p:available"
