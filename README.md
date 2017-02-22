@@ -38,6 +38,14 @@ Build
 
     $ make
 
+Tests
+-----
+
+    # Install bats:
+    # apt-get install bats
+    # git clone https://github.com/sstephenson/bats.git # or from git
+    make test
+
 Sandboxing
 ----------
 
@@ -320,7 +328,7 @@ certificate verification.
 License
 -------
 
-Copyright (c) 2015-2016, Michael Santos <michael.santos@gmail.com>
+Copyright (c) 2015-2017, Michael Santos <michael.santos@gmail.com>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
