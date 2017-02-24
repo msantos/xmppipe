@@ -203,7 +203,9 @@ xmppipe_roomname(char *label)
     char name[16] = {0};
 
     buf = xmppipe_malloc(len);
-    (void)gethostname(name, sizeof(name));
+    if (gethostname(name, sizeof(name)) < 0) {
+        (void)memcpy(name, "xmppipe", sizeof(name)-1);
+    }
     name[sizeof(name)-1] = '\0';
 
     (void)snprintf(buf, len, "%s-%s-%d", label, name, getpid());
