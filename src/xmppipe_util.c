@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2017, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -204,7 +204,7 @@ xmppipe_roomname(char *label)
 
     buf = xmppipe_malloc(len);
     if (gethostname(name, sizeof(name)) < 0) {
-        (void)memcpy(name, "xmppipe", sizeof(name)-1);
+        (void)snprintf(name, sizeof(name)-1, "%s", XMPPIPE_RESOURCE);
     }
     name[sizeof(name)-1] = '\0';
 

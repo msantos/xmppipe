@@ -190,7 +190,7 @@ main(int argc, char **argv)
         state->room = xmppipe_roomname("stdout");
 
     if (state->resource == NULL)
-        state->resource = xmppipe_strdup("xmppipe");
+        state->resource = xmppipe_strdup(XMPPIPE_RESOURCE);
 
     if (strchr(state->room, '@')) {
         state->out = xmppipe_strdup(state->room);
