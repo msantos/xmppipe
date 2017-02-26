@@ -77,6 +77,8 @@ main(int argc, char **argv)
     state->sm_request_interval = 1;
     state->sm_fc = 15;
     state->sm_unacked = 5;
+    state->room = xmppipe_roomname("stdout");
+    state->resource = xmppipe_strdup(XMPPIPE_RESOURCE);
 
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
@@ -185,12 +187,6 @@ main(int argc, char **argv)
         usage(state);
 
     state->server = xmppipe_servername(jid);
-
-    if (state->room == NULL)
-        state->room = xmppipe_roomname("stdout");
-
-    if (state->resource == NULL)
-        state->resource = xmppipe_strdup(XMPPIPE_RESOURCE);
 
     if (strchr(state->room, '@')) {
         state->out = xmppipe_strdup(state->room);
