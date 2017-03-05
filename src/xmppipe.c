@@ -583,13 +583,16 @@ handle_sm_ack(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmppipe_state_t *state = userdata;
     const char *h = NULL;
     u_int32_t ack = 0;
+    const char *errstr = NULL;
 
     h = xmpp_stanza_get_attribute(stanza, "h");
 
     if (h == NULL)
         return 1;
 
-    ack = (u_int32_t)atoi(h); /* XXX */
+    ack = strtonum(h, 0, UINT_MAX-1, &errstr);
+    if (errstr)
+        goto XMPPIPE_STREAMERR;
 
     if (state->verbose)
         (void)fprintf(stderr, "SM: request=%u ack=%u last=%u\n",
