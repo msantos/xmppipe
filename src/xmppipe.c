@@ -66,6 +66,7 @@ main(int argc, char **argv)
     u_int16_t port = 0;
 
     int ch = 0;
+    const char *errstr = NULL;
 
     state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
@@ -108,7 +109,11 @@ main(int argc, char **argv)
                     p = strchr(addr, ':');
                     if (p) {
                         *p++ = '\0';
-                        port = (u_int16_t)atoi(p);
+                        port = strtonum(p, 0, 0xfffe, &errstr);
+                        if (errstr) {
+                            warnx("invalid argument: %s: %s", p, errstr);
+                            usage(state);
+                        }
                     }
                 }
                 break;
@@ -129,31 +134,62 @@ main(int argc, char **argv)
 
             case 'b':
                 /* read buffer size */
-                state->bufsz = (size_t)atoi(optarg);
+                state->bufsz = strtonum(optarg, 3, 0xfffe, &errstr);
+                if (errstr) {
+                    warnx("invalid argument: %s: %s", optarg, errstr);
+                    usage(state);
+                }
                 break;
             case 'c':
                 /* XEP-0198: stream management flow control */
-                state->sm_fc = (u_int32_t)atoi(optarg);
+                state->sm_fc = strtonum(optarg, 0, 0xfffe, &errstr);
+                if (errstr) {
+                    warnx("invalid argument: %s: %s", optarg, errstr);
+                    usage(state);
+                }
                 break;
             case 'I':
                 /* XEP-0198: stream management request interval */
-                state->sm_request_interval = (u_int32_t)atoi(optarg);
+                state->sm_request_interval = strtonum(optarg, 0, 0xfffe,
+                        &errstr);
+                if (errstr) {
+                    warnx("invalid argument: %s: %s", optarg, errstr);
+                    usage(state);
+                }
                 break;
             case 'k':
                 /* XEP-0199: XMPP ping keepalives */
-                state->keepalive = (u_int32_t)atoi(optarg) * 1000;
+                state->sm_request_interval = strtonum(optarg, 0, 0xfffe,
+                        &errstr) * 1000;
+                if (errstr) {
+                    warnx("invalid argument: %s: %s", optarg, errstr);
+                    usage(state);
+                }
                 break;
             case 'K':
                 /* XEP-0199: number of keepalive without a reply */
-                state->keepalive_limit = (u_int32_t)atoi(optarg);
+                state->keepalive_limit = strtonum(optarg, 0, 0xfffe,
+                        &errstr);
+                if (errstr) {
+                    warnx("invalid argument: %s: %s", optarg, errstr);
+                    usage(state);
+                }
                 break;
             case 'P':
                 /* poll delay */
-                state->poll = (u_int32_t)atoi(optarg);
+                state->poll = strtonum(optarg, 0, 0xfffe, &errstr);
+                if (errstr) {
+                    warnx("invalid argument: %s: %s", optarg, errstr);
+                    usage(state);
+                }
                 break;
             case 'U':
                 /* XEP-0198: stream management unacked requests */
-                state->sm_unacked = (u_int32_t)atoi(optarg);
+                state->sm_unacked = strtonum(optarg, 0, 0xfffe, &errstr);
+                if (errstr) {
+                    warnx("invalid argument: %s: %s", optarg, errstr);
+                    usage(state);
+                }
                 break;
 
             case 'd':
@@ -179,8 +215,7 @@ main(int argc, char **argv)
     if (jid == NULL)
         usage(state);
 
-    if (state->bufsz < 3 || state->bufsz >= 0xffff
-            || (state->encode && BASE64_LENGTH(state->bufsz) + 1 > 0xffff))
+    if (state->encode && BASE64_LENGTH(state->bufsz) + 1 > 0xffff)
         usage(state);
 
     if (state->keepalive_limit < 1)
