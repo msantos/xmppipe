@@ -23,6 +23,9 @@ extern char *__progname;
 
 static void usage(xmppipe_state_t *xp);
 
+static long long xmppipe_strtonum(xmppipe_state_t *state, const char *nptr,
+        long long minval, long long maxval);
+
 void handle_connection(xmpp_conn_t * const, const xmpp_conn_event_t, const int,
         xmpp_stream_error_t * const, void * const userdata);
 int handle_disco_items(xmpp_conn_t * const, xmpp_stanza_t * const,
@@ -66,7 +69,6 @@ main(int argc, char **argv)
     u_int16_t port = 0;
 
     int ch = 0;
-    const char *errstr = NULL;
 
     state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
@@ -109,11 +111,7 @@ main(int argc, char **argv)
                     p = strchr(addr, ':');
                     if (p) {
                         *p++ = '\0';
-                        port = strtonum(p, 0, 0xfffe, &errstr);
-                        if (errstr) {
-                            warnx("invalid argument: %s: %s", p, errstr);
-                            usage(state);
-                        }
+                        port = xmppipe_strtonum(state, p, 0, 0xfffe);
                     }
                 }
                 break;
@@ -134,62 +132,34 @@ main(int argc, char **argv)
 
             case 'b':
                 /* read buffer size */
-                state->bufsz = strtonum(optarg, 3, 0xfffe, &errstr);
-                if (errstr) {
-                    warnx("invalid argument: %s: %s", optarg, errstr);
-                    usage(state);
-                }
+                state->bufsz = xmppipe_strtonum(state, optarg, 3, 0xfffe);
                 break;
             case 'c':
                 /* XEP-0198: stream management flow control */
-                state->sm_fc = strtonum(optarg, 0, 0xfffe, &errstr);
-                if (errstr) {
-                    warnx("invalid argument: %s: %s", optarg, errstr);
-                    usage(state);
-                }
+                state->sm_fc = xmppipe_strtonum(state, optarg, 0, 0xfffe);
                 break;
             case 'I':
                 /* XEP-0198: stream management request interval */
-                state->sm_request_interval = strtonum(optarg, 0, 0xfffe,
-                        &errstr);
-                if (errstr) {
-                    warnx("invalid argument: %s: %s", optarg, errstr);
-                    usage(state);
-                }
+                state->sm_request_interval = xmppipe_strtonum(state, optarg, 0,
+                        0xfffe);
                 break;
             case 'k':
                 /* XEP-0199: XMPP ping keepalives */
-                state->sm_request_interval = strtonum(optarg, 0, 0xfffe,
-                        &errstr) * 1000;
-                if (errstr) {
-                    warnx("invalid argument: %s: %s", optarg, errstr);
-                    usage(state);
-                }
+                state->sm_request_interval = xmppipe_strtonum(state, optarg, 0,
+                        0xfffe) * 1000;
                 break;
             case 'K':
                 /* XEP-0199: number of keepalive without a reply */
-                state->keepalive_limit = strtonum(optarg, 0, 0xfffe,
-                        &errstr);
-                if (errstr) {
-                    warnx("invalid argument: %s: %s", optarg, errstr);
-                    usage(state);
-                }
+                state->keepalive_limit = xmppipe_strtonum(state, optarg, 0,
+                        0xfffe);
                 break;
             case 'P':
                 /* poll delay */
-                state->poll = strtonum(optarg, 0, 0xfffe, &errstr);
-                if (errstr) {
-                    warnx("invalid argument: %s: %s", optarg, errstr);
-                    usage(state);
-                }
+                state->poll = xmppipe_strtonum(state, optarg, 0, 0xfffe);
                 break;
             case 'U':
                 /* XEP-0198: stream management unacked requests */
-                state->sm_unacked = strtonum(optarg, 0, 0xfffe, &errstr);
-                if (errstr) {
-                    warnx("invalid argument: %s: %s", optarg, errstr);
-                    usage(state);
-                }
+                state->sm_unacked = xmppipe_strtonum(state, optarg, 0, 0xfffe);
                 break;
 
             case 'd':
@@ -1213,6 +1183,20 @@ xmppipe_stream_close(xmppipe_state_t *state)
 {
     if (state->sm_enabled)
         xmpp_send_raw_string(state->conn, "</stream:stream>");
+}
+
+    static long long
+xmppipe_strtonum(xmppipe_state_t *state, const char *nptr, long long minval,
+        long long maxval)
+{
+    long long n = 0;
+    const char *errstr = NULL;
+
+    n = strtonum(nptr, minval, maxval, &errstr);
+    if (errstr)
+        errx(EXIT_FAILURE, "%s: %s", errstr, nptr);
+
+    return n;
 }
 
     static void
