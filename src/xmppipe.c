@@ -388,14 +388,20 @@ event_loop(xmppipe_state_t *state)
         if (state->status == XMPPIPE_S_DISCONNECTED)
             goto XMPPIPE_EXIT;
 
-        if (state->sm_enabled &&
-                ( (state->sm_request_unack > state->sm_unacked)
-                 || (state->sm_request - state->sm_ack_sent > state->sm_fc))) {
-            if (state->verbose)
-                (void)fprintf(stderr, "WAIT: request=%u ack_sent=%u unack=%u\n",
-                        state->sm_request, state->sm_ack_sent,
-                        state->sm_request_unack);
-            goto XMPPIPE_POLL;
+        if (state->sm_enabled) {
+            if (state->sm_ack_sent > state->sm_request)
+                errx(EXIT_FAILURE, "h too large: sent=%u, server responded=%u",
+                        state->sm_request, state->sm_ack_sent);
+
+            if ( (state->sm_request_unack > state->sm_unacked)
+                 || (state->sm_request - state->sm_ack_sent > state->sm_fc)) {
+                if (state->verbose)
+                    (void)fprintf(stderr,
+                            "WAIT: request=%u ack_sent=%u unack=%u\n",
+                            state->sm_request, state->sm_ack_sent,
+                            state->sm_request_unack);
+                goto XMPPIPE_POLL;
+            }
         }
 
         if (eof) {
