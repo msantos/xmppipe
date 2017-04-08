@@ -90,7 +90,7 @@ Options
 -o *output*
 :   XMPP MUC name
 
-    Default: stdout-*hostname*-*pid*
+    Default: stdout-*hostname*-*uid*
 
 -S *subject*
 :   XMPP MUC subject

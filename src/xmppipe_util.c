@@ -208,7 +208,7 @@ xmppipe_roomname(char *label)
     }
     name[sizeof(name)-1] = '\0';
 
-    (void)snprintf(buf, len, "%s-%s-%d", label, name, getpid());
+    (void)snprintf(buf, len, "%s-%s-%d", label, name, getuid());
 
     return buf;
 }
