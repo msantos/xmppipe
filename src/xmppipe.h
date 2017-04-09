@@ -17,6 +17,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <limits.h>
 #include <err.h>
 
 #include <strophe.h>
