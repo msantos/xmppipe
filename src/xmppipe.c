@@ -86,6 +86,12 @@ main(int argc, char **argv)
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
+    if (state->verbose)
+        (void)fprintf(stderr, "sandbox: init: %s\n", XMPPIPE_SANDBOX);
+
+    if (xmppipe_sandbox_init(state) < 0)
+        err(EXIT_FAILURE, "sandbox failed");
+
     while ( (ch = getopt(argc, argv, "a:b:c:dDehI:k:K:o:P:p:r:sS:u:U:vx")) != -1) {
         switch (ch) {
             case 'u':
@@ -223,9 +229,9 @@ main(int argc, char **argv)
         errx(EXIT_FAILURE, "XMPP handshake failed");
 
     if (state->verbose)
-        (void)fprintf(stderr, "sandbox: entering %s\n", XMPPIPE_SANDBOX);
+        (void)fprintf(stderr, "sandbox: stdin: %s\n", XMPPIPE_SANDBOX);
 
-    if (xmppipe_sandbox_init(state) < 0)
+    if (xmppipe_sandbox_stdin(state) < 0)
         err(EXIT_FAILURE, "sandbox failed");
 
     if (xmppipe_stream_init(state) < 0)

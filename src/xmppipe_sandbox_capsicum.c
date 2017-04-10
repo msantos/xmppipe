@@ -26,6 +26,12 @@
     int
 xmppipe_sandbox_init(xmppipe_state_t *state)
 {
+    return 0;
+}
+
+    int
+xmppipe_sandbox_stdin(xmppipe_state_t *state)
+{
     struct rlimit rl;
     cap_rights_t policy_read;
     cap_rights_t policy_write;

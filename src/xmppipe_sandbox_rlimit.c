@@ -21,6 +21,12 @@
     int
 xmppipe_sandbox_init(xmppipe_state_t *state)
 {
+    return 0;
+}
+
+    int
+xmppipe_sandbox_stdin(xmppipe_state_t *state)
+{
     struct rlimit rl_zero = {0};
     struct rlimit rl_nofile = {0};
 

@@ -76,6 +76,12 @@
     int
 xmppipe_sandbox_init(xmppipe_state_t *state)
 {
+    return 0;
+}
+
+    int
+xmppipe_sandbox_stdin(xmppipe_state_t *state)
+{
     struct sock_filter filter[] = {
         /* Ensure the syscall arch convention is as expected. */
         BPF_STMT(BPF_LD+BPF_W+BPF_ABS,
