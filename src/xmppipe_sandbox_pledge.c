@@ -19,7 +19,7 @@
     int
 xmppipe_sandbox_init(xmppipe_state_t *state)
 {
-    return 0;
+    return pledge("stdio inet dns", NULL);
 }
 
     int
