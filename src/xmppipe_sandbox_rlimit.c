@@ -21,6 +21,13 @@
     int
 xmppipe_sandbox_init(xmppipe_state_t *state)
 {
+    struct rlimit rl_zero = {0};
+
+#ifdef RLIMIT_NPROC
+    if (setrlimit(RLIMIT_NPROC, &rl_zero) < 0)
+        return -1;
+#endif
+
     return 0;
 }
 
