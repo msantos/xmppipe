@@ -1,5 +1,6 @@
 .PHONY: all static clean test
 
+PROG=xmppipe
 RM=rm
 
 UNAME_SYS := $(shell uname -s)
@@ -23,7 +24,9 @@ XMPPIPE_SANDBOX_RLIMIT_NOFILE ?= -1
 CFLAGS += -DXMPPIPE_SANDBOX=\"$(XMPPIPE_SANDBOX)\" -D$(XMPPIPE_SANDBOX) \
 		  -DXMPPIPE_SANDBOX_RLIMIT_NOFILE=$(XMPPIPE_SANDBOX_RLIMIT_NOFILE)
 
-all:
+all: $(PROG)
+
+$(PROG):
 	$(CC) -g -Wall $(CFLAGS) -o xmppipe src/*.c $(LDFLAGS) -lstrophe
 
 static:
@@ -36,7 +39,7 @@ static:
 		/usr/lib/*/libuuid.a
 
 clean:
-	-@$(RM) xmppipe
+	-@$(RM) $(PROG)
 
-test:
+test: $(PROG)
 	-@PATH=.:$$PATH bats test
