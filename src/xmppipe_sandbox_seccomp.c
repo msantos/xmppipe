@@ -107,6 +107,9 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #ifdef __NR_send
         SC_ALLOW(send),
 #endif
+#ifdef __NR_sendmmsg
+        SC_ALLOW(sendmmsg),
+#endif
 #ifdef __NR_connect
         SC_ALLOW(connect),
 #endif
