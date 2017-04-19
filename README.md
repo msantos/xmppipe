@@ -50,20 +50,34 @@ Sandboxing
 ----------
 
 xmppipe restricts itself to the operations necessary for interacting
-with stdio. The restrictions are enforced after the XMPP connection
-is established so the TLS handshake and initial XMPP handshake are
-not sandboxed.
+with stdio.
 
-The limitations depend on the platform. By default:
+When the process starts, an "init" sandbox limits the process to
+operations required for connecting to the XMPP server. After the
+connection is established, a more restrictive sandbox limits operations
+to interacting with stdio.
 
-* Linux: seccomp(2)
+The mechanism used depends on the platform. By default:
 
-* OpenBSD: pledge(2)
+* Linux:
 
-* FreeBSD: capsicum(4)
+    * init: seccomp(2)
+    * stdio: seccomp(2)
+
+* OpenBSD:
+
+    * init: pledge(2)
+    * stdio: pledge(2)
+
+* FreeBSD:
+
+    * init: setrlimit(2)
+    * stdio: setrlimit(2)/capsicum(4)
 
 * other: setrlimit(2)
 
+    * init: setrlimit(2)
+    * stdio: setrlimit(2)
 
 Selecting the sandbox can be done at compile time. For example, to use
 the "rlimit" sandbox:
@@ -350,9 +364,3 @@ TODO
   Switch to using [libmesode](https://github.com/boothj5/libmesode)
 
 * support [XEP-0384: OMEMO Encryption](https://xmpp.org/extensions/xep-0384.html)
-
-* sandbox
-
-  Strengthen the sandbox restrictions:
-  * policy for TLS handshake
-  * policy for initial XMPP handshake
