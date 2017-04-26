@@ -29,13 +29,18 @@ endif
 
 XMPPIPE_SANDBOX ?= XMPPIPE_SANDBOX_RLIMIT
 XMPPIPE_SANDBOX_RLIMIT_NOFILE ?= -1
-CFLAGS += -DXMPPIPE_SANDBOX=\"$(XMPPIPE_SANDBOX)\" -D$(XMPPIPE_SANDBOX) \
+
+XMPPIPE_CFLAGS ?= -g -Wall
+CFLAGS += $(XMPPIPE_CFLAGS) \
+		  -DXMPPIPE_SANDBOX=\"$(XMPPIPE_SANDBOX)\" -D$(XMPPIPE_SANDBOX) \
 		  -DXMPPIPE_SANDBOX_RLIMIT_NOFILE=$(XMPPIPE_SANDBOX_RLIMIT_NOFILE)
+
+LDFLAGS += $(XMPPIPE_LDFLAGS)
 
 all: $(PROG)
 
 $(PROG):
-	$(CC) -g -Wall $(CFLAGS) -o xmppipe src/*.c $(LDFLAGS) -lstrophe
+	$(CC) $(CFLAGS) -o xmppipe src/*.c $(LDFLAGS) -lstrophe
 
 static:
 	$(CC) $(CFLAGS) -g -Wall -o xmppipe src/*.c -Wl,--no-as-needed \
