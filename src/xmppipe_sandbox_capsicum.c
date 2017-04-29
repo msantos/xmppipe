@@ -37,18 +37,12 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
     int
 xmppipe_sandbox_stdin(xmppipe_state_t *state)
 {
-    struct rlimit rl;
+    struct rlimit rl = {0};
     cap_rights_t policy_read;
     cap_rights_t policy_write;
     cap_rights_t policy_rw;
 
     int fd = -1;
-
-    rl.rlim_cur = 0;
-    rl.rlim_max = 0;
-
-    if (setrlimit(RLIMIT_NPROC, &rl) < 0)
-        return -1;
 
     fd = xmppipe_conn_fd(state);
     if (fd < 0)
