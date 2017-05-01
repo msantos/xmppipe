@@ -54,9 +54,9 @@ xmppipe_sandbox_stdin(xmppipe_state_t *state)
     if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
         return -1;
 
-    cap_rights_init(&policy_read, CAP_READ, CAP_EVENT);
-    cap_rights_init(&policy_write, CAP_WRITE);
-    cap_rights_init(&policy_rw, CAP_READ, CAP_WRITE,
+    (void)cap_rights_init(&policy_read, CAP_READ, CAP_EVENT);
+    (void)cap_rights_init(&policy_write, CAP_WRITE);
+    (void)cap_rights_init(&policy_rw, CAP_READ, CAP_WRITE,
             CAP_FSTAT, CAP_FCNTL, CAP_EVENT);
 
     if (cap_rights_limit(STDIN_FILENO, &policy_read) < 0)
