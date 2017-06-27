@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <resolv.h>
+#include <getopt.h>
 
 extern char *__progname;
 
@@ -58,6 +59,30 @@ void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *, size_t);
 void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 void xmppipe_ping(xmppipe_state_t *);
 
+static const struct option long_options[] =
+{
+    {"address",            required_argument,  NULL, 'a'},
+    {"buffer-size",        required_argument,  NULL, 'b'},
+    {"flow-control",       required_argument,  NULL, 'c'},
+    {"discard",            no_argument,        NULL, 'd'},
+    {"discard-to-stdout",  no_argument,        NULL, 'D'},
+    {"ignore-eof",         no_argument,        NULL, 'e'},
+    {"interval",           required_argument,  NULL, 'I'},
+    {"keepalive",          required_argument,  NULL, 'k'},
+    {"keepalive-failures", required_argument,  NULL, 'K'},
+    {"ouput",              required_argument,  NULL, 'o'},
+    {"password",           required_argument,  NULL, 'p'},
+    {"poll-delay",         required_argument,  NULL, 'P'},
+    {"resource",           required_argument,  NULL, 'r'},
+    {"exit-when-empty",    no_argument,        NULL, 's'},
+    {"subject",            required_argument,  NULL, 'S'},
+    {"username",           required_argument,  NULL, 'u'},
+    {"unacked-requests",   required_argument,  NULL, 'U'},
+    {"verbose",            no_argument,        NULL, 'v'},
+    {"base64",             no_argument,        NULL, 'x'},
+    {"help",               no_argument,        NULL, 'h'}
+};
+
     int
 main(int argc, char **argv)
 {
@@ -92,7 +117,8 @@ main(int argc, char **argv)
     if (xmppipe_sandbox_init(state) < 0)
         err(EXIT_FAILURE, "sandbox failed");
 
-    while ( (ch = getopt(argc, argv, "a:b:c:dDehI:k:K:o:P:p:r:sS:u:U:vx")) != -1) {
+    while ( (ch = getopt_long(argc, argv, "a:b:c:dDehI:k:K:o:P:p:r:sS:u:U:vx",
+                    long_options, NULL)) != -1) {
         switch (ch) {
             case 'u':
                 /* username/jid */
@@ -187,6 +213,9 @@ main(int argc, char **argv)
                 usage(state);
         }
     }
+
+    argc -= optind;
+    argv += optind;
 
     if (jid == NULL)
         usage(state);
@@ -1217,26 +1246,26 @@ usage(xmppipe_state_t *state)
     (void)fprintf(stderr, "%s %s (%s)\n",
             __progname, XMPPIPE_VERSION, XMPPIPE_SANDBOX);
     (void)fprintf(stderr,
-            "usage: %s <options>\n"
-            "   -u <jid>        username (aka JID)\n"
-            "   -p <password>   password\n"
-            "   -r <resource>   resource (aka MUC nick)\n"
-            "   -o <output>     MUC room to send stdout\n"
-            "   -S <subject>    set MUC subject\n"
-            "   -a <addr:port>  set XMPP server address (port is optional)\n"
+            "usage: %s [OPTIONS]\n"
+            "   -u, --user <jid>                    username (aka JID)\n"
+            "   -p, --passord <password>            password\n"
+            "   -r, --resource <resource>           resource (aka MUC nick)\n"
+            "   -o, --output <output>               MUC room to send stdout\n"
+            "   -S, --subject <subject>             set MUC subject\n"
+            "   -a, --address <addr:port>           set XMPP server address (port is optional)\n"
 
-            "   -d              discard stdin when MUC is empty\n"
-            "   -D              discard stdin and print to local stdout\n"
-            "   -e              ignore stdin EOF\n"
-            "   -s              exit when MUC is empty\n"
-            "   -x              base64 encode/decode data\n"
+            "   -d, --discard                       discard stdin when MUC is empty\n"
+            "   -D, --discard-to-stdout             discard stdin and print to local stdout\n"
+            "   -e, --ignore-eof                    ignore stdin EOF\n"
+            "   -s, --exit-when-empty               exit when MUC is empty\n"
+            "   -x, --base64                        base64 encode/decode data\n"
 
-            "   -b <size>       size of read buffer\n"
-            "   -I <interval>   request stream management status every interval messages\n"
-            "   -k <seconds>    periodically send a keepalive\n"
-            "   -K <count>      number of keepalive failures before exiting\n"
-            "   -P <ms>         poll delay\n"
-            "   -v              verbose\n",
+            "   -b, --buffer-size <size>            size of read buffer\n"
+            "   -I, --interval <interval>           request stream management status every interval messages\n"
+            "   -k, --keepalives <seconds>          periodically send a keepalive\n"
+            "   -K, --keepalive-failures <count>    number of keepalive failures before exiting\n"
+            "   -P, --poll-delay <ms>               poll delay\n"
+            "   -v, --verbose                       verbose\n",
             __progname
             );
 
