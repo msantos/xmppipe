@@ -27,12 +27,6 @@ Requirements
 
 * [libstrophe](https://github.com/strophe/libstrophe)
 
-* Linux: libuuid
-
-~~~
-apt-get install uuid-dev
-~~~
-
 Build
 -----
 

@@ -1134,7 +1134,7 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf,
     xmpp_stanza_t *text = NULL;
     char *id = NULL;
 
-    id = xmppipe_id_alloc();
+    id = xmpp_uuid_gen(state->ctx);
 
     if (id == NULL) {
         errx(EXIT_FAILURE, "unable to allocate message id");
@@ -1168,7 +1168,7 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf,
 
     xmppipe_send(state, message);
     (void)xmpp_stanza_release(message);
-    free(id);
+    xmpp_free(state->ctx, id);
 }
 
     void

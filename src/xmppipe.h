@@ -96,7 +96,6 @@ typedef struct {
 int xmppipe_fmt_init();
 char *xmppipe_fmt(const char *);
 char *xmppipe_nfmt(const char *, size_t);
-char *xmppipe_id_alloc();
 int xmppipe_set_nonblock(int fd);
 
 char *xmppipe_servername(char *);
