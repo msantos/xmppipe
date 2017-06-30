@@ -147,6 +147,12 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #ifdef __NR_getsockopt
         SC_ALLOW(getsockopt),
 #endif
+#ifdef __NR_lseek
+        SC_ALLOW(lseek),
+#endif
+#ifdef __NR__llseek
+        SC_ALLOW(_llseek),
+#endif
 
         /* uuid */
 #ifdef __NR_gettimeofday
