@@ -70,7 +70,7 @@ static const struct option long_options[] =
     {"interval",           required_argument,  NULL, 'I'},
     {"keepalive",          required_argument,  NULL, 'k'},
     {"keepalive-failures", required_argument,  NULL, 'K'},
-    {"ouput",              required_argument,  NULL, 'o'},
+    {"stdout",             required_argument,  NULL, 'o'},
     {"password",           required_argument,  NULL, 'p'},
     {"poll-delay",         required_argument,  NULL, 'P'},
     {"resource",           required_argument,  NULL, 'r'},
@@ -1250,7 +1250,7 @@ usage(xmppipe_state_t *state)
             "   -u, --user <jid>                    username (aka JID)\n"
             "   -p, --passord <password>            password\n"
             "   -r, --resource <resource>           resource (aka MUC nick)\n"
-            "   -o, --output <output>               MUC room to send stdout\n"
+            "   -o, --stdout <muc>                  MUC room to send stdout\n"
             "   -S, --subject <subject>             set MUC subject\n"
             "   -a, --address <addr:port>           set XMPP server address (port is optional)\n"
 
