@@ -70,7 +70,7 @@ static const struct option long_options[] =
     {"interval",           required_argument,  NULL, 'I'},
     {"keepalive",          required_argument,  NULL, 'k'},
     {"keepalive-failures", required_argument,  NULL, 'K'},
-    {"stdout",             required_argument,  NULL, 'o'},
+    {"output",             required_argument,  NULL, 'o'},
     {"password",           required_argument,  NULL, 'p'},
     {"poll-delay",         required_argument,  NULL, 'P'},
     {"resource",           required_argument,  NULL, 'r'},
@@ -80,7 +80,8 @@ static const struct option long_options[] =
     {"unacked-requests",   required_argument,  NULL, 'U'},
     {"verbose",            no_argument,        NULL, 'v'},
     {"base64",             no_argument,        NULL, 'x'},
-    {"help",               no_argument,        NULL, 'h'}
+    {"help",               no_argument,        NULL, 'h'},
+    {NULL,                 0,                  NULL, 0}
 };
 
     int
@@ -1247,20 +1248,20 @@ usage(xmppipe_state_t *state)
             __progname, XMPPIPE_VERSION, XMPPIPE_SANDBOX);
     (void)fprintf(stderr,
             "usage: %s [OPTIONS]\n"
-            "   -u, --user <jid>                    username (aka JID)\n"
-            "   -p, --passord <password>            password\n"
+            "   -u, --username <jid>                XMPP username (aka JID)\n"
+            "   -p, --password <password>           XMPP password\n"
             "   -r, --resource <resource>           resource (aka MUC nick)\n"
-            "   -o, --stdout <muc>                  MUC room to send stdout\n"
+            "   -o, --output <muc>                  MUC room to send stdin\n"
             "   -S, --subject <subject>             set MUC subject\n"
             "   -a, --address <addr:port>           set XMPP server address (port is optional)\n"
 
             "   -d, --discard                       discard stdin when MUC is empty\n"
             "   -D, --discard-to-stdout             discard stdin and print to local stdout\n"
             "   -e, --ignore-eof                    ignore stdin EOF\n"
-            "   -s, --exit-when-empty               exit when MUC is empty\n"
+            "   -s, --exit-when-empty               exit when all participants leave MUC\n"
             "   -x, --base64                        base64 encode/decode data\n"
 
-            "   -b, --buffer-size <size>            size of read buffer\n"
+            "   -b, --buffer-size <size>            size of stdin read buffer\n"
             "   -I, --interval <interval>           request stream management status every interval messages\n"
             "   -k, --keepalives <seconds>          periodically send a keepalive\n"
             "   -K, --keepalive-failures <count>    number of keepalive failures before exiting\n"
