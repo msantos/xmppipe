@@ -27,6 +27,9 @@ Requirements
 
 * [libstrophe](https://github.com/strophe/libstrophe)
 
+  libstrophe 0.9.2 or later is required for [TLS certificate
+  verification](https://github.com/strophe/libstrophe/issues/100).
+
 Build
 -----
 
@@ -43,15 +46,19 @@ Tests
 Sandboxing
 ----------
 
-xmppipe restricts itself to the operations necessary for interacting
-with stdio.
+xmppipe uses a sandbox to try to restrict itself to whatever operations
+are necessary for interacting with stdio.
 
-When the process starts, an "init" sandbox limits the process to
-operations required for connecting to the XMPP server. After the
-connection is established, a more restrictive sandbox limits operations
-to interacting with stdio.
+There are 2 sandboxes:
 
-The mechanism used depends on the platform. By default:
+* a permissive "init" sandbox allowing network connections to the
+  XMPP server
+
+* after the connection is established, a stricter "stdio" sandbox
+  restricting the process to stdio operations
+
+The effectiveness of the sandbox depends on which mechanism is used. By
+default:
 
 * Linux:
 
@@ -321,18 +328,6 @@ Compatibility
 
 Tested with ejabberd and mongooseim.
 
-Security Considerations
------------------------
-
-[libstrophe](https://github.com/strophe/libstrophe.git) does not verify
-the TLS server certificates. Sessions can be MITM'ed.
-
-libstrophe has support for TLS certificate verification on a
-[branch](https://github.com/strophe/libstrophe/tree/tls-cert).
-
-[libmesode](https://github.com/boothj5/libmesode.git) supports TLS
-certificate verification.
-
 License
 -------
 
@@ -353,8 +348,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 TODO
 ----
 
-* Support TLS certificate verification
-
-  Switch to using [libmesode](https://github.com/boothj5/libmesode)
-
 * support [XEP-0384: OMEMO Encryption](https://xmpp.org/extensions/xep-0384.html)
+
+* support alternative input modes
+
+  Add a command line argument to enable various input modes. The default
+  mode converts stdin to a message body.
+
+  "formatted" mode takes the same input as the output. For example,
+  to send a chat message:
+
+    echo 'm:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here' | xmppipe
+
+  A "raw" mode could also be added: XML input/output.
