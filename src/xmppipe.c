@@ -791,7 +791,7 @@ handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     xmppipe_stanza_set_name(reply, "iq");
     xmppipe_stanza_set_type(reply, "result");
 
-    id = xmpp_stanza_get_attribute(stanza, "from");
+    id = xmpp_stanza_get_attribute(stanza, "id");
     if (id == NULL)
         return 1;
 
