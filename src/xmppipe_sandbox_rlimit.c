@@ -23,10 +23,8 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 {
     struct rlimit rl_zero = {0};
 
-#ifdef RLIMIT_NPROC
     if (setrlimit(RLIMIT_NPROC, &rl_zero) < 0)
         return -1;
-#endif
 
     return 0;
 }
@@ -34,29 +32,19 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
     int
 xmppipe_sandbox_stdin(xmppipe_state_t *state)
 {
-    struct rlimit rl_zero = {0};
-    struct rlimit rl_nofile = {0};
+    struct rlimit rl = {0};
 
-    rl_zero.rlim_cur = 0;
-    rl_zero.rlim_max = 0;
+    rl.rlim_cur = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
+    rl.rlim_max = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
 
-    rl_nofile.rlim_cur = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
-    rl_nofile.rlim_max = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
-
-#ifdef RLIMIT_NPROC
-    if (setrlimit(RLIMIT_NPROC, &rl_zero) < 0)
-        return -1;
-#endif
-
-#ifdef RLIMIT_NOFILE
-    if (rl_nofile.rlim_cur == (rlim_t)-1) {
+    if (rl.rlim_cur == (rlim_t)-1) {
         int fd = xmppipe_conn_fd(state);
         if (fd < 0) return -1;
-        rl_nofile.rlim_cur = rl_nofile.rlim_max = fd + 1;
+        rl.rlim_cur = rl.rlim_max = fd + 1;
     }
-    if (setrlimit(RLIMIT_NOFILE, &rl_nofile) < 0)
+
+    if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
         return -1;
-#endif
 
 	return 0;
 }
