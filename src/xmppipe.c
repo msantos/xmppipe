@@ -59,6 +59,10 @@ void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *, size_t);
 void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 void xmppipe_ping(xmppipe_state_t *);
 
+enum {
+    OPT_NO_TLS_VERIFY = 1
+};
+
 static const struct option long_options[] =
 {
     {"address",            required_argument,  NULL, 'a'},
@@ -81,6 +85,9 @@ static const struct option long_options[] =
     {"verbose",            no_argument,        NULL, 'v'},
     {"base64",             no_argument,        NULL, 'x'},
     {"help",               no_argument,        NULL, 'h'},
+
+    {"no-tls-verify",      no_argument,        NULL, OPT_NO_TLS_VERIFY},
+
     {NULL,                 0,                  NULL, 0}
 };
 
@@ -93,6 +100,7 @@ main(int argc, char **argv)
     char *pass = NULL;
     char *addr = NULL;
     u_int16_t port = 0;
+    int flags = 0;
 
     int ch = 0;
 
@@ -209,6 +217,10 @@ main(int argc, char **argv)
                 state->opt |= XMPPIPE_OPT_SIGPIPE;
                 break;
 
+            case OPT_NO_TLS_VERIFY:
+                flags |= XMPP_CONN_FLAG_TRUST_TLS;
+                break;
+
             case 'h':
             default:
                 usage(state);
@@ -248,6 +260,9 @@ main(int argc, char **argv)
     state->conn = xmpp_conn_new(state->ctx);
     if (state->conn == NULL)
         errx(EXIT_FAILURE, "could not allocate connection");
+
+    if (xmpp_conn_set_flags(state->conn, flags) < 0)
+        errx(EXIT_FAILURE, "failed to set connection flags");
 
     xmpp_conn_set_jid(state->conn, jid);
     xmpp_conn_set_pass(state->conn, pass);
@@ -1266,7 +1281,9 @@ usage(xmppipe_state_t *state)
             "   -k, --keepalives <seconds>          periodically send a keepalive\n"
             "   -K, --keepalive-failures <count>    number of keepalive failures before exiting\n"
             "   -P, --poll-delay <ms>               poll delay\n"
-            "   -v, --verbose                       verbose\n",
+            "   -v, --verbose                       verbose\n"
+
+            "       --no-tls-verify                 disable TLS certificate verification\n",
             __progname
             );
 

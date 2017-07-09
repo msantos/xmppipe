@@ -146,6 +146,9 @@ Options
 -v
 :   Increase verbosity
 
+--no-tls-verify
+:   Disable TLS certificate verification
+
 Decoding Percent-Encoded Strings
 --------------------------------
 
