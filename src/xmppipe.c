@@ -1024,17 +1024,19 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         return 1;
 
     if (state->encode) {
-        /* Does not need to be NULL terminated, buf is passed with length */
-        size_t len = strlen(message) * 3 / 4;
-        char *buf = xmppipe_calloc(len, 1);
-        int n = b64_pton(message, (u_char *)buf, len);
-        if (n <= 0 || n > len) {
+        size_t len = strlen(message);
+        unsigned char *buf = NULL;
+        size_t n = 0;
+
+        xmpp_base64_decode_bin(state->ctx, message, len, &buf, &n);
+
+        if (buf == NULL) {
             /* Not a base64 message */
-            free(buf);
             return 1;
         }
-        emessage = xmppipe_nfmt(buf,n);
-        free(buf);
+
+        emessage = xmppipe_nfmt((char *)buf,n);
+        xmpp_free(state->ctx, buf);
     }
     else {
         emessage = xmppipe_fmt(message);
@@ -1168,12 +1170,14 @@ xmppipe_send_message(xmppipe_state_t *state, char *to, char *type, char *buf,
     text = xmppipe_stanza_new(state->ctx);
 
     if (state->encode) {
-        size_t b64len = BASE64_LENGTH(len) + 1; /* Include trailing NULL */
-        char *b64 = xmppipe_calloc(b64len, 1);
-        if (b64_ntop((u_char *)buf, len, b64, b64len) < 0)
-            errx(EXIT_FAILURE, "encode: invalid input: %zu/%zu", len, b64len);
+        size_t len = strlen(buf);
+        char *b64 = xmpp_base64_encode(state->ctx, (unsigned char *)buf, len);
+
+        if (b64 == NULL)
+            errx(EXIT_FAILURE, "encode: invalid input: %zu", len);
+
         xmppipe_stanza_set_text(text, b64);
-        free(b64);
+        xmpp_free(state->ctx, b64);
     }
     else {
         xmppipe_stanza_set_text(text, buf);
