@@ -15,7 +15,7 @@
 #ifdef XMPPIPE_SANDBOX_SECCOMP
 #include <stddef.h>
 #include <errno.h>
-#include <linux/unistd.h>
+#include <sys/syscall.h>
 #include <linux/audit.h>
 #include <linux/filter.h>
 #include <sys/prctl.h>
