@@ -83,12 +83,12 @@ default:
 Selecting the sandbox can be done at compile time. For example, to use
 the "rlimit" sandbox:
 
-    XMPPIPE_SANDBOX=XMPPIPE_SANDBOX_RLIMIT make
+    XMPPIPE_SANDBOX=rlimit make
 
 If a sandbox is interfering with normal operation, please open an issue.
 To disable the sandbox, compile using the "null" sandbox:
 
-    XMPPIPE_SANDBOX=XMPPIPE_SANDBOX_NULL make
+    XMPPIPE_SANDBOX=null make
 
 Options
 -------

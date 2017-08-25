@@ -9,30 +9,31 @@ ifeq ($(UNAME_SYS), Linux)
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector \
 			  --param=ssp-buffer-size=4 -Wformat -Werror=format-security \
 			  -fno-strict-aliasing
-	XMPPIPE_SANDBOX ?= XMPPIPE_SANDBOX_SECCOMP
+	XMPPIPE_SANDBOX ?= seccomp
 	XMPPIPE_SANDBOX_RLIMIT_NOFILE ?= 0
 else ifeq ($(UNAME_SYS), FreeBSD)
 	CFLAGS ?= -DHAVE_STRTONUM \
 			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector \
 			  --param=ssp-buffer-size=4 -Wformat -Werror=format-security \
 			  -fno-strict-aliasing
-	XMPPIPE_SANDBOX ?= XMPPIPE_SANDBOX_CAPSICUM
+	XMPPIPE_SANDBOX ?= capsicum
 else ifeq ($(UNAME_SYS), OpenBSD)
-	XMPPIPE_SANDBOX ?= XMPPIPE_SANDBOX_PLEDGE
 	CFLAGS ?= -DHAVE_STRTONUM \
 			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector \
 			  --param=ssp-buffer-size=4 -Wformat -Werror=format-security \
 			  -fno-strict-aliasing
+	XMPPIPE_SANDBOX ?= pledge
 else ifeq ($(UNAME_SYS), SunOS)
 else ifeq ($(UNAME_SYS), Darwin)
 endif
 
-XMPPIPE_SANDBOX ?= XMPPIPE_SANDBOX_RLIMIT
+XMPPIPE_SANDBOX ?= rlimit
 XMPPIPE_SANDBOX_RLIMIT_NOFILE ?= -1
 
 XMPPIPE_CFLAGS ?= -g -Wall
 CFLAGS += $(XMPPIPE_CFLAGS) \
-		  -DXMPPIPE_SANDBOX=\"$(XMPPIPE_SANDBOX)\" -D$(XMPPIPE_SANDBOX) \
+		  -DXMPPIPE_SANDBOX=\"$(XMPPIPE_SANDBOX)\" \
+		  -DXMPPIPE_SANDBOX_$(XMPPIPE_SANDBOX) \
 		  -DXMPPIPE_SANDBOX_RLIMIT_NOFILE=$(XMPPIPE_SANDBOX_RLIMIT_NOFILE)
 
 LDFLAGS += $(XMPPIPE_LDFLAGS)
