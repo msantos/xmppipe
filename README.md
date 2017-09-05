@@ -93,57 +93,57 @@ To disable the sandbox, compile using the "null" sandbox:
 Options
 -------
 
--u *JID*
+-u, --username *JID*
 :   XMPP username: takes precedence over environment variable
 
--p *password*
+-p, --password *password*
 :   XMPP password: takes precedence over environment variable
 
--r *resource*
+-r, --resource *resource*
 :   XMPP resource, used as the nickname in the MUC
 
--o *output*
+-o, --output *output*
 :   XMPP MUC name
 
     Default: stdout-*hostname*-*uid*
 
--S *subject*
+-S, --subject *subject*
 :   XMPP MUC subject
 
--a *address:port*
+-a, --address *address:port*
 :   Specify the IP address and port of the XMPP server
 
--d
+-d, --discard
 :   Discard stdin when MUC is empty
 
--D
+-D, --discard-to-stdout
 :   Discard stdin and print to local stdout
 
--e
+-e, --ignore-eof
 :   Ignore stdin EOF
 
--s
+-s, --exit-when-empty
 :   Exit when MUC is empty
 
--x
+-x, --base64
 :   Base64 encode/decode data
 
--b *size*
+-b, --buffer-size *size*
 :   Size of read buffer
 
--I *interval*
+-I, --interval *interval*
 :   Request stream management status every interval messages
 
--k *seconds* 
+-k, --keepalives *seconds*
 :   Periodically send a keepalive
 
--K *count*
+-K, --keepalive-failures *count*
 :   Number of keepalive failures before exiting
 
--P *ms*
+-P, --poll-delay *ms*
 :   Poll delay
 
--v
+-v, --verbose
 :   Increase verbosity
 
 --no-tls-verify
@@ -170,11 +170,11 @@ An interactive XMPP bot written in the shell:
 ~~~ shell
 #!/bin/bash
 
-set -e
-set -u
+set -o errexit
+set -o nounset
 set -o pipefail
 
-trap cleanup 0
+trap cleanup EXIT
 
 TMPDIR=$(mktemp -d)
 
@@ -254,7 +254,8 @@ mkfifo riemann
 curl -s --get --data subscribe=true \
     --data-urlencode 'query=(service ~= "^example")' \
     http://example.com:80/index < /dev/null > riemann &
-xmppipe -o "muc" -d -vv -S "riemann events" < riemann
+xmppipe --verbose --verbose \
+        --output "muc" --discard --subject "riemann events" < riemann
 ~~~
 
 ### Mirror a terminal session using script(1)
@@ -271,7 +272,7 @@ FIFO=$TMPDIR/console
 mkfifo $FIFO
 
 stty cols 80 rows 24
-(cat $FIFO | xmppipe -r user -o $MUC -x) > /dev/null 2> $TMPDIR/stderr &
+(cat $FIFO | xmppipe --resource user --output $MUC -x) > /dev/null 2> $TMPDIR/stderr &
 script -q -f $FIFO
 ~~~
 
@@ -285,7 +286,7 @@ decode() {
 }
 
 stty cols 80 rows 24
-xmppipe -r viewer -o console -x | while read l; do
+xmppipe --resource viewer --output console --base64 | while read l; do
     IFS=:
     set -- $l
     if [ "$1" = "m" ]; then
