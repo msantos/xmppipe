@@ -23,10 +23,7 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 {
     struct rlimit rl_zero = {0};
 
-    if (setrlimit(RLIMIT_NPROC, &rl_zero) < 0)
-        return -1;
-
-    return 0;
+    return setrlimit(RLIMIT_NPROC, &rl_zero);
 }
 
     int
@@ -43,9 +40,6 @@ xmppipe_sandbox_stdin(xmppipe_state_t *state)
         rl.rlim_cur = rl.rlim_max = fd + 1;
     }
 
-    if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
-        return -1;
-
-	return 0;
+    return setrlimit(RLIMIT_NOFILE, &rl);
 }
 #endif
