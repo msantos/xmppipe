@@ -46,11 +46,10 @@ $(PROG):
 
 static:
 	$(CC) $(CFLAGS) -g -Wall -o xmppipe src/*.c -Wl,--no-as-needed \
-		-ldl -lz \
-		/usr/local/lib/libstrophe.a \
-		/usr/lib/*/libssl.a \
-		/usr/lib/*/libcrypto.a \
-		/usr/lib/*/libexpat.a
+		-ldl -lz -lresolv \
+		-l:libstrophe.a \
+		-l:libssl.a -l:libcrypto.a \
+		-l:libexpat.a
 
 clean:
 	-@$(RM) $(PROG)
