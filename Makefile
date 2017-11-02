@@ -6,21 +6,21 @@ RM=rm
 UNAME_SYS := $(shell uname -s)
 ifeq ($(UNAME_SYS), Linux)
 	LDFLAGS += -Wl,-Bsymbolic-functions -Wl,-z,relro
-	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector \
-			  --param=ssp-buffer-size=4 -Wformat -Werror=format-security \
+	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
+			  -Wformat -Werror=format-security \
 			  -fno-strict-aliasing
 	XMPPIPE_SANDBOX ?= seccomp
 	XMPPIPE_SANDBOX_RLIMIT_NOFILE ?= 0
 else ifeq ($(UNAME_SYS), FreeBSD)
 	CFLAGS ?= -DHAVE_STRTONUM \
-			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector \
-			  --param=ssp-buffer-size=4 -Wformat -Werror=format-security \
+			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
+			  -Wformat -Werror=format-security \
 			  -fno-strict-aliasing
 	XMPPIPE_SANDBOX ?= capsicum
 else ifeq ($(UNAME_SYS), OpenBSD)
 	CFLAGS ?= -DHAVE_STRTONUM \
-			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector \
-			  --param=ssp-buffer-size=4 -Wformat -Werror=format-security \
+			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
+			  -Wformat -Werror=format-security \
 			  -fno-strict-aliasing
 	XMPPIPE_SANDBOX ?= pledge
 else ifeq ($(UNAME_SYS), SunOS)
