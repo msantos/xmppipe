@@ -5,7 +5,6 @@ RM=rm
 
 UNAME_SYS := $(shell uname -s)
 ifeq ($(UNAME_SYS), Linux)
-	LDFLAGS += -Wl,-Bsymbolic-functions -Wl,-z,relro
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
 			  -fno-strict-aliasing
@@ -37,7 +36,7 @@ CFLAGS += $(XMPPIPE_CFLAGS) \
 		  -DXMPPIPE_SANDBOX_$(XMPPIPE_SANDBOX) \
 		  -DXMPPIPE_SANDBOX_RLIMIT_NOFILE=$(XMPPIPE_SANDBOX_RLIMIT_NOFILE)
 
-LDFLAGS += $(XMPPIPE_LDFLAGS)
+LDFLAGS += $(XMPPIPE_LDFLAGS) -Wl,-z,relro,-z,now
 
 all: $(PROG)
 
