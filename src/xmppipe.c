@@ -1263,7 +1263,7 @@ xmppipe_strtonum(xmppipe_state_t *state, const char *nptr, long long minval,
     static void
 usage(xmppipe_state_t *state)
 {
-    (void)fprintf(stderr, "%s %s (%s)\n",
+    (void)fprintf(stderr, "%s %s (using %s sandbox)\n",
             __progname, XMPPIPE_VERSION, XMPPIPE_SANDBOX);
     (void)fprintf(stderr,
             "usage: %s [OPTIONS]\n"
