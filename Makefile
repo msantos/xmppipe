@@ -36,7 +36,8 @@ CFLAGS += $(XMPPIPE_CFLAGS) \
 		  -DXMPPIPE_SANDBOX_$(XMPPIPE_SANDBOX) \
 		  -DXMPPIPE_SANDBOX_RLIMIT_NOFILE=$(XMPPIPE_SANDBOX_RLIMIT_NOFILE)
 
-LDFLAGS += $(XMPPIPE_LDFLAGS) -Wl,-z,relro,-z,now
+XMPPIPE_LDFLAGS ?= -Wl,-z,relro,-z,now
+LDFLAGS += $(XMPPIPE_LDFLAGS)
 
 all: $(PROG)
 
@@ -45,7 +46,7 @@ $(PROG):
 
 static:
 	$(CC) $(CFLAGS) -g -Wall -o xmppipe src/*.c -Wl,--no-as-needed \
-		-ldl -lz -lresolv \
+		$(LDFLAGS) -ldl -lz -lresolv \
 		-l:libstrophe.a \
 		-l:libssl.a -l:libcrypto.a \
 		-l:libexpat.a
