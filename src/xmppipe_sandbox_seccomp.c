@@ -258,6 +258,10 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
         SC_ALLOW(sysinfo),
 #endif
 
+#ifdef __NR_restart_syscall
+        SC_ALLOW(restart_syscall),
+#endif
+
         /* Default deny */
         BPF_STMT(BPF_RET+BPF_K, SECCOMP_FILTER_FAIL)
     };
