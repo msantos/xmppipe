@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <err.h>
+#include <sys/types.h>
 
 #include <strophe.h>
 

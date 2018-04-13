@@ -15,7 +15,6 @@
 #include "xmppipe.h"
 
 #include <sys/select.h>
-#include <sys/types.h>
 #include <netinet/in.h>
 #include <resolv.h>
 #include <getopt.h>
