@@ -37,7 +37,7 @@ xmppipe_conn_fd(xmppipe_state_t *state)
     if (getrlimit(RLIMIT_NOFILE, &rl) < 0)
         return -1;
 
-    for (fd = STDERR_FILENO+1; fd < rl.rlim_cur; fd++) {
+    for (fd = rl.rlim_cur; fd > STDERR_FILENO; fd--) {
         if (fcntl(fd, F_GETFD, 0) < 0)
             continue;
 
