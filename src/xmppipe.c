@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2017, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2018, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -67,6 +67,7 @@ static const struct option long_options[] =
     {"address",            required_argument,  NULL, 'a'},
     {"buffer-size",        required_argument,  NULL, 'b'},
     {"flow-control",       required_argument,  NULL, 'c'},
+    {"chat",               no_argument,        NULL, 'C'},
     {"discard",            no_argument,        NULL, 'd'},
     {"discard-to-stdout",  no_argument,        NULL, 'D'},
     {"ignore-eof",         no_argument,        NULL, 'e'},
@@ -115,6 +116,7 @@ main(int argc, char **argv)
     state->sm_unacked = 5;
     state->room = xmppipe_roomname("stdout");
     state->resource = xmppipe_strdup(XMPPIPE_RESOURCE);
+    state->opt |= XMPPIPE_OPT_GROUPCHAT;
 
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
@@ -125,7 +127,7 @@ main(int argc, char **argv)
     if (xmppipe_sandbox_init(state) < 0)
         err(EXIT_FAILURE, "sandbox failed");
 
-    while ( (ch = getopt_long(argc, argv, "a:b:c:dDehI:k:K:o:P:p:r:sS:u:U:vx",
+    while ( (ch = getopt_long(argc, argv, "a:b:Cc:dDehI:k:K:o:P:p:r:sS:u:U:vx",
                     long_options, NULL)) != -1) {
         switch (ch) {
             case 'u':
@@ -200,6 +202,10 @@ main(int argc, char **argv)
             case 'U':
                 /* XEP-0198: stream management unacked requests */
                 state->sm_unacked = xmppipe_strtonum(state, optarg, 0, 0xfffe);
+                break;
+
+            case 'C':
+                state->opt &= ~XMPPIPE_OPT_GROUPCHAT;
                 break;
 
             case 'd':
@@ -281,13 +287,13 @@ main(int argc, char **argv)
     if (xmppipe_stream_init(state) < 0)
         errx(EXIT_FAILURE, "enabling stream management failed");
 
-    if (xmppipe_muc_init(state) < 0)
+    if ( (state->opt & XMPPIPE_OPT_GROUPCHAT) && xmppipe_muc_init(state) < 0)
         errx(EXIT_FAILURE, "failed to join MUC");
 
     if (xmppipe_presence_init(state) < 0)
         errx(EXIT_FAILURE, "publishing presence failed");
 
-    if (state->subject)
+    if ( (state->opt & XMPPIPE_OPT_GROUPCHAT) && state->subject)
         xmppipe_muc_subject(state, state->subject);
 
     event_loop(state);
@@ -337,6 +343,11 @@ xmppipe_stream_init(xmppipe_state_t *state)
             "urn:xmpp:sm:3", "r", NULL, state);
     xmpp_handler_add(state->conn, handle_sm_ack,
             "urn:xmpp:sm:3", "a", NULL, state);
+    xmpp_handler_add(state->conn, handle_message,
+        NULL, "message", NULL, state);
+    xmpp_handler_add(state->conn, handle_version,
+            "jabber:iq:version", "iq", NULL, state);
+    xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 
     /* XXX multiple handlers can be called for each event
      * XXX
@@ -352,7 +363,6 @@ xmppipe_stream_init(xmppipe_state_t *state)
     int
 xmppipe_muc_init(xmppipe_state_t *state)
 {
-    xmpp_stanza_t *presence = NULL;
     xmpp_stanza_t *iq = NULL;
     xmpp_stanza_t *query = NULL;
 
@@ -360,10 +370,6 @@ xmppipe_muc_init(xmppipe_state_t *state)
             "http://jabber.org/protocol/muc", "presence", "error", state);
     xmpp_handler_add(state->conn, handle_presence,
             "http://jabber.org/protocol/muc#user", "presence", NULL, state);
-    xmpp_handler_add(state->conn, handle_version,
-            "jabber:iq:version", "iq", NULL, state);
-    xmpp_handler_add(state->conn, handle_message, NULL, "message", NULL, state);
-    xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 
     /* Discover the MUC service */
     if (state->out == NULL) {
@@ -391,24 +397,29 @@ xmppipe_muc_init(xmppipe_state_t *state)
         state->status = XMPPIPE_S_MUC_SERVICE_LOOKUP;
     }
 
-    /* Send initial <presence/> so that we appear online to contacts */
-    presence = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(presence, "presence");
-    xmppipe_send(state, presence);
-    (void)xmpp_stanza_release(presence);
-
-    if (state->out) {
-        xmppipe_muc_join(state);
-        xmppipe_muc_unlock(state);
-        state->status = XMPPIPE_S_MUC_WAITJOIN;
-    }
-
     return 0;
 }
 
     int
 xmppipe_presence_init(xmppipe_state_t *state)
 {
+    xmpp_stanza_t *presence = NULL;
+
+    /* Send initial <presence/> so that we appear online to contacts */
+    presence = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(presence, "presence");
+    xmppipe_send(state, presence);
+    (void)xmpp_stanza_release(presence);
+
+    if (!(state->opt & XMPPIPE_OPT_GROUPCHAT))
+      state->status = XMPPIPE_S_READY_AVAIL;
+
+    if ( (state->opt & XMPPIPE_OPT_GROUPCHAT) && state->out) {
+        xmppipe_muc_join(state);
+        xmppipe_muc_unlock(state);
+        state->status = XMPPIPE_S_MUC_WAITJOIN;
+    }
+
     for ( ; ; ) {
         xmpp_run_once(state->ctx, state->poll);
         switch (state->status) {
@@ -553,7 +564,9 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
             return 2;
         }
 
-        xmppipe_send_message(state, state->out, "groupchat", buf, n);
+        xmppipe_send_message(state, state->out,
+            (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat",
+            buf, n);
         state->interval = 0;
         return 3;
     }
@@ -774,8 +787,10 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         state->out = xmppipe_conference(state->room, state->mucservice);
         state->mucjid = xmppipe_mucjid(state->out, state->resource);
 
+        if (state->opt & XMPPIPE_OPT_GROUPCHAT) {
         xmppipe_muc_join(state);
         xmppipe_muc_unlock(state);
+        }
 
         return 0;
     }
@@ -1011,7 +1026,9 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         return 1;
 
     /* Check if the message is from us */
-    if (XMPPIPE_STREQ(type, "groupchat") && XMPPIPE_STREQ(from, state->mucjid))
+    if (XMPPIPE_STREQ(type,
+          state->opt & XMPPIPE_OPT_GROUPCHAT ? "groupchat" : "chat")
+        && XMPPIPE_STREQ(from, state->mucjid))
         return 1;
 
     child = xmpp_stanza_get_child_by_name(stanza, "body");

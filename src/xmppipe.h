@@ -52,6 +52,7 @@ enum {
     XMPPIPE_OPT_DISCARD_TO_STDOUT = 1 << 1, /* Throw away stdin and send to local stdout */
     XMPPIPE_OPT_EOF = 1 << 2,               /* Keep running on stdin EOF */
     XMPPIPE_OPT_SIGPIPE = 1 << 3,           /* Exit if no occupants in MUC */
+    XMPPIPE_OPT_GROUPCHAT = 1 << 4,         /* Use groupchat */
 };
 
 typedef struct {
