@@ -193,36 +193,40 @@ decode() {
 }
 
 bot() {
-    while read line; do
-        IFS=:
-        set -- $line
-        if [ "$1" = "p" ]; then
-            decode "$line" 1>&2
-            echo 1>&2
-        elif [ "$1" = "m" ]; then
-            USER="$(decode ${3#*%2F})"
-            IFS=$OFS
-            MSG="$(decode ${!#})"
-            case $MSG in
-                *"has set the subject to:"*) ;;
-                "sudo make me a sandwich")
-                    echo "$USER: you're a sandwich"
-                    ;;
-                sudo*)
-                    echo "I'm sorry, $USER. I'm afraid I can't do that."
-                    ;;
-                uptime)
-                    uptime
-                    ;;
-                exit)
-                    echo "exiting ..."
-                    exit 0
-                    ;;
-                *)
-                    echo "$@"
-                    ;;
-            esac
-        fi
+    while IFS=: read -r type status from to message; do
+        case "$type" in
+            m) ;;
+
+            p) decode "$type:$status:$from:$to" 1>&2
+               echo 1>&2
+               continue
+               ;;
+
+            *) continue ;;
+        esac
+
+        USER="$(decode ${from#*/})"
+        MSG="$(decode ${message})"
+
+        case $MSG in
+            *"has set the subject to:"*) ;;
+            "sudo make me a sandwich")
+                echo "$USER: you're a sandwich"
+                ;;
+            sudo*)
+                echo "I'm sorry, $USER. I'm afraid I can't do that."
+                ;;
+            uptime)
+                uptime
+                ;;
+            exit)
+                echo "exiting ..."
+                exit 0
+                ;;
+            *)
+                echo "$MSG"
+                ;;
+        esac
     done < $out
 }
 
@@ -286,13 +290,10 @@ decode() {
 }
 
 stty cols 80 rows 24
-xmppipe --resource viewer --output console --base64 | while read l; do
-    IFS=:
-    set -- $l
-    if [ "$1" = "m" ]; then
-        decode $5
-    fi
-done
+xmppipe --resource viewer --output console --base64 | \
+  while IFS=: read x s f t m; do
+    [ "$m" = "m" ] && decode $5
+  done
 ~~~
 
 ### Mirror a terminal session to a web page

@@ -29,21 +29,20 @@ atexit() {
 }
 
 decode() {
-    while read line; do
-        OFS=$IFS
-        IFS=:
-        set -- $line
-        [ "$1" = "m" ] && printf '%b' "${!#//%/\\x}"
-        IFS=$OFS
+    while IFS=: read type status from to message; do
+        case "$type" in
+            m) printf '%b' "${message//%/\\x}" ;;
+            *) ;;
+        esac
     done
 }
 
 server() {
     CONNECT=0
     xmppipe -e -r server -o $1 -b 1024 -x < /dev/null | \
-    while read line; do
-        case $line in
-            p*)
+    while IFS=: read type rest; do
+        case "$type" in
+            p)
                 CONNECT=$((CONNECT + 1))
                 if [ "$CONNECT" -gt "1" ]; then
                     exec "$PROGNAME" session $@
