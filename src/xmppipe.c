@@ -104,6 +104,9 @@ main(int argc, char **argv)
 
     int ch = 0;
 
+    if (setvbuf(stdout, NULL, _IOLBF, 0) < 0)
+        err(EXIT_FAILURE, "setvbuf");
+
     state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
     state->status = XMPPIPE_S_CONNECTING;
@@ -513,8 +516,6 @@ XMPPIPE_POLL:
         if ((state->opt & XMPPIPE_OPT_SIGPIPE)
                 && state->status == XMPPIPE_S_READY_EMPTY)
             goto XMPPIPE_EXIT;
-
-        (void)fflush(stdout);
     }
 
 XMPPIPE_EXIT:
@@ -558,7 +559,6 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
                 char *enc = NULL;
                 enc = xmppipe_fmt(buf);
                 (void)printf("!:%s\n", enc);
-                (void)fflush(stdout);
                 free(enc);
             }
             return 2;
@@ -941,7 +941,6 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     eto = xmppipe_fmt(to);
 
     (void)printf("p:%s:%s:%s\n", etype, efrom, eto);
-    (void)fflush(stdout);
 
     state->interval = 0;
 
@@ -1063,7 +1062,6 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     eto = xmppipe_fmt(to);
 
     (void)printf("m:%s:%s:%s:%s\n", etype, efrom, eto, emessage);
-    (void)fflush(stdout);
 
     state->interval = 0;
 
