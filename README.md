@@ -262,6 +262,36 @@ xmppipe --verbose --verbose \
         --output "muc" --discard --subject "riemann events" < riemann
 ~~~
 
+### Desktop Notifications
+
+~~~ shell
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+decode() {
+    printf '%b' "${1//%/\\x}"
+}
+
+MUC=""
+
+while getopts ":o:" opt; do
+  case $opt in
+    o) MUC="$OPTARG" ;;
+    *) ;;
+  esac
+done
+
+xmppipe "$@" | while IFS=: read type status from to message; do
+  case "$type" in
+    m) notify-send "$MUC" "$(decode $message)" ;;
+    *) continue ;;
+  esac
+done
+~~~
+
 ### Mirror a terminal session using script(1)
 
 * user
