@@ -25,6 +25,7 @@ static void usage(xmppipe_state_t *xp);
 
 static long long xmppipe_strtonum(xmppipe_state_t *state, const char *nptr,
         long long minval, long long maxval);
+static void xmppipe_next_state(xmppipe_state_t *state, int status);
 
 void handle_connection(xmpp_conn_t * const, const xmpp_conn_event_t, const int,
         xmpp_stream_error_t * const, void * const userdata);
@@ -109,7 +110,7 @@ main(int argc, char **argv)
 
     state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
-    state->status = XMPPIPE_S_CONNECTING;
+    xmppipe_next_state(state, XMPPIPE_S_CONNECTING);
     state->bufsz = 2049;
     state->poll = 10;
     state->keepalive = 60 * 1000;
@@ -387,6 +388,7 @@ xmppipe_muc_init(xmppipe_state_t *state)
         xmppipe_stanza_set_name(iq, "iq");
         xmppipe_stanza_set_type(iq, "get");
         xmppipe_stanza_set_attribute(iq, "to", state->server);
+        xmppipe_stanza_set_id(iq, "_xmppipe_muc_init");
 
         query = xmppipe_stanza_new(state->ctx);
         xmppipe_stanza_set_name(query, "query");
@@ -397,7 +399,7 @@ xmppipe_muc_init(xmppipe_state_t *state)
         xmppipe_send(state, iq);
         (void)xmpp_stanza_release(iq);
 
-        state->status = XMPPIPE_S_MUC_SERVICE_LOOKUP;
+        xmppipe_next_state(state, XMPPIPE_S_MUC_SERVICE_LOOKUP);
     }
 
     return 0;
@@ -415,12 +417,12 @@ xmppipe_presence_init(xmppipe_state_t *state)
     (void)xmpp_stanza_release(presence);
 
     if (!(state->opt & XMPPIPE_OPT_GROUPCHAT))
-      state->status = XMPPIPE_S_READY_AVAIL;
+      xmppipe_next_state(state, XMPPIPE_S_READY_AVAIL);
 
     if ( (state->opt & XMPPIPE_OPT_GROUPCHAT) && state->out) {
         xmppipe_muc_join(state);
         xmppipe_muc_unlock(state);
-        state->status = XMPPIPE_S_MUC_WAITJOIN;
+        xmppipe_next_state(state, XMPPIPE_S_MUC_WAITJOIN);
     }
 
     for ( ; ; ) {
@@ -585,11 +587,11 @@ handle_connection(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
         case XMPP_CONN_CONNECT:
             if (state->verbose)
                 fprintf(stderr, "DEBUG: connected\n");
-            state->status = XMPPIPE_S_CONNECTED;
+            xmppipe_next_state(state, XMPPIPE_S_CONNECTED);
             break;
 
         default:
-            state->status = XMPPIPE_S_DISCONNECTED;
+            xmppipe_next_state(state, XMPPIPE_S_DISCONNECTED);
             if (state->verbose)
                 fprintf(stderr, "DEBUG: disconnected\n");
             errx(EXIT_FAILURE, "handle_connection: disconnected");
@@ -716,6 +718,7 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         xmpp_stanza_t *iq, *reply;
         const char *jid = NULL;
         const char *name = NULL;
+        char *id = NULL;
 
         name = xmpp_stanza_get_name(item);
         if (name == NULL)
@@ -733,6 +736,12 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         xmppipe_stanza_set_type(iq, "get");
         xmppipe_stanza_set_attribute(iq, "to", jid);
 
+        id = xmpp_uuid_gen(state->ctx);
+        if (id == NULL) {
+            errx(EXIT_FAILURE, "unable to allocate message id");
+        }
+        xmppipe_stanza_set_id(iq, id);
+
         reply = xmppipe_stanza_new(ctx);
         xmppipe_stanza_set_name(reply, "query");
         xmppipe_stanza_set_ns(reply, "http://jabber.org/protocol/disco#info");
@@ -741,6 +750,7 @@ handle_disco_items(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
         xmppipe_send(state, iq);
         (void)xmpp_stanza_release(iq);
+        xmpp_free(state->ctx, id);
     }
 
     return 0;
@@ -894,7 +904,8 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (from == NULL || to == NULL)
         return 1;
 
-    x = xmpp_stanza_get_child_by_name(stanza, "x");
+    x = xmpp_stanza_get_child_by_ns(stanza,
+        "http://jabber.org/protocol/muc#user");
 
     if (x) {
         for (item = xmpp_stanza_get_children(x); item != NULL;
@@ -909,7 +920,7 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
                         free(state->mucjid);
                         state->mucjid= xmppipe_strdup(from);
                     }
-                    state->status = XMPPIPE_S_READY;
+                    xmppipe_next_state(state, XMPPIPE_S_READY);
                     me = 1;
                     break;
                 }
@@ -931,10 +942,10 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     }
 
     if (state->status == XMPPIPE_S_READY && state->occupants > 0)
-        state->status = XMPPIPE_S_READY_AVAIL;
+        xmppipe_next_state(state, XMPPIPE_S_READY_AVAIL);
 
     if (state->status == XMPPIPE_S_READY_AVAIL && state->occupants == 0)
-        state->status = XMPPIPE_S_READY_EMPTY;
+        xmppipe_next_state(state, XMPPIPE_S_READY_EMPTY);
 
     etype = xmppipe_fmt(type);
     efrom = xmppipe_fmt(from);
@@ -1272,6 +1283,15 @@ xmppipe_strtonum(xmppipe_state_t *state, const char *nptr, long long minval,
         errx(EXIT_FAILURE, "%s: %s", errstr, nptr);
 
     return n;
+}
+
+    static void
+xmppipe_next_state(xmppipe_state_t *state, int status)
+{
+    if (state->verbose)
+      (void)fprintf(stderr, "status: %d -> %d\n", state->status, status);
+
+    state->status = status;
 }
 
     static void
