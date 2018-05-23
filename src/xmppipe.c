@@ -63,6 +63,22 @@ enum {
     OPT_NO_TLS_VERIFY = 1
 };
 
+static const char const *xmppipe_states[] = {
+    "XMPPIPE_S_DISCONNECTED",
+    "XMPPIPE_S_CONNECTING",
+    "XMPPIPE_S_CONNECTED",
+
+    "XMPPIPE_S_MUC_SERVICE_LOOKUP",
+    "XMPPIPE_S_MUC_FEATURE_LOOKUP",
+    "XMPPIPE_S_MUC_WAITJOIN",
+    "XMPPIPE_S_MUC_JOIN",
+    "XMPPIPE_S_MUC_UNLOCK",
+
+    "XMPPIPE_S_READY",
+    "XMPPIPE_S_READY_AVAIL",
+    "XMPPIPE_S_READY_EMPTY"
+};
+
 static const struct option long_options[] =
 {
     {"address",            required_argument,  NULL, 'a'},
@@ -1289,7 +1305,11 @@ xmppipe_strtonum(xmppipe_state_t *state, const char *nptr, long long minval,
 xmppipe_next_state(xmppipe_state_t *state, int status)
 {
     if (state->verbose)
-      (void)fprintf(stderr, "status: %d -> %d\n", state->status, status);
+      (void)fprintf(stderr, "next state: %s (%d) -> %s (%d)\n",
+          (state->status < 0 || state->status > XMPPIPE_S_READY_EMPTY) ? "unknown" : xmppipe_states[state->status],
+          state->status,
+          (state->status < 0 || state->status > XMPPIPE_S_READY_EMPTY) ? "unknown" : xmppipe_states[status],
+          status);
 
     state->status = status;
 }

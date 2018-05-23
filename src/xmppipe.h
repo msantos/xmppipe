@@ -23,7 +23,7 @@
 
 #include <strophe.h>
 
-#define XMPPIPE_VERSION "0.9.3"
+#define XMPPIPE_VERSION "0.10.0"
 #define XMPPIPE_RESOURCE "xmppipe"
 
 #define XMPPIPE_STREQ(a,b)      (strcmp((a),(b)) == 0)
