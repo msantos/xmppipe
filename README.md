@@ -234,6 +234,27 @@ bot > $in &
 xmppipe "$@" <$in >$out
 ~~~
 
+### Sending Notifications/Alerts
+
+Start `xmppipe` attached to pipe:
+
+~~~ shell
+mkfifo /tmp/xmpp
+xmppipe -o groupchat <> /tmp/xmpp
+~~~
+
+Any data written to the pipe from a script or command line will be sent
+to the groupchat:
+
+~~~ shell
+# assuming XMPPIPE_FILE=/tmp/xmpp
+echo "test" > /tmp/xmpp
+
+df -h > /tmp/mpp
+
+git diff > /tmp/xmpp
+~~~
+
 ### SSH over XMPP
 
 See [examples/ssh-over-xmpp](https://github.com/msantos/xmppipe/blob/master/examples/ssh-over-xmpp):
@@ -366,7 +387,7 @@ Tested with ejabberd and mongooseim.
 License
 -------
 
-Copyright (c) 2015-2017, Michael Santos <michael.santos@gmail.com>
+Copyright (c) 2015-2018, Michael Santos <michael.santos@gmail.com>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
