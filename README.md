@@ -46,16 +46,13 @@ Tests
 Sandboxing
 ----------
 
-xmppipe uses a sandbox to try to restrict itself to whatever operations
-are necessary for interacting with stdio.
-
-There are 2 sandboxes:
+xmppipe applies 2 sandboxes:
 
 * a permissive "init" sandbox allowing network connections to the
   XMPP server
 
-* after the connection is established, a stricter "stdio" sandbox
-  restricting the process to stdio operations
+* once the connection is established, a stricter "stdio" sandbox
+  limits the process to stdio
 
 The effectiveness of the sandbox depends on which mechanism is used. By
 default:
@@ -80,8 +77,8 @@ default:
     * init: setrlimit(2)
     * stdio: setrlimit(2)
 
-Selecting the sandbox can be done at compile time. For example, to use
-the "rlimit" sandbox:
+Selecting the sandbox is done at compile time. For example, to use the
+"rlimit" sandbox:
 
     XMPPIPE_SANDBOX=rlimit make
 
@@ -236,18 +233,17 @@ xmppipe "$@" <$in >$out
 
 ### Sending Notifications/Alerts
 
-Start `xmppipe` attached to pipe:
+Start `xmppipe` attached to a pipe:
 
 ~~~ shell
 mkfifo /tmp/xmpp
+
 xmppipe -o groupchat <> /tmp/xmpp
 ~~~
 
-Any data written to the pipe from a script or command line will be sent
-to the groupchat:
+Any data written to the pipe will be sent to the groupchat:
 
 ~~~ shell
-# assuming XMPPIPE_FILE=/tmp/xmpp
 echo "test" > /tmp/xmpp
 
 df -h > /tmp/mpp
