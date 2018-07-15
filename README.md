@@ -143,6 +143,9 @@ Options
 -v, --verbose
 :   Increase verbosity
 
+--chat
+:   Use one to one chat
+
 --no-tls-verify
 :   Disable TLS certificate verification
 

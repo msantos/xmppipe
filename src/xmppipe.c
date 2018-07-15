@@ -60,7 +60,8 @@ void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 void xmppipe_ping(xmppipe_state_t *);
 
 enum {
-    OPT_NO_TLS_VERIFY = 1
+    OPT_NO_TLS_VERIFY = 1,
+    OPT_CHAT,
 };
 
 static const char const *xmppipe_states[] = {
@@ -84,7 +85,7 @@ static const struct option long_options[] =
     {"address",            required_argument,  NULL, 'a'},
     {"buffer-size",        required_argument,  NULL, 'b'},
     {"flow-control",       required_argument,  NULL, 'c'},
-    {"chat",               no_argument,        NULL, 'C'},
+    {"chat",               no_argument,        NULL, OPT_CHAT},
     {"discard",            no_argument,        NULL, 'd'},
     {"discard-to-stdout",  no_argument,        NULL, 'D'},
     {"ignore-eof",         no_argument,        NULL, 'e'},
@@ -147,7 +148,7 @@ main(int argc, char **argv)
     if (xmppipe_sandbox_init(state) < 0)
         err(EXIT_FAILURE, "sandbox failed");
 
-    while ( (ch = getopt_long(argc, argv, "a:b:Cc:dDehI:k:K:o:P:p:r:sS:u:U:vx",
+    while ( (ch = getopt_long(argc, argv, "a:b:c:dDehI:k:K:o:P:p:r:sS:u:U:vx",
                     long_options, NULL)) != -1) {
         switch (ch) {
             case 'u':
@@ -224,10 +225,6 @@ main(int argc, char **argv)
                 state->sm_unacked = xmppipe_strtonum(state, optarg, 0, 0xfffe);
                 break;
 
-            case 'C':
-                state->opt &= ~XMPPIPE_OPT_GROUPCHAT;
-                break;
-
             case 'd':
                 state->opt |= XMPPIPE_OPT_DISCARD;
                 break;
@@ -244,6 +241,9 @@ main(int argc, char **argv)
 
             case OPT_NO_TLS_VERIFY:
                 flags |= XMPP_CONN_FLAG_TRUST_TLS;
+                break;
+            case OPT_CHAT:
+                state->opt &= ~XMPPIPE_OPT_GROUPCHAT;
                 break;
 
             case 'h':
@@ -1341,6 +1341,7 @@ usage(xmppipe_state_t *state)
             "   -P, --poll-delay <ms>               poll delay\n"
             "   -v, --verbose                       verbose\n"
 
+            "       --chat                          use one to one chat\n"
             "       --no-tls-verify                 disable TLS certificate verification\n",
             __progname
             );
