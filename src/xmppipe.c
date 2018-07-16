@@ -270,6 +270,13 @@ main(int argc, char **argv)
         state->out = xmppipe_strdup(state->room);
         state->mucjid = xmppipe_mucjid(state->out, state->resource);
     }
+    else if (!(state->opt & XMPPIPE_OPT_GROUPCHAT)) {
+        char *from = strchr(jid, '@');
+        if (from == NULL)
+            usage(state);
+        from++;
+        state->out = xmppipe_conference(state->room, from);
+    }
 
     if (xmppipe_fmt_init() < 0)
         errx(EXIT_FAILURE, "xmppipe_fmt_init");
