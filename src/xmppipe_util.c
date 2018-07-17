@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2017, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2018, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,6 +15,14 @@
 #include "xmppipe.h"
 
 #include <fcntl.h>
+
+#define XMPPIPE_NULL(a_) \
+    if ((a_) == NULL) { \
+        errx(3, "invalid argument: %s/%s (%s:%d)", \
+            __FUNCTION__, \
+            #a_, \
+            __FILE__, \
+            __LINE__); }
 
     int
 xmppipe_set_nonblock(int fd)
@@ -99,6 +107,10 @@ xmppipe_stanza_new(xmpp_ctx_t *ctx)
 xmppipe_stanza_set_attribute(xmpp_stanza_t * const stanza,
         const char * const key, const char * const value)
 {
+    XMPPIPE_NULL(stanza);
+    XMPPIPE_NULL(key);
+    XMPPIPE_NULL(value);
+
     if (xmpp_stanza_set_attribute(stanza, key, value) < 0)
         err(3, "xmppipe_stanza_set_attribute");
 }
@@ -106,6 +118,9 @@ xmppipe_stanza_set_attribute(xmpp_stanza_t * const stanza,
     void
 xmppipe_stanza_set_id(xmpp_stanza_t * const stanza, const char * const id)
 {
+    XMPPIPE_NULL(stanza);
+    XMPPIPE_NULL(id);
+
     if (xmpp_stanza_set_id(stanza, id) < 0)
         err(3, "xmppipe_stanza_set_id");
 }
@@ -113,6 +128,9 @@ xmppipe_stanza_set_id(xmpp_stanza_t * const stanza, const char * const id)
     void
 xmppipe_stanza_set_name(xmpp_stanza_t *stanza, const char * const name)
 {
+    XMPPIPE_NULL(stanza);
+    XMPPIPE_NULL(name);
+
     switch (xmpp_stanza_set_name(stanza, name)) {
         case 0:
             return;
@@ -128,6 +146,9 @@ xmppipe_stanza_set_name(xmpp_stanza_t *stanza, const char * const name)
     void
 xmppipe_stanza_set_ns(xmpp_stanza_t * const stanza, const char * const ns)
 {
+    XMPPIPE_NULL(stanza);
+    XMPPIPE_NULL(ns);
+
     if (xmpp_stanza_set_ns(stanza, ns) < 0)
         err(3, "xmppipe_stanza_set_ns");
 }
@@ -135,6 +156,9 @@ xmppipe_stanza_set_ns(xmpp_stanza_t * const stanza, const char * const ns)
     void
 xmppipe_stanza_set_text(xmpp_stanza_t *stanza, const char * const text)
 {
+    XMPPIPE_NULL(stanza);
+    XMPPIPE_NULL(text);
+
     if (xmpp_stanza_set_text(stanza, text) < 0)
         err(3, "xmppipe_stanza_set_text");
 }
@@ -142,6 +166,9 @@ xmppipe_stanza_set_text(xmpp_stanza_t *stanza, const char * const text)
     void
 xmppipe_stanza_set_type(xmpp_stanza_t * const stanza, const char * const type)
 {
+    XMPPIPE_NULL(stanza);
+    XMPPIPE_NULL(type);
+
     if (xmpp_stanza_set_type(stanza, type) < 0)
         err(3, "xmppipe_stanza_set_type");
 }
@@ -149,6 +176,9 @@ xmppipe_stanza_set_type(xmpp_stanza_t * const stanza, const char * const type)
     void
 xmppipe_stanza_add_child(xmpp_stanza_t * stanza, xmpp_stanza_t * child)
 {
+    XMPPIPE_NULL(stanza);
+    XMPPIPE_NULL(child);
+
     if (xmpp_stanza_add_child(stanza, child) < 0)
         err(3, "xmppipe_stanza_add_child");
 }
