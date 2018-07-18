@@ -193,11 +193,11 @@ decode() {
 }
 
 bot() {
-    while IFS=: read -r type status from to message; do
-        case "$type" in
+    while IFS=: read -r stanza type from to body; do
+        case "$stanza" in
             m) ;;
 
-            p) decode "$type:$status:$from:$to" 1>&2
+            p) decode "$stanza:$type:$from:$to" 1>&2
                echo 1>&2
                continue
                ;;
@@ -206,7 +206,7 @@ bot() {
         esac
 
         USER="$(decode ${from#*/})"
-        MSG="$(decode ${message})"
+        MSG="$(decode ${body})"
 
         case $MSG in
             *"has set the subject to:"*) ;;
@@ -304,9 +304,9 @@ while getopts ":o:" opt; do
   esac
 done
 
-xmppipe "$@" | while IFS=: read type status from to message; do
-  case "$type" in
-    m) notify-send "$MUC" "$(decode $message)" ;;
+xmppipe "$@" | while IFS=: read stanza type from to body; do
+  case "$stanza" in
+    m) notify-send "$MUC" "$(decode $body)" ;;
     *) continue ;;
   esac
 done

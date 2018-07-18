@@ -29,9 +29,9 @@ atexit() {
 }
 
 decode() {
-    while IFS=: read type status from to message; do
-        case "$type" in
-            m) printf '%b' "${message//%/\\x}" ;;
+    while IFS=: read stanza type from to body; do
+        case "$stanza" in
+            m) printf '%b' "${body//%/\\x}" ;;
             *) ;;
         esac
     done
@@ -40,8 +40,8 @@ decode() {
 server() {
     CONNECT=0
     xmppipe -e -r server -o $1 -b 1024 -x < /dev/null | \
-    while IFS=: read type rest; do
-        case "$type" in
+    while IFS=: read stanza rest; do
+        case "$stanza" in
             p)
                 CONNECT=$((CONNECT + 1))
                 if [ "$CONNECT" -gt "1" ]; then
