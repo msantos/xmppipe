@@ -20,7 +20,11 @@ Usage
 
     XMPPIPE_USERNAME=me@example.com
     XMPPIPE_PASSWORD="password"
-    xmppipe -o muc
+
+    # default name: stdout-*hostname*-*uid*
+    xmpipe
+    xmppipe muc
+    xmppipe muc@example.com
 
 Requirements
 ------------
@@ -98,11 +102,6 @@ Options
 
 -r, --resource *resource*
 :   XMPP resource, used as the nickname in the MUC
-
--o, --output *output*
-:   XMPP MUC name
-
-    Default: stdout-*hostname*-*uid*
 
 -S, --subject *subject*
 :   XMPP MUC subject
@@ -279,7 +278,7 @@ curl -s --get --data subscribe=true \
     --data-urlencode 'query=(service ~= "^example")' \
     http://example.com:80/index < /dev/null > riemann &
 xmppipe --verbose --verbose \
-        --output "muc" --discard --subject "riemann events" < riemann
+        --discard --subject "riemann events" muc < riemann
 ~~~
 
 ### Desktop Notifications
@@ -326,7 +325,7 @@ FIFO=$TMPDIR/console
 mkfifo $FIFO
 
 stty cols 80 rows 24
-(cat $FIFO | xmppipe --resource user --output $MUC -x) > /dev/null 2> $TMPDIR/stderr &
+(cat $FIFO | xmppipe --resource user -x $MUC) > /dev/null 2> $TMPDIR/stderr &
 script -q -f $FIFO
 ~~~
 
@@ -340,7 +339,7 @@ decode() {
 }
 
 stty cols 80 rows 24
-xmppipe --resource viewer --output console --base64 | \
+xmppipe --resource viewer --base64 console | \
   while IFS=: read -r x s f t m; do
     [ "$m" = "m" ] && decode "$m"
   done

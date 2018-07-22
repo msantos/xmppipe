@@ -255,6 +255,11 @@ main(int argc, char **argv)
     argc -= optind;
     argv += optind;
 
+    if (argc > 0) {
+      free(state->room);
+      state->room = xmppipe_strdup(argv[0]);
+    }
+
     if (jid == NULL)
         usage(state);
 
@@ -1331,7 +1336,6 @@ usage(xmppipe_state_t *state)
             "   -u, --username <jid>                XMPP username (aka JID)\n"
             "   -p, --password <password>           XMPP password\n"
             "   -r, --resource <resource>           resource (aka MUC nick)\n"
-            "   -o, --output <muc>                  MUC room to send stdin\n"
             "   -S, --subject <subject>             set MUC subject\n"
             "   -a, --address <addr:port>           set XMPP server address (port is optional)\n"
 

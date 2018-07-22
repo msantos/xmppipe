@@ -42,4 +42,4 @@ done
 shift $((OPTIND-1))
 
 wait_presence "$TO" "$@" > $TMPDIR/stdin &
-xmppipe -o $MUC -r "$FROM" -u "$XMPPIPE_USERNAME" -p "$XMPPIPE_PASSWORD" < $TMPDIR/stdin > $TMPDIR/stdout
+xmppipe -r "$FROM" -u "$XMPPIPE_USERNAME" -p "$XMPPIPE_PASSWORD" "$MUC" < $TMPDIR/stdin > $TMPDIR/stdout
