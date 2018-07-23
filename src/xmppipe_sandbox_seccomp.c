@@ -274,10 +274,7 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
     if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0)
         return -1;
 
-    if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog))
-        return -1;
-
-    return 0;
+    return prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog);
 }
 
     int
@@ -386,9 +383,6 @@ xmppipe_sandbox_stdin(xmppipe_state_t *state)
         .filter = filter,
     };
 
-    if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog))
-        return -1;
-
-    return 0;
+    return prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog);
 }
 #endif
