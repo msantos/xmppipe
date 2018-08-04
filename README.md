@@ -370,7 +370,7 @@ Example:
 
 ### Message
 
-    m:<chat|groupchat>:<from jid>:<to jid>:<message body>
+    m:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<message body>
 
 Example:
 
