@@ -55,6 +55,11 @@ enum {
     XMPPIPE_OPT_GROUPCHAT = 1 << 4,         /* Use groupchat */
 };
 
+enum {
+    XMPPIPE_FMT_STDIN = 0,
+    XMPPIPE_FMT_COLON
+};
+
 typedef struct {
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
@@ -92,6 +97,7 @@ typedef struct {
     int opt;
     int verbose;
     int encode;         /* base64 encode/decode data to MUC */
+    int format;         /* input format: stdin, colon */
 } xmppipe_state_t;
 
 

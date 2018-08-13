@@ -55,6 +55,7 @@ void xmppipe_stream_close(xmppipe_state_t *);
 void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
 void xmppipe_muc_subject(xmppipe_state_t *, char *);
+void xmppipe_send_stanza(xmppipe_state_t *, char *, size_t);
 void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *, size_t);
 void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 void xmppipe_ping(xmppipe_state_t *);
@@ -89,6 +90,7 @@ static const struct option long_options[] =
     {"discard",            no_argument,        NULL, 'd'},
     {"discard-to-stdout",  no_argument,        NULL, 'D'},
     {"ignore-eof",         no_argument,        NULL, 'e'},
+    {"format",             no_argument,        NULL, 'F'},
     {"interval",           required_argument,  NULL, 'I'},
     {"keepalive",          required_argument,  NULL, 'k'},
     {"keepalive-failures", required_argument,  NULL, 'K'},
@@ -148,7 +150,7 @@ main(int argc, char **argv)
     if (xmppipe_sandbox_init(state) < 0)
         err(EXIT_FAILURE, "sandbox failed");
 
-    while ( (ch = getopt_long(argc, argv, "a:b:c:dDehI:k:K:o:P:p:r:sS:u:U:vx",
+    while ( (ch = getopt_long(argc, argv, "a:b:c:dDeF:hI:k:K:o:P:p:r:sS:u:U:vx:",
                     long_options, NULL)) != -1) {
         switch (ch) {
             case 'u':
@@ -188,6 +190,15 @@ main(int argc, char **argv)
                 break;
             case 'v':
                 state->verbose++;
+                break;
+            case 'F':
+                if (strcmp(optarg, "stdin") == 0)
+                    state->format = XMPPIPE_FMT_STDIN;
+                else if (strcmp(optarg, "colon") == 0)
+                    state->format = XMPPIPE_FMT_COLON;
+                else
+                    usage(state);
+
                 break;
             case 'x':
                 state->encode = 1;
@@ -594,9 +605,7 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
             return 2;
         }
 
-        xmppipe_send_message(state, state->out,
-            (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat",
-            buf, n);
+        xmppipe_send_stanza(state, buf, n);
         state->interval = 0;
         return 3;
     }
@@ -1194,6 +1203,90 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
 
     xmppipe_send(state, message);
     (void)xmpp_stanza_release(message);
+}
+
+    void
+xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
+{
+    int i = 0;
+    int j = 0;
+    char *to = NULL;
+    char *type = NULL;
+    char *buf = NULL;
+    char *body = NULL;
+
+    char *tok[6] = {0};
+
+    switch (state->format) {
+      case XMPPIPE_FMT_STDIN:
+        xmppipe_send_message(state, state->out,
+            (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat",
+            buf0, len);
+        return;
+
+      case XMPPIPE_FMT_COLON:
+        break;
+
+      default:
+        if (state->verbose)
+          (void)fprintf(stderr, "unsupported format: %d\n", state->format);
+
+        return;
+    }
+
+    buf = xmppipe_strdup(buf0);
+
+    tok[0] = strtok(buf, ":");
+    switch (tok[0][0]) {
+      case 'm':
+        j = 5;
+        break;
+      case 'p':
+        j = 4;
+        /* unsupported: fall through */
+      default:
+        if (state->verbose)
+          (void)fprintf(stderr, "unsupported stanza: %s\n",
+              tok[0] == NULL ? "NULL" : tok[0]);
+
+        return;
+    }
+
+    while (tok[i] != NULL && i < j) {
+      i++;
+      tok[i] = strtok(NULL, ":");
+
+      if (state->verbose)
+          (void)fprintf(stderr, "message:%d:%s\n", i,
+              tok[i] == NULL ? "NULL" : tok[i]);
+    }
+
+    if (tok[1] == NULL) {
+        if (state->verbose)
+          (void)fprintf(stderr, "type required\n");
+
+        return;
+    }
+
+    if (tok[2] == NULL) {
+        if (state->verbose)
+          (void)fprintf(stderr, "to address required\n");
+
+        return;
+    }
+
+    if (tok[4] == NULL) {
+        if (state->verbose)
+          (void)fprintf(stderr, "body required\n");
+
+        return;
+    }
+
+    type = tok[1];
+    to = tok[2];
+    body = tok[4];
+
+    xmppipe_send_message(state, to, type, body, strlen(body));
 }
 
     void
