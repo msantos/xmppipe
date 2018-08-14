@@ -90,7 +90,7 @@ static const struct option long_options[] =
     {"discard",            no_argument,        NULL, 'd'},
     {"discard-to-stdout",  no_argument,        NULL, 'D'},
     {"ignore-eof",         no_argument,        NULL, 'e'},
-    {"format",             no_argument,        NULL, 'F'},
+    {"format",             required_argument,  NULL, 'F'},
     {"interval",           required_argument,  NULL, 'I'},
     {"keepalive",          required_argument,  NULL, 'k'},
     {"keepalive-failures", required_argument,  NULL, 'K'},
