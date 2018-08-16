@@ -1282,11 +1282,27 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
         return;
     }
 
-    type = tok[1];
-    to = tok[2];
-    body = tok[4];
+    type = xmppipe_fmt_decode(tok[1]);
+
+    if (type == NULL)
+        goto XMPPIPE_ERR;
+
+    to = xmppipe_fmt_decode(tok[2]);
+
+    if (to == NULL)
+        goto XMPPIPE_ERR;
+
+    body = xmppipe_fmt_decode(tok[4]);
+
+    if (body == NULL)
+        goto XMPPIPE_ERR;
 
     xmppipe_send_message(state, to, type, body, strlen(body));
+
+XMPPIPE_ERR:
+    free(type);
+    free(to);
+    free(body);
 }
 
     void

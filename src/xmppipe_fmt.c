@@ -13,6 +13,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include "xmppipe.h"
+#include "errno.h"
 
 static unsigned char rfc3986[256];
 
@@ -55,4 +56,52 @@ xmppipe_nfmt(const char *s, size_t len)
 xmppipe_fmt(const char *s)
 {
     return xmppipe_nfmt(s, strlen(s));
+}
+
+    char *
+xmppipe_nfmt_decode(const char *s, size_t len)
+{
+    char *buf = xmppipe_calloc(len+1, 1);
+    char *p = buf;
+    size_t i = 0;
+    char fmt[3] = {0};
+    char *endptr;
+
+    for (i = 0; i < len; i++) {
+        unsigned char c = s[i];
+        if (c == '%') {
+            unsigned char n = 0;
+
+            if (i + 2 > len) goto XMPPIPE_ERR;
+
+            (void)memcpy(fmt, s+i+1, 2);
+
+            errno = 0;
+            n = strtol(fmt, &endptr, 16);
+
+            if ( (errno != 0) || (endptr == fmt))
+                goto XMPPIPE_ERR;
+
+            *p++ = n;
+            i += 2;
+        }
+        else {
+            *p++ = c;
+        }
+    }
+
+    return buf;
+
+XMPPIPE_ERR:
+    free(buf);
+    return NULL;
+}
+
+    char *
+xmppipe_fmt_decode(const char *s)
+{
+    if (s == NULL)
+        return NULL;
+
+    return xmppipe_nfmt_decode(s, strlen(s));
 }
