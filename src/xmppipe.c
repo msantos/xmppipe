@@ -1236,7 +1236,7 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
 
     buf = xmppipe_strdup(buf0);
 
-    tok[0] = strtok(buf, ":");
+    tok[0] = xmppipe_strtok(buf, ":");
     switch (tok[0][0]) {
       case 'm':
         j = 5;
@@ -1254,7 +1254,7 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
 
     while (tok[i] != NULL && i < j) {
       i++;
-      tok[i] = strtok(NULL, ":");
+      tok[i] = xmppipe_strtok(NULL, ":");
 
       if (state->verbose)
           (void)fprintf(stderr, "message:%d:%s\n", i,
@@ -1268,12 +1268,18 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
         return;
     }
 
+    if (strlen(tok[1]) == 0)
+        tok[1] = (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat";
+
     if (tok[2] == NULL) {
         if (state->verbose)
           (void)fprintf(stderr, "to address required\n");
 
         return;
     }
+
+    if (strlen(tok[2]) == 0)
+        tok[2] = state->out;
 
     if (tok[4] == NULL) {
         if (state->verbose)
@@ -1300,6 +1306,7 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
     xmppipe_send_message(state, to, type, body, strlen(body));
 
 XMPPIPE_ERR:
+    free(buf);
     free(type);
     free(to);
     free(body);
