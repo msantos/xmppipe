@@ -598,7 +598,7 @@ handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len)
         if ((state->opt & XMPPIPE_OPT_DISCARD) && state->occupants == 0) {
             if (state->opt & XMPPIPE_OPT_DISCARD_TO_STDOUT) {
                 char *enc = NULL;
-                enc = xmppipe_fmt(buf);
+                enc = xmppipe_fmt_encode(buf);
                 (void)printf("!:%s\n", enc);
                 free(enc);
             }
@@ -984,9 +984,9 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (state->status == XMPPIPE_S_READY_AVAIL && state->occupants == 0)
         xmppipe_next_state(state, XMPPIPE_S_READY_EMPTY);
 
-    etype = xmppipe_fmt(type);
-    efrom = xmppipe_fmt(from);
-    eto = xmppipe_fmt(to);
+    etype = xmppipe_fmt_encode(type);
+    efrom = xmppipe_fmt_encode(from);
+    eto = xmppipe_fmt_encode(to);
 
     (void)printf("p:%s:%s:%s\n", etype, efrom, eto);
 
@@ -1098,16 +1098,16 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
             return 1;
         }
 
-        emessage = xmppipe_nfmt((char *)buf,n);
+        emessage = xmppipe_nfmt_encode((char *)buf,n);
         xmpp_free(state->ctx, buf);
     }
     else {
-        emessage = xmppipe_fmt(message);
+        emessage = xmppipe_fmt_encode(message);
     }
 
-    etype = xmppipe_fmt(type);
-    efrom = xmppipe_fmt(from);
-    eto = xmppipe_fmt(to);
+    etype = xmppipe_fmt_encode(type);
+    efrom = xmppipe_fmt_encode(from);
+    eto = xmppipe_fmt_encode(to);
 
     (void)printf("m:%s:%s:%s:%s\n", etype, efrom, eto, emessage);
 

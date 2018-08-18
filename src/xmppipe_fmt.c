@@ -32,7 +32,7 @@ xmppipe_fmt_init()
 }
 
     char *
-xmppipe_nfmt(const char *s, size_t len)
+xmppipe_nfmt_encode(const char *s, size_t len)
 {
     char *buf = xmppipe_calloc(len * 3 + 1, 1);
     char *p = buf;
@@ -53,9 +53,9 @@ xmppipe_nfmt(const char *s, size_t len)
 }
 
     char *
-xmppipe_fmt(const char *s)
+xmppipe_fmt_encode(const char *s)
 {
-    return xmppipe_nfmt(s, strlen(s));
+    return xmppipe_nfmt_encode(s, strlen(s));
 }
 
     char *
