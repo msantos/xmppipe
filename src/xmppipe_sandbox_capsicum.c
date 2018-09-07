@@ -39,8 +39,6 @@ xmppipe_sandbox_stdin(xmppipe_state_t *state)
     cap_rights_t policy_write;
     cap_rights_t policy_rw;
 
-    const unsigned long cmds[] = { TIOCGETA, TIOCGWINSZ };
-
     int fd = -1;
 
     fd = xmppipe_conn_fd(state);
@@ -54,7 +52,7 @@ xmppipe_sandbox_stdin(xmppipe_state_t *state)
         return -1;
 
     (void)cap_rights_init(&policy_read, CAP_READ, CAP_EVENT);
-    (void)cap_rights_init(&policy_write, CAP_WRITE, CAP_FSTAT, CAP_IOCTL);
+    (void)cap_rights_init(&policy_write, CAP_WRITE);
     (void)cap_rights_init(&policy_rw, CAP_READ, CAP_WRITE,
             CAP_FSTAT, CAP_FCNTL, CAP_EVENT);
 
@@ -64,13 +62,7 @@ xmppipe_sandbox_stdin(xmppipe_state_t *state)
     if (cap_rights_limit(STDOUT_FILENO, &policy_write) < 0)
         return -1;
 
-    if (cap_ioctls_limit(STDOUT_FILENO, cmds, sizeof(cmds)) < 0)
-        return -1;
-
     if (cap_rights_limit(STDERR_FILENO, &policy_write) < 0)
-        return -1;
-
-    if (cap_ioctls_limit(STDERR_FILENO, cmds, sizeof(cmds)) < 0)
         return -1;
 
     if (cap_rights_limit(fd, &policy_rw) < 0)
