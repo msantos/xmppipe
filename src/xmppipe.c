@@ -150,7 +150,7 @@ main(int argc, char **argv)
     if (xmppipe_sandbox_init(state) < 0)
         err(EXIT_FAILURE, "sandbox failed");
 
-    while ( (ch = getopt_long(argc, argv, "a:b:c:dDeF:hI:k:K:o:P:p:r:sS:u:U:vx:",
+    while ( (ch = getopt_long(argc, argv, "a:b:c:dDeF:hI:k:K:o:P:p:r:sS:u:U:vx",
                     long_options, NULL)) != -1) {
         switch (ch) {
             case 'u':
