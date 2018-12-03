@@ -144,9 +144,6 @@ main(int argc, char **argv)
     jid = xmppipe_getenv("XMPPIPE_USERNAME");
     pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
-    if (state->verbose)
-        (void)fprintf(stderr, "sandbox: init: %s\n", XMPPIPE_SANDBOX);
-
     if (xmppipe_sandbox_init(state) < 0)
         err(EXIT_FAILURE, "sandbox failed");
 
