@@ -1203,22 +1203,25 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
 }
 
     void
-xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
+xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len)
 {
-    int i = 0;
-    int j = 0;
     char *to = NULL;
     char *type = NULL;
-    char *buf = NULL;
-    char *body = NULL;
+    char *deftype;
 
-    char *tok[6] = {0};
+    int i;
+    size_t n;
+    char *tmp = NULL;
+    char *start = NULL;
+    char *end = NULL;
+    char *body = NULL;
+    int valid = 0;
+
+    deftype = (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat";
 
     switch (state->format) {
       case XMPPIPE_FMT_STDIN:
-        xmppipe_send_message(state, state->out,
-            (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat",
-            buf0, len);
+        xmppipe_send_message(state, state->out, deftype, buf, len);
         return;
 
       case XMPPIPE_FMT_COLON:
@@ -1231,79 +1234,86 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf0, size_t len)
         return;
     }
 
-    buf = xmppipe_strdup(buf0);
+    tmp = xmppipe_strdup(buf);
+    start = tmp;
 
-    tok[0] = xmppipe_strtok(buf, ":");
-    switch (tok[0][0]) {
-      case 'm':
-        j = 5;
-        break;
-      case 'p':
-        j = 4;
-        /* unsupported: fall through */
-      default:
-        if (state->verbose)
-          (void)fprintf(stderr, "unsupported stanza: %s\n",
-              tok[0] == NULL ? "NULL" : tok[0]);
+    /* trailing newline */
+    end = strchr(start, '\n');
+    if (end != NULL)
+      *end = '\0';
 
-        return;
-    }
+    for (i = 0; start != NULL; i++) {
+      end = strchr(start, ':');
+      if (end != NULL)
+        *end++ = '\0';
 
-    while (tok[i] != NULL && i < j) {
-      i++;
-      tok[i] = xmppipe_strtok(NULL, ":");
+      n = strlen(start);
 
       if (state->verbose)
           (void)fprintf(stderr, "message:%d:%s\n", i,
-              tok[i] == NULL ? "NULL" : tok[i]);
+              n == 0 ? "<empty>" : start);
+
+      switch (i) {
+        case 0:
+          if (n != 1) {
+            if (state->verbose)
+              (void)fprintf(stderr, "stanza required\n");
+
+            goto XMPPIPE_DONE;
+          }
+
+          switch (start[0]) {
+            case 'm':
+              break;
+            case 'p':
+              /* unsupported: fall through */
+            default:
+              if (state->verbose)
+                (void)fprintf(stderr, "unsupported stanza: %c\n", start[0]);
+
+              goto XMPPIPE_DONE;
+          }
+          break;
+
+        case 1:
+          type = xmppipe_fmt_decode((n == 0) ? deftype : start);
+          if (type == NULL)
+            goto XMPPIPE_DONE;
+          break;
+
+        case 2:
+          to = xmppipe_fmt_decode((n == 0) ? state->out : start);
+          if (to == NULL)
+            goto XMPPIPE_DONE;
+
+          break;
+
+        case 3:
+          break;
+
+        case 4:
+          body = xmppipe_fmt_decode(start);
+          if (body == NULL)
+            goto XMPPIPE_DONE;
+
+          valid = 1;
+          break;
+
+        default:
+          goto XMPPIPE_DONE;
+      }
+
+      start = end;
     }
 
-    if (tok[1] == NULL) {
-        if (state->verbose)
-          (void)fprintf(stderr, "type required\n");
+XMPPIPE_DONE:
+    if (valid == 1)
+      xmppipe_send_message(state, to, type, body, strlen(body));
+    else
+      if (state->verbose)
+        (void)fprintf(stderr, "invalid input\n");
 
-        return;
-    }
-
-    if (strlen(tok[1]) == 0)
-        tok[1] = (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat";
-
-    if (tok[2] == NULL) {
-        if (state->verbose)
-          (void)fprintf(stderr, "to address required\n");
-
-        return;
-    }
-
-    if (strlen(tok[2]) == 0)
-        tok[2] = state->out;
-
-    if (tok[4] == NULL) {
-        if (state->verbose)
-          (void)fprintf(stderr, "body required\n");
-
-        return;
-    }
-
-    type = xmppipe_fmt_decode(tok[1]);
-
-    if (type == NULL)
-        goto XMPPIPE_ERR;
-
-    to = xmppipe_fmt_decode(tok[2]);
-
-    if (to == NULL)
-        goto XMPPIPE_ERR;
-
-    body = xmppipe_fmt_decode(tok[4]);
-
-    if (body == NULL)
-        goto XMPPIPE_ERR;
-
-    xmppipe_send_message(state, to, type, body, strlen(body));
-
-XMPPIPE_ERR:
-    free(buf);
+    free(tmp);
     free(type);
     free(to);
     free(body);

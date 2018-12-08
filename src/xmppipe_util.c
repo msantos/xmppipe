@@ -92,30 +92,6 @@ xmppipe_calloc(size_t nmemb, size_t size)
     return buf;
 }
 
-// https://stackoverflow.com/a/30295426
-    char
-*xmppipe_strtok(char *str, char const *delims)
-{
-    static char *src = NULL;
-    char *p, *ret = 0;
-
-    if (str != NULL) src = str;
-
-    if (src == NULL || *src == '\0')
-        return NULL;
-
-    ret = src;
-    if ((p = strpbrk(src, delims)) != NULL)
-    {
-        *p  = 0;
-        src = ++p;
-    }
-    else
-        src += strlen(src);
-
-    return ret;
-}
-
     xmpp_stanza_t *
 xmppipe_stanza_new(xmpp_ctx_t *ctx)
 {

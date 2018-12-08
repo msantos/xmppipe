@@ -61,11 +61,14 @@ xmppipe_fmt_encode(const char *s)
     char *
 xmppipe_nfmt_decode(const char *s, size_t len)
 {
-    char *buf = xmppipe_calloc(len+1, 1);
-    char *p = buf;
+    char *buf;
+    char *p;
     size_t i = 0;
     char fmt[3] = {0};
     char *endptr;
+
+    buf = xmppipe_calloc(len+1, 1);
+    p = buf;
 
     for (i = 0; i < len; i++) {
         unsigned char c = s[i];
