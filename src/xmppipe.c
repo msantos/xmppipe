@@ -56,6 +56,7 @@ void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
 void xmppipe_muc_subject(xmppipe_state_t *, char *);
 void xmppipe_send_stanza(xmppipe_state_t *, char *, size_t);
+void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len);
 void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *, size_t);
 void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 void xmppipe_ping(xmppipe_state_t *);
@@ -1205,26 +1206,16 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
     void
 xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len)
 {
-    char *to = NULL;
-    char *type = NULL;
-    char *deftype;
-
-    int i;
-    size_t n;
-    char *tmp = NULL;
-    char *start = NULL;
-    char *end = NULL;
-    char *body = NULL;
-    int valid = 0;
-
-    deftype = (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat";
-
     switch (state->format) {
       case XMPPIPE_FMT_STDIN:
-        xmppipe_send_message(state, state->out, deftype, buf, len);
+        xmppipe_send_message(state,
+            state->out,
+            (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat",
+            buf, len);
         return;
 
       case XMPPIPE_FMT_COLON:
+        xmppipe_send_stanza_fmt(state, buf, len);
         break;
 
       default:
@@ -1233,6 +1224,24 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len)
 
         return;
     }
+}
+
+    void
+xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len)
+{
+    char *to = NULL;
+    char *type = NULL;
+    char *default_type;
+
+    int i;
+    size_t n;
+    char *tmp;
+    char *start;
+    char *end;
+    char *body = NULL;
+    int valid = 0;
+
+    default_type = (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat";
 
     tmp = xmppipe_strdup(buf);
     start = tmp;
@@ -1276,7 +1285,7 @@ xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len)
           break;
 
         case 1:
-          type = xmppipe_fmt_decode((n == 0) ? deftype : start);
+          type = xmppipe_fmt_decode((n == 0) ? default_type : start);
           if (type == NULL)
             goto XMPPIPE_DONE;
           break;
