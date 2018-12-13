@@ -56,8 +56,8 @@ enum {
 };
 
 enum {
-    XMPPIPE_FMT_STDIN = 0,
-    XMPPIPE_FMT_COLON
+    XMPPIPE_FMT_TEXT = 0,
+    XMPPIPE_FMT_CSV
 };
 
 typedef struct {

@@ -190,10 +190,10 @@ main(int argc, char **argv)
                 state->verbose++;
                 break;
             case 'F':
-                if (strcmp(optarg, "stdin") == 0)
-                    state->format = XMPPIPE_FMT_STDIN;
-                else if (strcmp(optarg, "colon") == 0)
-                    state->format = XMPPIPE_FMT_COLON;
+                if (strcmp(optarg, "text") == 0)
+                    state->format = XMPPIPE_FMT_TEXT;
+                else if (strcmp(optarg, "csv") == 0)
+                    state->format = XMPPIPE_FMT_CSV;
                 else
                     usage(state);
 
@@ -1207,14 +1207,14 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
 xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len)
 {
     switch (state->format) {
-      case XMPPIPE_FMT_STDIN:
+      case XMPPIPE_FMT_TEXT:
         xmppipe_send_message(state,
             state->out,
             (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat",
             buf, len);
         return;
 
-      case XMPPIPE_FMT_COLON:
+      case XMPPIPE_FMT_CSV:
         xmppipe_send_stanza_fmt(state, buf, len);
         break;
 
