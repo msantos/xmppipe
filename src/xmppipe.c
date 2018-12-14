@@ -66,7 +66,7 @@ enum {
     OPT_CHAT,
 };
 
-static const char const *xmppipe_states[] = {
+static const char * const xmppipe_states[] = {
     "XMPPIPE_S_DISCONNECTED",
     "XMPPIPE_S_CONNECTING",
     "XMPPIPE_S_CONNECTED",
