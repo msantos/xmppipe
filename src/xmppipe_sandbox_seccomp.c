@@ -107,6 +107,9 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #ifdef __NR_send
         SC_ALLOW(send),
 #endif
+#ifdef __NR_sendmsg
+        SC_ALLOW(sendmsg),
+#endif
 #ifdef __NR_sendmmsg
         SC_ALLOW(sendmmsg),
 #endif
@@ -129,6 +132,9 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
         /* /etc/resolv.conf */
 #ifdef __NR_open
         SC_ALLOW(open),
+#endif
+#ifdef __NR_openat
+        SC_ALLOW(openat),
 #endif
 #ifdef __NR_close
         SC_ALLOW(close),
@@ -182,6 +188,9 @@ xmppipe_sandbox_init(xmppipe_state_t *state)
 #endif
 #ifdef __NR_fstat64
         SC_ALLOW(fstat64),
+#endif
+#ifdef __NR_getrandom
+        SC_ALLOW(getrandom),
 #endif
 
 #ifdef __NR_getppid
