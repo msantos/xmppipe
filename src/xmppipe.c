@@ -1071,9 +1071,7 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         return 1;
 
     /* Check if the message is from us */
-    if (XMPPIPE_STREQ(type,
-          state->opt & XMPPIPE_OPT_GROUPCHAT ? "groupchat" : "chat")
-        && XMPPIPE_STREQ(from, state->mucjid))
+    if (XMPPIPE_STREQ(type, "groupchat") && XMPPIPE_STREQ(from, state->mucjid))
         return 1;
 
     child = xmpp_stanza_get_child_by_name(stanza, "body");
