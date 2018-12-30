@@ -7,28 +7,32 @@ UNAME_SYS := $(shell uname -s)
 ifeq ($(UNAME_SYS), Linux)
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
+			  -pie -fPIE \
 			  -fno-strict-aliasing
 	XMPPIPE_SANDBOX ?= seccomp
 	XMPPIPE_SANDBOX_RLIMIT_NOFILE ?= 0
-	LDFLAGS ?= -Wl,-z,relro,-z,now
+	LDFLAGS ?= -Wl,-z,relro,-z,now -Wl,-z,noexecstack
 else ifeq ($(UNAME_SYS), FreeBSD)
 	CFLAGS ?= -DHAVE_STRTONUM \
 			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
+			  -pie -fPIE \
 			  -fno-strict-aliasing
 	XMPPIPE_SANDBOX ?= capsicum
-	LDFLAGS ?= -Wl,-z,relro,-z,now
+	LDFLAGS ?= -Wl,-z,relro,-z,now -Wl,-z,noexecstack
 else ifeq ($(UNAME_SYS), OpenBSD)
 	CFLAGS ?= -DHAVE_STRTONUM \
 			  -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
+			  -pie -fPIE \
 			  -fno-strict-aliasing
 	XMPPIPE_SANDBOX ?= pledge
-	LDFLAGS ?= -Wl,-z,relro,-z,now
+	LDFLAGS ?= -Wl,-z,relro,-z,now -Wl,-z,noexecstack
 else ifeq ($(UNAME_SYS), SunOS)
 else ifeq ($(UNAME_SYS), Darwin)
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
+			  -pie -fPIE \
 			  -fno-strict-aliasing
 endif
 
