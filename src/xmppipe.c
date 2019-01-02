@@ -64,6 +64,7 @@ void xmppipe_ping(xmppipe_state_t *);
 enum {
     OPT_NO_TLS_VERIFY = 1,
     OPT_CHAT,
+    OPT_CHAT_MARKER,
 };
 
 static const char * const xmppipe_states[] = {
@@ -88,6 +89,7 @@ static const struct option long_options[] =
     {"buffer-size",        required_argument,  NULL, 'b'},
     {"flow-control",       required_argument,  NULL, 'c'},
     {"chat",               no_argument,        NULL, OPT_CHAT},
+    {"chat-marker",        no_argument,        NULL, OPT_CHAT_MARKER},
     {"discard",            no_argument,        NULL, 'd'},
     {"discard-to-stdout",  no_argument,        NULL, 'D'},
     {"ignore-eof",         no_argument,        NULL, 'e'},
@@ -253,6 +255,10 @@ main(int argc, char **argv)
                 break;
             case OPT_CHAT:
                 state->opt &= ~XMPPIPE_OPT_GROUPCHAT;
+                break;
+
+            case OPT_CHAT_MARKER:
+                state->opt |= XMPPIPE_OPT_CHAT_MARKER;
                 break;
 
             case 'h':
@@ -1033,7 +1039,6 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
             text ? text : "no description");
 }
 
-
     int
 handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
         void * const userdata)
@@ -1045,11 +1050,14 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     const char *type = NULL;
     const char *from = NULL;
     const char *to = NULL;
+    const char *ns;
 
     char *etype = NULL;
     char *efrom = NULL;
     char *eto = NULL;
     char *emessage = NULL;
+
+    char *symbol = "m";
 
     if (xmpp_stanza_get_child_by_name(stanza, "delay"))
         return 1;
@@ -1070,38 +1078,49 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     if (XMPPIPE_STREQ(type, "groupchat") && XMPPIPE_STREQ(from, state->mucjid))
         return 1;
 
-    child = xmpp_stanza_get_child_by_name(stanza, "body");
-    if (child == NULL)
-        return 1;
-
-    message = xmpp_stanza_get_text(child);
-    if (message == NULL)
-        return 1;
-
-    if (state->encode) {
-        size_t len = strlen(message);
-        unsigned char *buf = NULL;
-        size_t n = 0;
-
-        xmpp_base64_decode_bin(state->ctx, message, len, &buf, &n);
-
-        if (buf == NULL) {
-            /* Not a base64 message */
+    child = xmpp_stanza_get_child_by_name(stanza, "displayed");
+    if (child != NULL) {
+        ns = xmpp_stanza_get_ns(child);
+        if (XMPPIPE_STREQ(ns, "urn:xmpp:chat-markers:0")) {
+          if (!(state->opt & XMPPIPE_OPT_CHAT_MARKER))
             return 1;
-        }
 
-        emessage = xmppipe_nfmt_encode((char *)buf,n);
-        xmpp_free(state->ctx, buf);
+          symbol = "M";
+        }
     }
-    else {
-        emessage = xmppipe_fmt_encode(message);
+
+    child = xmpp_stanza_get_child_by_name(stanza, "body");
+
+    if (child != NULL) {
+        message = xmpp_stanza_get_text(child);
+        if (message != NULL) {
+          if (state->encode) {
+            size_t len = strlen(message);
+            unsigned char *buf = NULL;
+            size_t n = 0;
+
+            xmpp_base64_decode_bin(state->ctx, message, len, &buf, &n);
+
+            if (buf == NULL) {
+                /* Not a base64 message */
+                return 1;
+            }
+
+            emessage = xmppipe_nfmt_encode((char *)buf, n);
+            xmpp_free(state->ctx, buf);
+          }
+          else {
+            emessage = xmppipe_fmt_encode(message);
+          }
+        }
     }
 
     etype = xmppipe_fmt_encode(type);
     efrom = xmppipe_fmt_encode(from);
     eto = xmppipe_fmt_encode(to);
 
-    (void)printf("m:%s:%s:%s:%s\n", etype, efrom, eto, emessage);
+    (void)printf("%s:%s:%s:%s:%s\n", symbol, etype, efrom, eto,
+        emessage == NULL ? "" : emessage);
 
     state->interval = 0;
 
