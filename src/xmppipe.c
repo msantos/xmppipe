@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2018, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1112,6 +1112,8 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
           else {
             emessage = xmppipe_fmt_encode(message);
           }
+
+          xmpp_free(state->ctx, message);
         }
     }
 
@@ -1124,7 +1126,6 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     state->interval = 0;
 
-    free(message);
     free(etype);
     free(efrom);
     free(eto);
