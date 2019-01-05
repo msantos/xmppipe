@@ -224,7 +224,7 @@ main(int argc, char **argv)
                 break;
             case 'K':
                 /* XEP-0199: number of keepalive without a reply */
-                state->keepalive_limit = xmppipe_strtonum(state, optarg, 0,
+                state->keepalive_limit = xmppipe_strtonum(state, optarg, 1,
                         0xfffe);
                 break;
             case 'P':
@@ -279,9 +279,6 @@ main(int argc, char **argv)
         usage(state);
 
     if (state->encode && BASE64_LENGTH(state->bufsz) + 1 > 0xffff)
-        usage(state);
-
-    if (state->keepalive_limit < 1)
         usage(state);
 
     state->server = xmppipe_servername(jid);
