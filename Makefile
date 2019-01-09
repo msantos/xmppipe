@@ -54,7 +54,10 @@ $(PROG):
 	$(CC) $(CFLAGS) -o xmppipe src/*.c $(LDFLAGS) -lstrophe
 
 static:
-	$(CC) $(CFLAGS) -g -Wall -o xmppipe src/*.c -Wl,--no-as-needed \
+	$(CC) $(CFLAGS) \
+		-no-pie -fno-PIE \
+		$(XMPPIPE_CFLAGS) \
+	 	-o xmppipe src/*.c -Wl,--no-as-needed \
 		$(LDFLAGS) -ldl -lz -lresolv \
 		-l:libstrophe.a \
 		-l:libssl.a -l:libcrypto.a \
