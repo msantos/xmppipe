@@ -1112,8 +1112,19 @@ handle_message(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
           xmpp_free(state->ctx, message);
         }
+        goto XMPPIPE_STDOUT;
     }
 
+    child = xmpp_stanza_get_child_by_name(stanza, "subject");
+    if (child != NULL) {
+        message = xmpp_stanza_get_text(child);
+        if (message != NULL)
+          emessage = xmppipe_fmt_encode(message);
+        symbol = "S";
+        xmpp_free(state->ctx, message);
+    }
+
+XMPPIPE_STDOUT:
     etype = xmppipe_fmt_encode(type);
     efrom = xmppipe_fmt_encode(from);
     eto = xmppipe_fmt_encode(to);
