@@ -232,12 +232,11 @@ xmppipe_roomname(char *label)
     size_t len = 64;
     char name[16] = {0};
 
-    buf = xmppipe_malloc(len);
-    if (gethostname(name, sizeof(name)) < 0) {
+    if (gethostname(name, sizeof(name)-1) < 0) {
         (void)snprintf(name, sizeof(name)-1, "%s", XMPPIPE_RESOURCE);
     }
-    name[sizeof(name)-1] = '\0';
 
+    buf = xmppipe_malloc(len);
     (void)snprintf(buf, len, "%s-%s-%d", label, name, getuid());
 
     return buf;
