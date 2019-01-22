@@ -46,6 +46,7 @@ fi
         -u "$XMPPIPE_TEST_USERNAME" \
         -p "$XMPPIPE_TEST_PASSWORD" \
         'test123: &(*)_+' &
+    sleep 10
     xmppipe -r user2 -s xmppipe-test-2 | egrep "^m:groupchat:[^/]+/user1:[^:]+:test123%3A%20%26%28%2A%29_%2B%0A"
 }
 
