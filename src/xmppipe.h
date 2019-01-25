@@ -101,7 +101,9 @@ typedef struct {
     int format;         /* input format: stdin, colon */
 } xmppipe_state_t;
 
+/* handlers */
 int handle_message(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
+int handle_version(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 
 void xmppipe_send_stanza(xmppipe_state_t *, char *, size_t);
 void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len);
