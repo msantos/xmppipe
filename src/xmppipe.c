@@ -36,7 +36,6 @@ int handle_disco_info(xmpp_conn_t * const, xmpp_stanza_t * const,
 int handle_presence(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_presence_error(xmpp_conn_t * const, xmpp_stanza_t * const,
         void * const);
-int handle_ping_reply(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_request(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_enabled(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_ack(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
@@ -958,15 +957,6 @@ handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     errx(EXIT_FAILURE, "%s: %s", code ? code : "no error code specified",
             text ? text : "no description");
-}
-
-    int
-handle_ping_reply(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-        void * const userdata)
-{
-    xmppipe_state_t *state = userdata;
-    state->keepalive_fail = 0;
-    return 1;
 }
 
     void
