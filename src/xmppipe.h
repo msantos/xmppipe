@@ -103,6 +103,7 @@ typedef struct {
 
 /* handlers */
 int handle_message(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
+int handle_null(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_ping_reply(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_version(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 

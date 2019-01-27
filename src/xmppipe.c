@@ -39,7 +39,6 @@ int handle_presence_error(xmpp_conn_t * const, xmpp_stanza_t * const,
 int handle_sm_request(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_enabled(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_ack(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
-int handle_null(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 
 int xmppipe_connect_init(xmppipe_state_t *);
 int xmppipe_stream_init(xmppipe_state_t *);
@@ -624,25 +623,6 @@ handle_connection(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                 fprintf(stderr, "DEBUG: disconnected\n");
             errx(EXIT_FAILURE, "handle_connection: disconnected");
     }
-}
-
-    int
-handle_null(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-        void * const userdata)
-{
-    xmppipe_state_t *state = userdata;
-    const char *name = NULL;
-
-    name = xmpp_stanza_get_name(stanza);
-    if (name == NULL)
-        return 1;
-
-    if (XMPPIPE_STREQ(name, "iq")
-            || XMPPIPE_STREQ(name, "message")
-            || XMPPIPE_STREQ(name, "presence"))
-        state->sm_ack_recv++;
-
-    return 1;
 }
 
     int
