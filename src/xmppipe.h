@@ -124,6 +124,8 @@ char *xmppipe_roomname(char *);
 char *xmppipe_conference(char *, char *);
 char *xmppipe_mucjid(char *, char *);
 
+void xmppipe_next_state(xmppipe_state_t *state, int status);
+
 char *xmppipe_getenv(const char *);
 char *xmppipe_strdup(const char *);
 void *xmppipe_malloc(size_t);
