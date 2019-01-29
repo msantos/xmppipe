@@ -105,6 +105,7 @@ typedef struct {
 int handle_message(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_null(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_ping_reply(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
+int handle_presence(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_version(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 
 void xmppipe_send_stanza(xmppipe_state_t *, char *, size_t);
