@@ -96,3 +96,43 @@ handle_presence(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
 
     return 1;
 }
+
+    int
+handle_presence_error(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
+        void * const userdata)
+{
+    xmppipe_state_t *state = userdata;
+    xmpp_stanza_t *error = NULL;
+    xmpp_stanza_t *child = NULL;
+
+    const char *from = NULL;
+    const char *to = NULL;
+    const char *code = NULL;
+    const char *text = NULL;
+
+    from = xmpp_stanza_get_attribute(stanza, "from");
+    to = xmpp_stanza_get_attribute(stanza, "to");
+
+    if (from == NULL || to == NULL)
+        return 1;
+
+    /* Check error is to our JID (user@example.org/binding) */
+    if (XMPPIPE_STRNEQ(to, xmpp_conn_get_bound_jid(conn)))
+        return 1;
+
+    /* Check error is from our resource in the MUC (room@example.org/nick) */
+    if (XMPPIPE_STRNEQ(from, state->mucjid))
+        return 1;
+
+    error = xmpp_stanza_get_child_by_name(stanza, "error");
+    if (error == NULL)
+        return 1;
+
+    code = xmpp_stanza_get_attribute(error, "code");
+    child = xmpp_stanza_get_child_by_name(error, "text");
+    if (child)
+        text = xmpp_stanza_get_text(child);
+
+    errx(EXIT_FAILURE, "%s: %s", code ? code : "no error code specified",
+            text ? text : "no description");
+}
