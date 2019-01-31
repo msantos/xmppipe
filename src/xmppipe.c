@@ -33,7 +33,6 @@ int handle_disco_items(xmpp_conn_t * const, xmpp_stanza_t * const,
 int handle_disco_info(xmpp_conn_t * const, xmpp_stanza_t * const,
         void * const);
 int handle_sm_request(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
-int handle_sm_enabled(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_ack(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 
 int xmppipe_connect_init(xmppipe_state_t *);
@@ -603,15 +602,6 @@ handle_connection(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                 fprintf(stderr, "DEBUG: disconnected\n");
             errx(EXIT_FAILURE, "handle_connection: disconnected");
     }
-}
-
-    int
-handle_sm_enabled(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-        void * const userdata)
-{
-    xmppipe_state_t *state = userdata;
-    state->sm_enabled = 1;
-    return 0;
 }
 
     int
