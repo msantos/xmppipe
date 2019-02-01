@@ -22,3 +22,29 @@ handle_sm_enabled(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     state->sm_enabled = 1;
     return 0;
 }
+
+    int
+handle_sm_request(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
+        void * const userdata)
+{
+    xmppipe_state_t *state = userdata;
+
+    xmpp_stanza_t *a = NULL;
+    char h[11] = {0};
+
+    if (state->sm_request % state->sm_request_interval != 0)
+        return 1;
+
+    (void)snprintf(h, sizeof(h), "%u", state->sm_ack_recv);
+
+    /* <a xmlns='urn:xmpp:sm:3' h='1'/> */
+    a = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(a, "a");
+    xmppipe_stanza_set_ns(a, "urn:xmpp:sm:3");
+    xmppipe_stanza_set_attribute(a, "h", h);
+
+    xmpp_send(state->conn, a);
+    (void)xmpp_stanza_release(a);
+
+    return 1;
+}

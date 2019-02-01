@@ -32,7 +32,6 @@ int handle_disco_items(xmpp_conn_t * const, xmpp_stanza_t * const,
         void * const);
 int handle_disco_info(xmpp_conn_t * const, xmpp_stanza_t * const,
         void * const);
-int handle_sm_request(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 int handle_sm_ack(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 
 int xmppipe_connect_init(xmppipe_state_t *);
@@ -602,32 +601,6 @@ handle_connection(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                 fprintf(stderr, "DEBUG: disconnected\n");
             errx(EXIT_FAILURE, "handle_connection: disconnected");
     }
-}
-
-    int
-handle_sm_request(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-        void * const userdata)
-{
-    xmppipe_state_t *state = userdata;
-
-    xmpp_stanza_t *a = NULL;
-    char h[11] = {0};
-
-    if (state->sm_request % state->sm_request_interval != 0)
-        return 1;
-
-    (void)snprintf(h, sizeof(h), "%u", state->sm_ack_recv);
-
-    /* <a xmlns='urn:xmpp:sm:3' h='1'/> */
-    a = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(a, "a");
-    xmppipe_stanza_set_ns(a, "urn:xmpp:sm:3");
-    xmppipe_stanza_set_attribute(a, "h", h);
-
-    xmpp_send(state->conn, a);
-    (void)xmpp_stanza_release(a);
-
-    return 1;
 }
 
     int
