@@ -270,3 +270,10 @@ xmppipe_next_state(xmppipe_state_t *state, int status)
 
     state->status = status;
 }
+
+    void
+xmppipe_stream_close(xmppipe_state_t *state)
+{
+    if (state->sm_enabled)
+        xmpp_send_raw_string(state->conn, "</stream:stream>");
+}

@@ -130,6 +130,7 @@ char *xmppipe_conference(char *, char *);
 char *xmppipe_mucjid(char *, char *);
 
 void xmppipe_next_state(xmppipe_state_t *state, int status);
+void xmppipe_stream_close(xmppipe_state_t *);
 
 char *xmppipe_getenv(const char *);
 char *xmppipe_strdup(const char *);

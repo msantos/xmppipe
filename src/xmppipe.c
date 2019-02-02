@@ -40,7 +40,6 @@ int xmppipe_muc_init(xmppipe_state_t *);
 int xmppipe_presence_init(xmppipe_state_t *);
 void event_loop(xmppipe_state_t *);
 int handle_stdin(xmppipe_state_t *, int, char *, size_t);
-void xmppipe_stream_close(xmppipe_state_t *);
 
 void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
@@ -855,13 +854,6 @@ xmppipe_ping(xmppipe_state_t *state)
     (void)xmpp_stanza_release(iq);
 
     state->keepalive_fail++;
-}
-
-    void
-xmppipe_stream_close(xmppipe_state_t *state)
-{
-    if (state->sm_enabled)
-        xmpp_send_raw_string(state->conn, "</stream:stream>");
 }
 
     static long long
