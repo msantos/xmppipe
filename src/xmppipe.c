@@ -32,7 +32,6 @@ int handle_disco_items(xmpp_conn_t * const, xmpp_stanza_t * const,
         void * const);
 int handle_disco_info(xmpp_conn_t * const, xmpp_stanza_t * const,
         void * const);
-int handle_sm_ack(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 
 int xmppipe_connect_init(xmppipe_state_t *);
 int xmppipe_stream_init(xmppipe_state_t *);
@@ -600,54 +599,6 @@ handle_connection(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                 fprintf(stderr, "DEBUG: disconnected\n");
             errx(EXIT_FAILURE, "handle_connection: disconnected");
     }
-}
-
-    int
-handle_sm_ack(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-        void * const userdata)
-{
-    xmppipe_state_t *state = userdata;
-    const char *h = NULL;
-    u_int32_t ack = 0;
-    const char *errstr = NULL;
-
-    h = xmpp_stanza_get_attribute(stanza, "h");
-
-    if (h == NULL)
-        return 1;
-
-    ack = strtonum(h, 0, UINT_MAX-1, &errstr);
-    if (errstr)
-        goto XMPPIPE_STREAMERR;
-
-    if (state->verbose)
-        (void)fprintf(stderr, "SM: request=%u ack=%u last=%u\n",
-                state->sm_request, ack, state->sm_ack_sent);
-
-    state->sm_request_unack = 0;
-
-    /* Number of stanzas received by server exceeds the number sent by
-     * the client.
-     */
-    if (ack > state->sm_request)
-        goto XMPPIPE_STREAMERR;
-
-    /* Server count not incremented since last request (stanzas may have
-     * been dropped).
-     *
-     * Could resend dropped stanzas.
-     *
-     */
-    if (ack == state->sm_ack_sent)
-        goto XMPPIPE_STREAMERR;
-
-    state->sm_ack_sent = ack;
-    return 1;
-
-XMPPIPE_STREAMERR:
-    xmppipe_stream_close(state);
-    errx(EXIT_FAILURE, "ack sequence mismatch: request=%u, ack=%u\n",
-            state->sm_request, state->sm_ack_sent);
 }
 
     int
