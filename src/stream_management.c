@@ -96,3 +96,10 @@ XMPPIPE_STREAMERR:
     errx(EXIT_FAILURE, "ack sequence mismatch: request=%u, ack=%u\n",
             state->sm_request, state->sm_ack_sent);
 }
+
+    void
+xmppipe_stream_close(xmppipe_state_t *state)
+{
+    if (state->sm_enabled)
+        xmpp_send_raw_string(state->conn, "</stream:stream>");
+}
