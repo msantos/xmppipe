@@ -44,8 +44,6 @@ void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
 void xmppipe_muc_subject(xmppipe_state_t *, char *);
 
-void xmppipe_ping(xmppipe_state_t *);
-
 enum {
     OPT_NO_TLS_VERIFY = 1,
     OPT_CHAT,
@@ -781,30 +779,6 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
 
     xmppipe_send(state, message);
     (void)xmpp_stanza_release(message);
-}
-
-    void
-xmppipe_ping(xmppipe_state_t *state)
-{
-    xmpp_stanza_t *iq = NULL;
-    xmpp_stanza_t *ping = NULL;
-
-    iq = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(iq, "iq");
-    xmppipe_stanza_set_type(iq, "get");
-    xmppipe_stanza_set_id(iq, "c2s1");
-    xmppipe_stanza_set_attribute(iq, "from", xmpp_conn_get_bound_jid(state->conn));
-
-    ping = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(ping, "ping");
-    xmppipe_stanza_set_ns(ping, "urn:xmpp:ping");
-
-    xmppipe_stanza_add_child(iq, ping);
-
-    xmppipe_send(state, iq);
-    (void)xmpp_stanza_release(iq);
-
-    state->keepalive_fail++;
 }
 
     static long long
