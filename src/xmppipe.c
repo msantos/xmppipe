@@ -40,7 +40,6 @@ int xmppipe_presence_init(xmppipe_state_t *);
 void event_loop(xmppipe_state_t *);
 int handle_stdin(xmppipe_state_t *, int, char *, size_t);
 
-void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
 void xmppipe_muc_subject(xmppipe_state_t *, char *);
 
@@ -705,26 +704,6 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     }
 
     return 1;
-}
-
-    void
-xmppipe_muc_join(xmppipe_state_t *state)
-{
-    xmpp_stanza_t *presence = NULL;
-    xmpp_stanza_t *x = NULL;
-
-    presence = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(presence, "presence");
-    xmppipe_stanza_set_attribute(presence, "to", state->mucjid);
-
-    x = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(x, "x");
-    xmppipe_stanza_set_ns(x, "http://jabber.org/protocol/muc");
-
-    xmppipe_stanza_add_child(presence, x);
-
-    xmppipe_send(state, presence);
-    (void)xmpp_stanza_release(presence);
 }
 
     void
