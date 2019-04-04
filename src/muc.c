@@ -1,0 +1,60 @@
+/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+#include "xmppipe.h"
+
+    void
+xmppipe_muc_join(xmppipe_state_t *state)
+{
+    xmpp_stanza_t *presence = NULL;
+    xmpp_stanza_t *x = NULL;
+
+    presence = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(presence, "presence");
+    xmppipe_stanza_set_attribute(presence, "to", state->mucjid);
+
+    x = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(x, "x");
+    xmppipe_stanza_set_ns(x, "http://jabber.org/protocol/muc");
+
+    xmppipe_stanza_add_child(presence, x);
+
+    xmppipe_send(state, presence);
+    (void)xmpp_stanza_release(presence);
+}
+
+    void
+xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
+{
+    xmpp_stanza_t *message = NULL;
+    xmpp_stanza_t *subject= NULL;
+    xmpp_stanza_t *text= NULL;
+
+    message = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(message, "message");
+    xmppipe_stanza_set_attribute(message, "to", state->out);
+    xmppipe_stanza_set_attribute(message, "type", "groupchat");
+
+    subject = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(subject, "subject");
+
+    text = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_text(text, buf);
+
+    xmppipe_stanza_add_child(subject, text);
+    xmppipe_stanza_add_child(message, subject);
+
+    xmppipe_send(state, message);
+    (void)xmpp_stanza_release(message);
+}

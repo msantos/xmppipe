@@ -41,7 +41,6 @@ void event_loop(xmppipe_state_t *);
 int handle_stdin(xmppipe_state_t *, int, char *, size_t);
 
 void xmppipe_muc_unlock(xmppipe_state_t *);
-void xmppipe_muc_subject(xmppipe_state_t *, char *);
 
 enum {
     OPT_NO_TLS_VERIFY = 1,
@@ -733,31 +732,6 @@ xmppipe_muc_unlock(xmppipe_state_t *state)
 
     xmppipe_send(state, iq);
     (void)xmpp_stanza_release(iq);
-}
-
-    void
-xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
-{
-    xmpp_stanza_t *message = NULL;
-    xmpp_stanza_t *subject= NULL;
-    xmpp_stanza_t *text= NULL;
-
-    message = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(message, "message");
-    xmppipe_stanza_set_attribute(message, "to", state->out);
-    xmppipe_stanza_set_attribute(message, "type", "groupchat");
-
-    subject = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(subject, "subject");
-
-    text = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_text(text, buf);
-
-    xmppipe_stanza_add_child(subject, text);
-    xmppipe_stanza_add_child(message, subject);
-
-    xmppipe_send(state, message);
-    (void)xmpp_stanza_release(message);
 }
 
     static long long
