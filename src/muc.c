@@ -58,3 +58,32 @@ xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
     xmppipe_send(state, message);
     (void)xmpp_stanza_release(message);
 }
+
+    void
+xmppipe_muc_unlock(xmppipe_state_t *state)
+{
+    xmpp_stanza_t *iq = NULL;
+    xmpp_stanza_t *q= NULL;
+    xmpp_stanza_t *x = NULL;
+
+    iq = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(iq, "iq");
+    xmppipe_stanza_set_attribute(iq, "to", state->out);
+    xmppipe_stanza_set_attribute(iq, "id", "create1");
+    xmppipe_stanza_set_attribute(iq, "type", "set");
+
+    q = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(q, "query");
+    xmppipe_stanza_set_ns(q, "http://jabber.org/protocol/muc#owner");
+
+    x = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(x, "x");
+    xmppipe_stanza_set_ns(x, "jabber:x:data");
+    xmppipe_stanza_set_attribute(x, "type", "submit");
+
+    xmppipe_stanza_add_child(q, x);
+    xmppipe_stanza_add_child(iq, q);
+
+    xmppipe_send(state, iq);
+    (void)xmpp_stanza_release(iq);
+}

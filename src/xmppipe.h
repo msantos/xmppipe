@@ -116,6 +116,7 @@ int handle_version(xmpp_conn_t * const, xmpp_stanza_t * const, void * const);
 
 void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_subject(xmppipe_state_t *, char *);
+void xmppipe_muc_unlock(xmppipe_state_t *);
 
 void xmppipe_send_stanza(xmppipe_state_t *, char *, size_t);
 void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len);

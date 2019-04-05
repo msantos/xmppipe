@@ -40,8 +40,6 @@ int xmppipe_presence_init(xmppipe_state_t *);
 void event_loop(xmppipe_state_t *);
 int handle_stdin(xmppipe_state_t *, int, char *, size_t);
 
-void xmppipe_muc_unlock(xmppipe_state_t *);
-
 enum {
     OPT_NO_TLS_VERIFY = 1,
     OPT_CHAT,
@@ -703,35 +701,6 @@ handle_disco_info(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     }
 
     return 1;
-}
-
-    void
-xmppipe_muc_unlock(xmppipe_state_t *state)
-{
-    xmpp_stanza_t *iq = NULL;
-    xmpp_stanza_t *q= NULL;
-    xmpp_stanza_t *x = NULL;
-
-    iq = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(iq, "iq");
-    xmppipe_stanza_set_attribute(iq, "to", state->out);
-    xmppipe_stanza_set_attribute(iq, "id", "create1");
-    xmppipe_stanza_set_attribute(iq, "type", "set");
-
-    q = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(q, "query");
-    xmppipe_stanza_set_ns(q, "http://jabber.org/protocol/muc#owner");
-
-    x = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(x, "x");
-    xmppipe_stanza_set_ns(x, "jabber:x:data");
-    xmppipe_stanza_set_attribute(x, "type", "submit");
-
-    xmppipe_stanza_add_child(q, x);
-    xmppipe_stanza_add_child(iq, q);
-
-    xmppipe_send(state, iq);
-    (void)xmpp_stanza_release(iq);
 }
 
     static long long
