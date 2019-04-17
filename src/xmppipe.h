@@ -142,7 +142,6 @@ char *xmppipe_getenv(const char *);
 char *xmppipe_strdup(const char *);
 void *xmppipe_malloc(size_t);
 void *xmppipe_calloc(size_t, size_t);
-char *xmppipe_strtok(char *str, char const *delims);
 
 xmpp_stanza_t *xmppipe_stanza_new(xmpp_ctx_t *);
 void xmppipe_stanza_set_attribute(xmpp_stanza_t * const, const char * const,
