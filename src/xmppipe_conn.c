@@ -17,6 +17,9 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* Retrieve the XMPP socket opened by libstrophe.
  *
@@ -33,12 +36,19 @@ xmppipe_conn_fd(xmppipe_state_t *state)
 {
     int fd = 0;
     struct rlimit rl = {0};
+    struct stat st = {0};
 
     if (getrlimit(RLIMIT_NOFILE, &rl) < 0)
         return -1;
 
     for (fd = rl.rlim_cur; fd > STDERR_FILENO; fd--) {
         if (fcntl(fd, F_GETFD, 0) < 0)
+            continue;
+
+        if (fstat(fd, &st) < 0)
+            return -1;
+
+        if (!S_ISSOCK(st.st_mode))
             continue;
 
         return fd;
