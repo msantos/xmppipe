@@ -177,7 +177,7 @@ main(int argc, char **argv)
                 break;
             case 'k':
                 /* XEP-0199: XMPP ping keepalives */
-                state->sm_request_interval = xmppipe_strtonum(state, optarg, 0,
+                state->keepalive = xmppipe_strtonum(state, optarg, 0,
                         0xfffe) * 1000;
                 break;
             case 'K':
