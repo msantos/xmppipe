@@ -130,7 +130,7 @@ Options
 -I, --interval *interval*
 :   Request stream management status every interval messages
 
--k, --keepalives *seconds*
+-k, --keepalive *seconds*
 :   Periodically send a keepalive
 
 -K, --keepalive-failures *count*

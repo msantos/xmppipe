@@ -597,7 +597,7 @@ usage(xmppipe_state_t *state)
 
             "   -b, --buffer-size <size>            size of stdin read buffer\n"
             "   -I, --interval <interval>           request stream management status every interval messages\n"
-            "   -k, --keepalives <seconds>          periodically send a keepalive\n"
+            "   -k, --keepalive <seconds>           periodically send a keepalive\n"
             "   -K, --keepalive-failures <count>    number of keepalive failures before exiting\n"
             "   -P, --poll-delay <ms>               poll delay\n"
             "   -v, --verbose                       verbose\n"
