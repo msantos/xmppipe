@@ -13,18 +13,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #ifdef XMPPIPE_SANDBOX_pledge
-#include <unistd.h>
 #include "xmppipe.h"
+#include <unistd.h>
 
-    int
-xmppipe_sandbox_init(xmppipe_state_t *state)
-{
-    return pledge("stdio inet dns", NULL);
+int xmppipe_sandbox_init(xmppipe_state_t *state) {
+  return pledge("stdio inet dns", NULL);
 }
 
-    int
-xmppipe_sandbox_stdin(xmppipe_state_t *state)
-{
-    return pledge("stdio", NULL);
+int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
+  return pledge("stdio", NULL);
 }
 #endif

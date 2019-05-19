@@ -15,15 +15,7 @@
 #ifdef XMPPIPE_SANDBOX_null
 #include "xmppipe.h"
 
-    int
-xmppipe_sandbox_init(xmppipe_state_t *state)
-{
-	return 0;
-}
+int xmppipe_sandbox_init(xmppipe_state_t *state) { return 0; }
 
-    int
-xmppipe_sandbox_stdin(xmppipe_state_t *state)
-{
-	return 0;
-}
+int xmppipe_sandbox_stdin(xmppipe_state_t *state) { return 0; }
 #endif

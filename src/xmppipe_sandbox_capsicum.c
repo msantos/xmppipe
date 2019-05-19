@@ -13,61 +13,57 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #ifdef XMPPIPE_SANDBOX_capsicum
-#include <sys/types.h>
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/resource.h>
 #include <sys/capability.h>
+#include <sys/param.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 #include <errno.h>
 
 #include "xmppipe.h"
 
-    int
-xmppipe_sandbox_init(xmppipe_state_t *state)
-{
-    struct rlimit rl = {0};
+int xmppipe_sandbox_init(xmppipe_state_t *state) {
+  struct rlimit rl = {0};
 
-    return setrlimit(RLIMIT_NPROC, &rl);
+  return setrlimit(RLIMIT_NPROC, &rl);
 }
 
-    int
-xmppipe_sandbox_stdin(xmppipe_state_t *state)
-{
-    struct rlimit rl = {0};
-    cap_rights_t policy_read;
-    cap_rights_t policy_write;
-    cap_rights_t policy_rw;
+int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
+  struct rlimit rl = {0};
+  cap_rights_t policy_read;
+  cap_rights_t policy_write;
+  cap_rights_t policy_rw;
 
-    int fd = -1;
+  int fd = -1;
 
-    fd = xmppipe_conn_fd(state);
-    if (fd < 0)
-        return -1;
+  fd = xmppipe_conn_fd(state);
+  if (fd < 0)
+    return -1;
 
-    rl.rlim_cur = fd;
-    rl.rlim_max = fd;
+  rl.rlim_cur = fd;
+  rl.rlim_max = fd;
 
-    if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
-        return -1;
+  if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
+    return -1;
 
-    (void)cap_rights_init(&policy_read, CAP_READ, CAP_EVENT);
-    (void)cap_rights_init(&policy_write, CAP_WRITE);
-    (void)cap_rights_init(&policy_rw, CAP_READ, CAP_WRITE,
-            CAP_FSTAT, CAP_FCNTL, CAP_EVENT);
+  (void)cap_rights_init(&policy_read, CAP_READ, CAP_EVENT);
+  (void)cap_rights_init(&policy_write, CAP_WRITE);
+  (void)cap_rights_init(&policy_rw, CAP_READ, CAP_WRITE, CAP_FSTAT, CAP_FCNTL,
+                        CAP_EVENT);
 
-    if (cap_rights_limit(STDIN_FILENO, &policy_read) < 0)
-        return -1;
+  if (cap_rights_limit(STDIN_FILENO, &policy_read) < 0)
+    return -1;
 
-    if (cap_rights_limit(STDOUT_FILENO, &policy_write) < 0)
-        return -1;
+  if (cap_rights_limit(STDOUT_FILENO, &policy_write) < 0)
+    return -1;
 
-    if (cap_rights_limit(STDERR_FILENO, &policy_write) < 0)
-        return -1;
+  if (cap_rights_limit(STDERR_FILENO, &policy_write) < 0)
+    return -1;
 
-    if (cap_rights_limit(fd, &policy_rw) < 0)
-        return -1;
+  if (cap_rights_limit(fd, &policy_rw) < 0)
+    return -1;
 
-    return cap_enter();
+  return cap_enter();
 }
 #endif

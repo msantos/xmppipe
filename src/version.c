@@ -14,73 +14,71 @@
  */
 #include "xmppipe.h"
 
-    int
-handle_version(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-        void * const userdata)
-{
-    xmpp_stanza_t *reply = NULL;
-    xmpp_stanza_t *query = NULL;
-    xmpp_stanza_t *name = NULL;
-    xmpp_stanza_t *version = NULL;
-    xmpp_stanza_t *text = NULL;
-    xmpp_stanza_t *child = NULL;
+int handle_version(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
+                   void *const userdata) {
+  xmpp_stanza_t *reply = NULL;
+  xmpp_stanza_t *query = NULL;
+  xmpp_stanza_t *name = NULL;
+  xmpp_stanza_t *version = NULL;
+  xmpp_stanza_t *text = NULL;
+  xmpp_stanza_t *child = NULL;
 
-    const char *ns = NULL;
-    const char *id = NULL;
-    const char *from = NULL;
+  const char *ns = NULL;
+  const char *id = NULL;
+  const char *from = NULL;
 
-    xmppipe_state_t *state = userdata;
-    xmpp_ctx_t *ctx = state->ctx;
+  xmppipe_state_t *state = userdata;
+  xmpp_ctx_t *ctx = state->ctx;
 
-    reply = xmppipe_stanza_new(ctx);
-    xmppipe_stanza_set_name(reply, "iq");
-    xmppipe_stanza_set_type(reply, "result");
+  reply = xmppipe_stanza_new(ctx);
+  xmppipe_stanza_set_name(reply, "iq");
+  xmppipe_stanza_set_type(reply, "result");
 
-    id = xmpp_stanza_get_attribute(stanza, "id");
-    if (id == NULL)
-        return 1;
-
-    xmppipe_stanza_set_id(reply, id);
-
-    from = xmpp_stanza_get_attribute(stanza, "from");
-    if (from == NULL)
-        return 1;
-
-    xmppipe_stanza_set_attribute(reply, "to",  from);
-
-    query = xmppipe_stanza_new(ctx);
-    xmppipe_stanza_set_name(query, "query");
-
-    child = xmpp_stanza_get_children(stanza);
-    if (child == NULL) {
-        (void)xmpp_stanza_release(query);
-        return 1;
-    }
-
-    ns = xmpp_stanza_get_ns(child);
-    if (ns)
-        xmppipe_stanza_set_ns(query, ns);
-
-    name = xmppipe_stanza_new(ctx);
-    xmppipe_stanza_set_name(name, "name");
-    xmppipe_stanza_add_child(query, name);
-
-    text = xmppipe_stanza_new(ctx);
-    xmppipe_stanza_set_text(text, "xmppipe");
-    xmppipe_stanza_add_child(name, text);
-
-    version = xmppipe_stanza_new(ctx);
-    xmppipe_stanza_set_name(version, "version");
-    xmppipe_stanza_add_child(query, version);
-
-    text = xmppipe_stanza_new(ctx);
-    xmppipe_stanza_set_text(text, XMPPIPE_VERSION);
-    xmppipe_stanza_add_child(version, text);
-
-    xmppipe_stanza_add_child(reply, query);
-
-    xmppipe_send(state, reply);
-    (void)xmpp_stanza_release(reply);
-
+  id = xmpp_stanza_get_attribute(stanza, "id");
+  if (id == NULL)
     return 1;
+
+  xmppipe_stanza_set_id(reply, id);
+
+  from = xmpp_stanza_get_attribute(stanza, "from");
+  if (from == NULL)
+    return 1;
+
+  xmppipe_stanza_set_attribute(reply, "to", from);
+
+  query = xmppipe_stanza_new(ctx);
+  xmppipe_stanza_set_name(query, "query");
+
+  child = xmpp_stanza_get_children(stanza);
+  if (child == NULL) {
+    (void)xmpp_stanza_release(query);
+    return 1;
+  }
+
+  ns = xmpp_stanza_get_ns(child);
+  if (ns)
+    xmppipe_stanza_set_ns(query, ns);
+
+  name = xmppipe_stanza_new(ctx);
+  xmppipe_stanza_set_name(name, "name");
+  xmppipe_stanza_add_child(query, name);
+
+  text = xmppipe_stanza_new(ctx);
+  xmppipe_stanza_set_text(text, "xmppipe");
+  xmppipe_stanza_add_child(name, text);
+
+  version = xmppipe_stanza_new(ctx);
+  xmppipe_stanza_set_name(version, "version");
+  xmppipe_stanza_add_child(query, version);
+
+  text = xmppipe_stanza_new(ctx);
+  xmppipe_stanza_set_text(text, XMPPIPE_VERSION);
+  xmppipe_stanza_add_child(version, text);
+
+  xmppipe_stanza_add_child(reply, query);
+
+  xmppipe_send(state, reply);
+  (void)xmpp_stanza_release(reply);
+
+  return 1;
 }

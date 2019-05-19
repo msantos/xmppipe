@@ -14,76 +14,70 @@
  */
 #include "xmppipe.h"
 
-    void
-xmppipe_muc_join(xmppipe_state_t *state)
-{
-    xmpp_stanza_t *presence = NULL;
-    xmpp_stanza_t *x = NULL;
+void xmppipe_muc_join(xmppipe_state_t *state) {
+  xmpp_stanza_t *presence = NULL;
+  xmpp_stanza_t *x = NULL;
 
-    presence = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(presence, "presence");
-    xmppipe_stanza_set_attribute(presence, "to", state->mucjid);
+  presence = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(presence, "presence");
+  xmppipe_stanza_set_attribute(presence, "to", state->mucjid);
 
-    x = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(x, "x");
-    xmppipe_stanza_set_ns(x, "http://jabber.org/protocol/muc");
+  x = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(x, "x");
+  xmppipe_stanza_set_ns(x, "http://jabber.org/protocol/muc");
 
-    xmppipe_stanza_add_child(presence, x);
+  xmppipe_stanza_add_child(presence, x);
 
-    xmppipe_send(state, presence);
-    (void)xmpp_stanza_release(presence);
+  xmppipe_send(state, presence);
+  (void)xmpp_stanza_release(presence);
 }
 
-    void
-xmppipe_muc_subject(xmppipe_state_t *state, char *buf)
-{
-    xmpp_stanza_t *message = NULL;
-    xmpp_stanza_t *subject= NULL;
-    xmpp_stanza_t *text= NULL;
+void xmppipe_muc_subject(xmppipe_state_t *state, char *buf) {
+  xmpp_stanza_t *message = NULL;
+  xmpp_stanza_t *subject = NULL;
+  xmpp_stanza_t *text = NULL;
 
-    message = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(message, "message");
-    xmppipe_stanza_set_attribute(message, "to", state->out);
-    xmppipe_stanza_set_attribute(message, "type", "groupchat");
+  message = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(message, "message");
+  xmppipe_stanza_set_attribute(message, "to", state->out);
+  xmppipe_stanza_set_attribute(message, "type", "groupchat");
 
-    subject = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(subject, "subject");
+  subject = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(subject, "subject");
 
-    text = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_text(text, buf);
+  text = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_text(text, buf);
 
-    xmppipe_stanza_add_child(subject, text);
-    xmppipe_stanza_add_child(message, subject);
+  xmppipe_stanza_add_child(subject, text);
+  xmppipe_stanza_add_child(message, subject);
 
-    xmppipe_send(state, message);
-    (void)xmpp_stanza_release(message);
+  xmppipe_send(state, message);
+  (void)xmpp_stanza_release(message);
 }
 
-    void
-xmppipe_muc_unlock(xmppipe_state_t *state)
-{
-    xmpp_stanza_t *iq = NULL;
-    xmpp_stanza_t *q= NULL;
-    xmpp_stanza_t *x = NULL;
+void xmppipe_muc_unlock(xmppipe_state_t *state) {
+  xmpp_stanza_t *iq = NULL;
+  xmpp_stanza_t *q = NULL;
+  xmpp_stanza_t *x = NULL;
 
-    iq = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(iq, "iq");
-    xmppipe_stanza_set_attribute(iq, "to", state->out);
-    xmppipe_stanza_set_attribute(iq, "id", "create1");
-    xmppipe_stanza_set_attribute(iq, "type", "set");
+  iq = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(iq, "iq");
+  xmppipe_stanza_set_attribute(iq, "to", state->out);
+  xmppipe_stanza_set_attribute(iq, "id", "create1");
+  xmppipe_stanza_set_attribute(iq, "type", "set");
 
-    q = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(q, "query");
-    xmppipe_stanza_set_ns(q, "http://jabber.org/protocol/muc#owner");
+  q = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(q, "query");
+  xmppipe_stanza_set_ns(q, "http://jabber.org/protocol/muc#owner");
 
-    x = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(x, "x");
-    xmppipe_stanza_set_ns(x, "jabber:x:data");
-    xmppipe_stanza_set_attribute(x, "type", "submit");
+  x = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(x, "x");
+  xmppipe_stanza_set_ns(x, "jabber:x:data");
+  xmppipe_stanza_set_attribute(x, "type", "submit");
 
-    xmppipe_stanza_add_child(q, x);
-    xmppipe_stanza_add_child(iq, q);
+  xmppipe_stanza_add_child(q, x);
+  xmppipe_stanza_add_child(iq, q);
 
-    xmppipe_send(state, iq);
-    (void)xmpp_stanza_release(iq);
+  xmppipe_send(state, iq);
+  (void)xmpp_stanza_release(iq);
 }

@@ -17,94 +17,83 @@
 
 static unsigned char rfc3986[256];
 
-    int
-xmppipe_fmt_init()
-{
-    int i = 0;
+int xmppipe_fmt_init() {
+  int i = 0;
 
-    for (i = 0; i < 256; i++)
-        rfc3986[i] = isalnum(i)
-            || i == '~' || i == '-' || i == '.' || i == '_'
-            || i == '@' || i == '/'
-            ? i : 0;
+  for (i = 0; i < 256; i++)
+    rfc3986[i] = isalnum(i) || i == '~' || i == '-' || i == '.' || i == '_' ||
+                         i == '@' || i == '/'
+                     ? i
+                     : 0;
 
-    return 0;
+  return 0;
 }
 
-    char *
-xmppipe_nfmt_encode(const char *s, size_t len)
-{
-    char *buf = xmppipe_calloc(len * 3 + 1, 1);
-    char *p = buf;
-    size_t i = 0;
+char *xmppipe_nfmt_encode(const char *s, size_t len) {
+  char *buf = xmppipe_calloc(len * 3 + 1, 1);
+  char *p = buf;
+  size_t i = 0;
 
-    for (i = 0; i < len; i++) {
-        unsigned char c = s[i];
-        if (rfc3986[c]) {
-            *p = c;
-            p++;
-        }
-        else {
-            p += sprintf(p, "%%%02X", c);
-        }
+  for (i = 0; i < len; i++) {
+    unsigned char c = s[i];
+    if (rfc3986[c]) {
+      *p = c;
+      p++;
+    } else {
+      p += sprintf(p, "%%%02X", c);
     }
+  }
 
-    return buf;
+  return buf;
 }
 
-    char *
-xmppipe_fmt_encode(const char *s)
-{
-    return xmppipe_nfmt_encode(s, strlen(s));
+char *xmppipe_fmt_encode(const char *s) {
+  return xmppipe_nfmt_encode(s, strlen(s));
 }
 
-    char *
-xmppipe_nfmt_decode(const char *s, size_t len)
-{
-    char *buf;
-    char *p;
-    size_t i = 0;
-    char fmt[3] = {0};
-    char *endptr;
+char *xmppipe_nfmt_decode(const char *s, size_t len) {
+  char *buf;
+  char *p;
+  size_t i = 0;
+  char fmt[3] = {0};
+  char *endptr;
 
-    buf = xmppipe_calloc(len+1, 1);
-    p = buf;
+  buf = xmppipe_calloc(len + 1, 1);
+  p = buf;
 
-    for (i = 0; i < len; i++) {
-        unsigned char c = s[i];
-        if (c == '%') {
-            unsigned char n = 0;
+  for (i = 0; i < len; i++) {
+    unsigned char c = s[i];
+    if (c == '%') {
+      unsigned char n = 0;
 
-            if (i + 2 > len) goto XMPPIPE_ERR;
+      if (i + 2 > len)
+        goto XMPPIPE_ERR;
 
-            (void)memcpy(fmt, s+i+1, 2);
+      (void)memcpy(fmt, s + i + 1, 2);
 
-            errno = 0;
-            n = strtol(fmt, &endptr, 16);
+      errno = 0;
+      n = strtol(fmt, &endptr, 16);
 
-            if ( (errno != 0) || (endptr == fmt))
-                goto XMPPIPE_ERR;
+      if ((errno != 0) || (endptr == fmt))
+        goto XMPPIPE_ERR;
 
-            *p++ = n;
-            i += 2;
-        }
-        else {
-            *p++ = c;
-        }
+      *p++ = n;
+      i += 2;
+    } else {
+      *p++ = c;
     }
+  }
 
-    return buf;
+  return buf;
 
 XMPPIPE_ERR:
-    free(buf);
-    return NULL;
+  free(buf);
+  return NULL;
 }
 
-    char *
-xmppipe_fmt_decode(const char *s)
-{
-    if (s == NULL)
-        return NULL;
+char *xmppipe_fmt_decode(const char *s) {
+  if (s == NULL)
+    return NULL;
 
-    return xmppipe_nfmt_decode(s, strlen(s));
+  return xmppipe_nfmt_decode(s, strlen(s));
 }
