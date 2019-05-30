@@ -18,6 +18,8 @@
 #include <resolv.h>
 #include <sys/select.h>
 
+static int handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len);
+
 void event_loop(xmppipe_state_t *state) {
   int fd = STDIN_FILENO;
   int eof = 0;
@@ -101,7 +103,7 @@ XMPPIPE_EXIT:
   return;
 }
 
-int handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len) {
+static int handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len) {
   fd_set rfds;
   struct timeval tv = {0};
   ssize_t n = 0;
