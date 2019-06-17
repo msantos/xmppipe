@@ -135,8 +135,6 @@ XMPPIPE_DONE:
 void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
                           char *buf, size_t len) {
   xmpp_stanza_t *message = NULL;
-  xmpp_stanza_t *body = NULL;
-  xmpp_stanza_t *text = NULL;
   char *id = NULL;
 
   id = xmpp_uuid_gen(state->ctx);
@@ -145,16 +143,7 @@ void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
     errx(EXIT_FAILURE, "unable to allocate message id");
   }
 
-  message = xmppipe_stanza_new(state->ctx);
-  xmppipe_stanza_set_name(message, "message");
-  xmppipe_stanza_set_type(message, type);
-  xmppipe_stanza_set_attribute(message, "to", to);
-  xmppipe_stanza_set_id(message, id);
-
-  body = xmppipe_stanza_new(state->ctx);
-  xmppipe_stanza_set_name(body, "body");
-
-  text = xmppipe_stanza_new(state->ctx);
+  message = xmppipe_message_new(state->ctx, type, to, id);
 
   if (state->encode) {
     size_t len = strlen(buf);
@@ -163,17 +152,13 @@ void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
     if (b64 == NULL)
       errx(EXIT_FAILURE, "encode: invalid input: %zu", len);
 
-    xmppipe_stanza_set_text(text, b64);
+    xmppipe_message_set_body(message, b64);
     xmpp_free(state->ctx, b64);
   } else {
-    xmppipe_stanza_set_text(text, buf);
+    xmppipe_message_set_body(message, buf);
   }
 
-  xmppipe_stanza_add_child(body, text);
-  xmppipe_stanza_add_child(message, body);
-
   xmppipe_send(state, message);
-  (void)xmpp_stanza_release(message);
   xmpp_free(state->ctx, id);
 }
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2017, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -144,6 +144,10 @@ char *xmppipe_getenv(const char *);
 char *xmppipe_strdup(const char *);
 void *xmppipe_malloc(size_t);
 void *xmppipe_calloc(size_t, size_t);
+
+xmpp_stanza_t *xmppipe_message_new(xmpp_ctx_t *ctx, const char *const type,
+                                   const char *const to, const char *const id);
+void xmppipe_message_set_body(xmpp_stanza_t *msg, const char *const text);
 
 xmpp_stanza_t *xmppipe_stanza_new(xmpp_ctx_t *);
 void xmppipe_stanza_set_attribute(xmpp_stanza_t *const, const char *const,

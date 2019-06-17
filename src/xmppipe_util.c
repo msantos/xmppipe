@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2018, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -92,6 +92,24 @@ void *xmppipe_calloc(size_t nmemb, size_t size) {
     err(3, "xmppipe_calloc: %zu/%zu", nmemb, size);
 
   return buf;
+}
+
+xmpp_stanza_t *xmppipe_message_new(xmpp_ctx_t *ctx, const char *const type,
+                                   const char *const to, const char *const id) {
+  xmpp_stanza_t *m = xmpp_message_new(ctx, type, to, id);
+
+  if (m == NULL)
+    err(3, "xmppipe_stanza_new");
+
+  return m;
+}
+
+void xmppipe_message_set_body(xmpp_stanza_t *msg, const char *const text) {
+  int rv;
+
+  rv = xmpp_message_set_body(msg, text);
+  if (rv != XMPP_EOK)
+    errx(EXIT_FAILURE, "xmpp_message_set_body: %u", rv);
 }
 
 xmpp_stanza_t *xmppipe_stanza_new(xmpp_ctx_t *ctx) {
