@@ -148,6 +148,7 @@ void *xmppipe_calloc(size_t, size_t);
 xmpp_stanza_t *xmppipe_message_new(xmpp_ctx_t *ctx, const char *const type,
                                    const char *const to, const char *const id);
 void xmppipe_message_set_body(xmpp_stanza_t *msg, const char *const text);
+xmpp_stanza_t *xmppipe_stanza_reply(xmpp_stanza_t *const stanza);
 
 xmpp_stanza_t *xmppipe_stanza_new(xmpp_ctx_t *);
 void xmppipe_stanza_set_attribute(xmpp_stanza_t *const, const char *const,

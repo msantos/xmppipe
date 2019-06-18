@@ -99,7 +99,7 @@ xmpp_stanza_t *xmppipe_message_new(xmpp_ctx_t *ctx, const char *const type,
   xmpp_stanza_t *m = xmpp_message_new(ctx, type, to, id);
 
   if (m == NULL)
-    err(3, "xmppipe_stanza_new");
+    err(3, "xmppipe_message_new");
 
   return m;
 }
@@ -110,6 +110,15 @@ void xmppipe_message_set_body(xmpp_stanza_t *msg, const char *const text) {
   rv = xmpp_message_set_body(msg, text);
   if (rv != XMPP_EOK)
     errx(EXIT_FAILURE, "xmpp_message_set_body: %u", rv);
+}
+
+xmpp_stanza_t *xmppipe_stanza_reply(xmpp_stanza_t *const stanza) {
+  xmpp_stanza_t *s = xmpp_stanza_reply(stanza);
+
+  if (s == NULL)
+    err(3, "xmppipe_stanza_reply");
+
+  return s;
 }
 
 xmpp_stanza_t *xmppipe_stanza_new(xmpp_ctx_t *ctx) {
