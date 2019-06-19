@@ -27,6 +27,7 @@ void xmppipe_muc_join(xmppipe_state_t *state) {
   xmppipe_stanza_set_ns(x, "http://jabber.org/protocol/muc");
 
   xmppipe_stanza_add_child(presence, x);
+  (void)xmpp_stanza_release(x);
 
   xmppipe_send(state, presence);
   (void)xmpp_stanza_release(presence);
@@ -50,6 +51,8 @@ void xmppipe_muc_subject(xmppipe_state_t *state, char *buf) {
 
   xmppipe_stanza_add_child(subject, text);
   xmppipe_stanza_add_child(message, subject);
+  (void)xmpp_stanza_release(text);
+  (void)xmpp_stanza_release(subject);
 
   xmppipe_send(state, message);
   (void)xmpp_stanza_release(message);
@@ -77,6 +80,8 @@ void xmppipe_muc_unlock(xmppipe_state_t *state) {
 
   xmppipe_stanza_add_child(q, x);
   xmppipe_stanza_add_child(iq, q);
+  (void)xmpp_stanza_release(x);
+  (void)xmpp_stanza_release(q);
 
   xmppipe_send(state, iq);
   (void)xmpp_stanza_release(iq);
