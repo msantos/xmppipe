@@ -37,6 +37,7 @@ void xmppipe_ping(xmppipe_state_t *state) {
   xmppipe_stanza_set_ns(ping, "urn:xmpp:ping");
 
   xmppipe_stanza_add_child(iq, ping);
+  (void)xmpp_stanza_release(ping);
 
   xmppipe_send(state, iq);
   (void)xmpp_stanza_release(iq);
