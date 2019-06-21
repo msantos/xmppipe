@@ -34,8 +34,10 @@ int handle_version(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
   xmppipe_stanza_set_type(reply, "result");
 
   id = xmpp_stanza_get_attribute(stanza, "id");
-  if (id == NULL)
+  if (id == NULL) {
+    (void)xmpp_stanza_release(reply);
     return 1;
+  }
 
   xmppipe_stanza_set_id(reply, id);
 
