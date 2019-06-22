@@ -375,6 +375,7 @@ int xmppipe_muc_init(xmppipe_state_t *state) {
     xmppipe_stanza_set_ns(query, "http://jabber.org/protocol/disco#items");
 
     xmppipe_stanza_add_child(iq, query);
+    (void)xmpp_stanza_release(query);
 
     xmppipe_send(state, iq);
     (void)xmpp_stanza_release(iq);
@@ -481,6 +482,7 @@ int handle_disco_items(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
     xmppipe_stanza_set_ns(reply, "http://jabber.org/protocol/disco#info");
 
     xmppipe_stanza_add_child(iq, reply);
+    (void)xmpp_stanza_release(reply);
 
     xmppipe_send(state, iq);
     (void)xmpp_stanza_release(iq);
