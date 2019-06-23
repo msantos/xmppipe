@@ -146,7 +146,6 @@ void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
   message = xmppipe_message_new(state->ctx, type, to, id);
 
   if (state->encode) {
-    size_t len = strlen(buf);
     char *b64 = xmpp_base64_encode(state->ctx, (unsigned char *)buf, len);
 
     if (b64 == NULL)
