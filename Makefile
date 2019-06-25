@@ -7,6 +7,9 @@ UNAME_SYS := $(shell uname -s)
 ifeq ($(UNAME_SYS), Linux)
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
+			  -Wconversion -Wshadow \
+			  -Wpointer-arith -Wcast-qual \
+			  -Wstrict-prototypes -Wmissing-prototypes \
 			  -pie -fPIE \
 			  -fno-strict-aliasing
 	XMPPIPE_SANDBOX ?= seccomp
@@ -57,7 +60,7 @@ static:
 	$(CC) $(CFLAGS) \
 		-no-pie -fno-PIE \
 		$(XMPPIPE_CFLAGS) \
-	 	-o xmppipe src/*.c -Wl,--no-as-needed \
+		-o xmppipe src/*.c -Wl,--no-as-needed \
 		$(LDFLAGS) -ldl -lz -lresolv \
 		-l:libstrophe.a \
 		-l:libssl.a -l:libcrypto.a \
