@@ -23,6 +23,10 @@
 
 #include <strophe.h>
 
+#ifndef HAVE_STRTONUM
+#include "strtonum.h"
+#endif
+
 #define XMPPIPE_VERSION "0.12.0"
 #define XMPPIPE_RESOURCE "xmppipe"
 
@@ -167,8 +171,3 @@ int xmppipe_conn_fd(xmppipe_state_t *state);
 int b64_ntop(u_char const *src, size_t srclength, char *target,
              size_t targsize);
 int b64_pton(char const *src, u_char *target, size_t targsize);
-
-#ifndef HAVE_STRTONUM
-long long strtonum(const char *numstr, long long minval, long long maxval,
-                   const char **errstrp);
-#endif
