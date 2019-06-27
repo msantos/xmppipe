@@ -57,7 +57,7 @@ int handle_sm_ack(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
   if (h == NULL)
     return 1;
 
-  ack = strtonum(h, 0, UINT_MAX - 1, &errstr);
+  ack = (u_int32_t)strtonum(h, 0, UINT_MAX - 1, &errstr);
   if (errstr)
     goto XMPPIPE_STREAMERR;
 
