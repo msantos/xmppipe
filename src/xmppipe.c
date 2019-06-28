@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
       p = strchr(addr, ':');
       if (p) {
         *p++ = '\0';
-        port = xmppipe_strtonum(state, p, 0, 0xfffe);
+        port = (u_int16_t)xmppipe_strtonum(state, p, 0, 0xfffe);
       }
     } break;
     case 'r':
@@ -157,31 +157,34 @@ int main(int argc, char **argv) {
 
     case 'b':
       /* read buffer size */
-      state->bufsz = xmppipe_strtonum(state, optarg, 3, 0xfffe);
+      state->bufsz = (size_t)xmppipe_strtonum(state, optarg, 3, 0xfffe);
       break;
     case 'c':
       /* XEP-0198: stream management flow control */
-      state->sm_fc = xmppipe_strtonum(state, optarg, 0, 0xfffe);
+      state->sm_fc = (u_int32_t)xmppipe_strtonum(state, optarg, 0, 0xfffe);
       break;
     case 'I':
       /* XEP-0198: stream management request interval */
-      state->sm_request_interval = xmppipe_strtonum(state, optarg, 0, 0xfffe);
+      state->sm_request_interval =
+          (u_int32_t)xmppipe_strtonum(state, optarg, 0, 0xfffe);
       break;
     case 'k':
       /* XEP-0199: XMPP ping keepalives */
-      state->keepalive = xmppipe_strtonum(state, optarg, 0, 0xfffe) * 1000;
+      state->keepalive =
+          (u_int32_t)xmppipe_strtonum(state, optarg, 0, 0xfffe) * 1000;
       break;
     case 'K':
       /* XEP-0199: number of keepalive without a reply */
-      state->keepalive_limit = xmppipe_strtonum(state, optarg, 1, 0xfffe);
+      state->keepalive_limit =
+          (u_int32_t)xmppipe_strtonum(state, optarg, 1, 0xfffe);
       break;
     case 'P':
       /* poll delay */
-      state->poll = xmppipe_strtonum(state, optarg, 0, 0xfffe);
+      state->poll = (u_int32_t)xmppipe_strtonum(state, optarg, 0, 0xfffe);
       break;
     case 'U':
       /* XEP-0198: stream management unacked requests */
-      state->sm_unacked = xmppipe_strtonum(state, optarg, 0, 0xfffe);
+      state->sm_unacked = (u_int32_t)xmppipe_strtonum(state, optarg, 0, 0xfffe);
       break;
 
     case 'd':
