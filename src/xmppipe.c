@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
   char *pass = NULL;
   char *addr = NULL;
   u_int16_t port = 0;
-  int flags = 0;
+  long flags = 0;
 
   int ch = 0;
 
