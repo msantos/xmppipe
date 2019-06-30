@@ -80,7 +80,6 @@ int handle_version(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 
   xmppipe_send(state, reply);
   (void)xmpp_stanza_release(reply);
-  (void)xmpp_stanza_release(reply);
 
   return 1;
 }
