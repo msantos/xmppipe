@@ -7,7 +7,7 @@ UNAME_SYS := $(shell uname -s)
 ifeq ($(UNAME_SYS), Linux)
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
-			  -Wconversion -Wshadow \
+			  -Wshadow \
 			  -Wpointer-arith -Wcast-qual \
 			  -Wstrict-prototypes -Wmissing-prototypes \
 			  -pie -fPIE \
