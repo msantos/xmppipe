@@ -58,7 +58,6 @@ enum {
   XMPPIPE_OPT_EOF = 1 << 2,     /* Keep running on stdin EOF */
   XMPPIPE_OPT_SIGPIPE = 1 << 3, /* Exit if no occupants in MUC */
   XMPPIPE_OPT_GROUPCHAT = 1 << 4,   /* Use groupchat */
-  XMPPIPE_OPT_CHAT_MARKER = 1 << 5, /* Display chat markers */
 };
 
 enum { XMPPIPE_FMT_TEXT = 0, XMPPIPE_FMT_CSV };

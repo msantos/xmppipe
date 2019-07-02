@@ -54,12 +54,8 @@ int handle_message(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
   child = xmpp_stanza_get_child_by_name(stanza, "displayed");
   if (child != NULL) {
     ns = xmpp_stanza_get_ns(child);
-    if (XMPPIPE_STREQ(ns, "urn:xmpp:chat-markers:0")) {
-      if (!(state->opt & XMPPIPE_OPT_CHAT_MARKER))
-        return 1;
-
+    if (XMPPIPE_STREQ(ns, "urn:xmpp:chat-markers:0"))
       symbol = "M";
-    }
   }
 
   child = xmpp_stanza_get_child_by_name(stanza, "body");

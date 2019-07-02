@@ -209,7 +209,6 @@ int main(int argc, char **argv) {
       break;
 
     case OPT_CHAT_MARKER:
-      state->opt |= XMPPIPE_OPT_CHAT_MARKER;
       break;
 
     case 'h':
