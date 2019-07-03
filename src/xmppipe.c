@@ -36,7 +36,6 @@ int xmppipe_presence_init(xmppipe_state_t *);
 enum {
   OPT_NO_TLS_VERIFY = 1,
   OPT_CHAT,
-  OPT_CHAT_MARKER,
 };
 
 static const struct option long_options[] = {
@@ -44,7 +43,6 @@ static const struct option long_options[] = {
     {"buffer-size", required_argument, NULL, 'b'},
     {"flow-control", required_argument, NULL, 'c'},
     {"chat", no_argument, NULL, OPT_CHAT},
-    {"chat-marker", no_argument, NULL, OPT_CHAT_MARKER},
     {"discard", no_argument, NULL, 'd'},
     {"discard-to-stdout", no_argument, NULL, 'D'},
     {"ignore-eof", no_argument, NULL, 'e'},
@@ -206,9 +204,6 @@ int main(int argc, char **argv) {
       break;
     case OPT_CHAT:
       state->opt &= ~XMPPIPE_OPT_GROUPCHAT;
-      break;
-
-    case OPT_CHAT_MARKER:
       break;
 
     case 'h':
