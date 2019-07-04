@@ -109,6 +109,9 @@ Options
 -a, --address *address:port*
 :   Specify the IP address and port of the XMPP server
 
+-F, --format *text:csv*
+:   stdin is text (default) or colon separated values
+
 -d, --discard
 :   Discard stdin when MUC is empty
 
@@ -406,12 +409,4 @@ TODO
 
 * support alternative input modes
 
-  Add a command line argument to enable various input modes. The default
-  mode converts stdin to a message body.
-
-  "formatted" mode takes the same input as the output. For example,
-  to send a chat message:
-
-    echo 'm:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here' | xmppipe
-
-  A "raw" mode could also be added: XML input/output.
+  * "raw" mode: XML input/output

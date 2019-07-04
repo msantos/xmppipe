@@ -563,6 +563,7 @@ static void usage(xmppipe_state_t *state) {
       "   -S, --subject <subject>             set MUC subject\n"
       "   -a, --address <addr:port>           set XMPP server address (port is "
       "optional)\n"
+      "   -F, --format <text|csv>             stdin is text (default) or colon separated values\n"
 
       "   -d, --discard                       discard stdin when MUC is empty\n"
       "   -D, --discard-to-stdout             discard stdin and print to local "
