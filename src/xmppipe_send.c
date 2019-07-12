@@ -14,6 +14,9 @@
  */
 #include "xmppipe.h"
 
+void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type, char *buf,
+                      size_t len);
+
 void xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len) {
   switch (state->format) {
   case XMPPIPE_FMT_TEXT:
@@ -46,6 +49,7 @@ void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len) {
   char *end;
   char *body = NULL;
   int valid = 0;
+  char format = 'm';
 
   default_type = (state->opt & XMPPIPE_OPT_GROUPCHAT) ? "groupchat" : "chat";
 
@@ -76,8 +80,11 @@ void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len) {
         goto XMPPIPE_DONE;
       }
 
+      format = start[0];
+
       switch (start[0]) {
-      case 'm':
+      case 'm': /* message */
+      case 'u': /* message with oob */
         break;
       case 'p':
       /* unsupported: fall through */
@@ -121,10 +128,19 @@ void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len) {
   }
 
 XMPPIPE_DONE:
-  if (valid == 1)
-    xmppipe_send_message(state, to, type, body, strlen(body));
-  else if (state->verbose)
+  if (valid == 1) {
+    switch (format) {
+    case 'u':
+      xmppipe_send_oob(state, to, type, body, strlen(body));
+      break;
+    case 'm':
+    default:
+      xmppipe_send_message(state, to, type, body, strlen(body));
+      break;
+    }
+  } else if (state->verbose) {
     (void)fprintf(stderr, "invalid input\n");
+  }
 
   free(tmp);
   free(type);
@@ -156,6 +172,46 @@ void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
   } else {
     xmppipe_message_set_body(message, buf);
   }
+
+  xmppipe_send(state, message);
+  xmpp_free(state->ctx, id);
+}
+
+void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type, char *buf,
+                      size_t len) {
+  xmpp_stanza_t *message;
+  xmpp_stanza_t *x;
+  xmpp_stanza_t *url;
+  xmpp_stanza_t *text;
+  char *id;
+
+  id = xmpp_uuid_gen(state->ctx);
+
+  if (id == NULL) {
+    errx(EXIT_FAILURE, "unable to allocate message id");
+  }
+
+  message = xmppipe_message_new(state->ctx, type, to, id);
+
+  x = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(x, "x");
+  xmppipe_stanza_set_ns(x, "jabber:x:oob");
+
+  url = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(url, "url");
+
+  text = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_text(text, buf);
+  xmppipe_stanza_add_child(url, text);
+  (void)xmpp_stanza_release(text);
+
+  xmppipe_stanza_add_child(x, url);
+  (void)xmpp_stanza_release(url);
+
+  xmppipe_stanza_add_child(message, x);
+  (void)xmpp_stanza_release(x);
+
+  xmppipe_message_set_body(message, buf);
 
   xmppipe_send(state, message);
   xmpp_free(state->ctx, id);
