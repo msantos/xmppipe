@@ -67,13 +67,14 @@ int handle_version(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 
   version = xmppipe_stanza_new(ctx);
   xmppipe_stanza_set_name(version, "version");
-  xmppipe_stanza_add_child(query, version);
-  (void)xmpp_stanza_release(version);
 
   text = xmppipe_stanza_new(ctx);
   xmppipe_stanza_set_text(text, XMPPIPE_VERSION);
   xmppipe_stanza_add_child(version, text);
   (void)xmpp_stanza_release(text);
+
+  xmppipe_stanza_add_child(query, version);
+  (void)xmpp_stanza_release(version);
 
   xmppipe_stanza_add_child(reply, query);
   (void)xmpp_stanza_release(query);
