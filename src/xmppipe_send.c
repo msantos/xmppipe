@@ -84,7 +84,7 @@ void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len) {
 
       switch (start[0]) {
       case 'm': /* message */
-      case 'u': /* message with oob */
+      case 'I': /* message: inline image using oob */
         break;
       case 'p':
       /* unsupported: fall through */
@@ -130,7 +130,7 @@ void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len) {
 XMPPIPE_DONE:
   if (valid == 1) {
     switch (format) {
-    case 'u':
+    case 'I':
       xmppipe_send_oob(state, to, type, body, strlen(body));
       break;
     case 'm':
