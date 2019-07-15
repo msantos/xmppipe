@@ -327,6 +327,7 @@ int xmppipe_stream_init(xmppipe_state_t *state) {
   xmpp_handler_add(state->conn, handle_message, NULL, "message", NULL, state);
   xmpp_handler_add(state->conn, handle_version, "jabber:iq:version", "iq", NULL,
                    state);
+  xmpp_handler_add(state->conn, handle_iq, NULL, "iq", "result", state);
   xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 
   /* XXX multiple handlers can be called for each event
@@ -521,6 +522,11 @@ int handle_disco_info(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
     if (var == NULL)
       continue;
 
+    if (XMPPIPE_STREQ(var, "urn:xmpp:http:upload:0")) {
+      state->upload = xmppipe_strdup(from);
+      continue;
+    }
+
     if (XMPPIPE_STRNEQ(var, "http://jabber.org/protocol/muc"))
       continue;
 
@@ -533,7 +539,7 @@ int handle_disco_info(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
       xmppipe_muc_unlock(state);
     }
 
-    return 0;
+    return 1;
   }
 
   return 1;
@@ -563,7 +569,8 @@ static void usage(xmppipe_state_t *state) {
       "   -S, --subject <subject>             set MUC subject\n"
       "   -a, --address <addr:port>           set XMPP server address (port is "
       "optional)\n"
-      "   -F, --format <text|csv>             stdin is text (default) or colon separated values\n"
+      "   -F, --format <text|csv>             stdin is text (default) or colon "
+      "separated values\n"
 
       "   -d, --discard                       discard stdin when MUC is empty\n"
       "   -D, --discard-to-stdout             discard stdin and print to local "

@@ -57,7 +57,7 @@ enum {
       1 << 1,                   /* Throw away stdin and send to local stdout */
   XMPPIPE_OPT_EOF = 1 << 2,     /* Keep running on stdin EOF */
   XMPPIPE_OPT_SIGPIPE = 1 << 3, /* Exit if no occupants in MUC */
-  XMPPIPE_OPT_GROUPCHAT = 1 << 4,   /* Use groupchat */
+  XMPPIPE_OPT_GROUPCHAT = 1 << 4, /* Use groupchat */
 };
 
 enum { XMPPIPE_FMT_TEXT = 0, XMPPIPE_FMT_CSV };
@@ -74,6 +74,8 @@ typedef struct {
   char *mucjid;     /* room@conference.xmpp.example.com/nick */
   char *subject;    /* topic/subject for MUC */
   char *out;        /* room@conference.xmpp.example.com */
+
+  char *upload; /* XEP 0363 upload service */
 
   int status;
   int occupants;
@@ -118,6 +120,8 @@ int handle_sm_ack(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 int handle_sm_enabled(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 int handle_sm_request(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 int handle_version(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
+int handle_iq(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
+              void *const userdata);
 
 void xmppipe_muc_join(xmppipe_state_t *);
 void xmppipe_muc_subject(xmppipe_state_t *, char *);

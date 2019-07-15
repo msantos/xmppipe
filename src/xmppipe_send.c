@@ -17,6 +17,9 @@
 void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type, char *buf,
                       size_t len);
 
+void xmppipe_send_http_upload(xmppipe_state_t *state, char *to, char *type,
+                              char *buf, size_t len);
+
 void xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len) {
   switch (state->format) {
   case XMPPIPE_FMT_TEXT:
@@ -84,7 +87,8 @@ void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len) {
 
       switch (start[0]) {
       case 'm': /* message */
-      case 'I': /* message: inline image using oob */
+      case 'I': /* message: iniline image using oob stanza */
+      case 'u': /* iq: http upload slot */
         break;
       case 'p':
       /* unsupported: fall through */
@@ -132,6 +136,9 @@ XMPPIPE_DONE:
     switch (format) {
     case 'I':
       xmppipe_send_oob(state, to, type, body, strlen(body));
+      break;
+    case 'u':
+      xmppipe_send_http_upload(state, to, type, body, strlen(body));
       break;
     case 'm':
     default:
@@ -214,6 +221,87 @@ void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type, char *buf,
   xmppipe_message_set_body(message, buf);
 
   xmppipe_send(state, message);
+  xmpp_free(state->ctx, id);
+}
+
+void xmppipe_send_http_upload(xmppipe_state_t *state, char *to, char *type,
+                              char *buf, size_t len) {
+  xmpp_stanza_t *iq;
+  xmpp_stanza_t *request;
+  char *id;
+  char *filename = NULL;
+  char *size = NULL;
+  char *content_type = NULL;
+
+  int i;
+  char *start;
+  char *end;
+
+  if (state->upload == NULL) {
+    if (state->verbose)
+      (void)fprintf(stderr, "error: XEP 0363 http upload is not supported\n");
+    return;
+  }
+
+  id = xmpp_uuid_gen(state->ctx);
+
+  if (id == NULL) {
+    errx(EXIT_FAILURE, "unable to allocate message id");
+  }
+
+  start = buf;
+
+  /* <filename>|<size>|<content-type> */
+  for (i = 0; start != NULL; i++) {
+    end = strchr(start, '|');
+    if (end != NULL)
+      *end++ = '\0';
+
+    switch (i) {
+    case 0: /* filename */
+      filename = start;
+      break;
+    case 1: /* size */
+      size = start;
+      break;
+    case 2: /* content-type */
+      content_type = start;
+      break;
+    default:
+      /* invalid */
+      break;
+    }
+
+    start = end;
+  }
+
+  if (filename == NULL || size == NULL) {
+    if (state->verbose)
+      (void)fprintf(stderr, "error: invalid http upload request\n");
+    return;
+  }
+
+  iq = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(iq, "iq");
+  xmppipe_stanza_set_attribute(iq, "id", id);
+  xmppipe_stanza_set_attribute(iq, "type", "get");
+  xmppipe_stanza_set_attribute(iq, "to", state->upload);
+
+  request = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(request, "request");
+  xmppipe_stanza_set_ns(request, "urn:xmpp:http:upload:0");
+  xmppipe_stanza_set_attribute(request, "filename", filename);
+  xmppipe_stanza_set_attribute(request, "size", size);
+
+  if (content_type)
+    xmppipe_stanza_set_attribute(request, "content-type", content_type);
+
+  xmppipe_stanza_add_child(iq, request);
+  (void)xmpp_stanza_release(request);
+
+  xmppipe_send(state, iq);
+
+  (void)xmpp_stanza_release(iq);
   xmpp_free(state->ctx, id);
 }
 
