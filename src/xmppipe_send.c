@@ -14,11 +14,17 @@
  */
 #include "xmppipe.h"
 
-void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type, char *buf,
-                      size_t len);
+static void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf,
+                                    size_t len);
 
-void xmppipe_send_http_upload(xmppipe_state_t *state, char *to, char *type,
-                              char *buf, size_t len);
+static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
+                                 char *buf, size_t len);
+
+static void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type,
+                             char *buf, size_t len);
+
+static void xmppipe_send_http_upload(xmppipe_state_t *state, char *to,
+                                     char *type, char *buf, size_t len);
 
 void xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len) {
   switch (state->format) {
@@ -40,7 +46,8 @@ void xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len) {
   }
 }
 
-void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len) {
+static void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf,
+                                    size_t len) {
   char *to = NULL;
   char *type = NULL;
   char *default_type;
@@ -155,8 +162,8 @@ XMPPIPE_DONE:
   free(body);
 }
 
-void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
-                          char *buf, size_t len) {
+static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
+                                 char *buf, size_t len) {
   xmpp_stanza_t *message = NULL;
   char *id = NULL;
 
@@ -184,8 +191,8 @@ void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
   xmpp_free(state->ctx, id);
 }
 
-void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type, char *buf,
-                      size_t len) {
+static void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type,
+                             char *buf, size_t len) {
   xmpp_stanza_t *message;
   xmpp_stanza_t *x;
   xmpp_stanza_t *url;
@@ -224,8 +231,8 @@ void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type, char *buf,
   xmpp_free(state->ctx, id);
 }
 
-void xmppipe_send_http_upload(xmppipe_state_t *state, char *to, char *type,
-                              char *buf, size_t len) {
+static void xmppipe_send_http_upload(xmppipe_state_t *state, char *to,
+                                     char *type, char *buf, size_t len) {
   xmpp_stanza_t *iq;
   xmpp_stanza_t *request;
   char *id;

@@ -128,8 +128,6 @@ void xmppipe_muc_subject(xmppipe_state_t *, char *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
 
 void xmppipe_send_stanza(xmppipe_state_t *, char *, size_t);
-void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf, size_t len);
-void xmppipe_send_message(xmppipe_state_t *, char *, char *, char *, size_t);
 void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 
 int xmppipe_fmt_init(void);
