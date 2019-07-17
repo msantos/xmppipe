@@ -249,6 +249,17 @@ char *xmppipe_roomname(char *label) {
   return buf;
 }
 
+char *xmppipe_uuid_gen(xmpp_ctx_t *ctx) {
+  char *uuid;
+
+  uuid = xmpp_uuid_gen(ctx);
+
+  if (uuid == NULL)
+    errx(EXIT_FAILURE, "unable to allocate message id");
+
+  return uuid;
+}
+
 void xmppipe_next_state(xmppipe_state_t *state, int status) {
   if (state->verbose)
     (void)fprintf(stderr, "next state: %s (%d) -> %s (%d)\n",

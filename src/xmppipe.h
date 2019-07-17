@@ -149,6 +149,7 @@ char *xmppipe_getenv(const char *);
 char *xmppipe_strdup(const char *);
 void *xmppipe_malloc(size_t);
 void *xmppipe_calloc(size_t, size_t);
+char *xmppipe_uuid_gen(xmpp_ctx_t *ctx);
 
 xmpp_stanza_t *xmppipe_message_new(xmpp_ctx_t *ctx, const char *const type,
                                    const char *const to, const char *const id);

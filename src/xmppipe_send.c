@@ -167,11 +167,7 @@ static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
   xmpp_stanza_t *message = NULL;
   char *id = NULL;
 
-  id = xmpp_uuid_gen(state->ctx);
-
-  if (id == NULL) {
-    errx(EXIT_FAILURE, "unable to allocate message id");
-  }
+  id = xmppipe_uuid_gen(state->ctx);
 
   message = xmppipe_message_new(state->ctx, type, to, id);
 
@@ -199,11 +195,7 @@ static void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type,
   xmpp_stanza_t *text;
   char *id;
 
-  id = xmpp_uuid_gen(state->ctx);
-
-  if (id == NULL) {
-    errx(EXIT_FAILURE, "unable to allocate message id");
-  }
+  id = xmppipe_uuid_gen(state->ctx);
 
   message = xmppipe_message_new(state->ctx, type, to, id);
 
@@ -250,11 +242,7 @@ static void xmppipe_send_http_upload(xmppipe_state_t *state, char *to,
     return;
   }
 
-  id = xmpp_uuid_gen(state->ctx);
-
-  if (id == NULL) {
-    errx(EXIT_FAILURE, "unable to allocate message id");
-  }
+  id = xmppipe_uuid_gen(state->ctx);
 
   start = buf;
 

@@ -469,10 +469,7 @@ int handle_disco_items(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
     xmppipe_stanza_set_type(iq, "get");
     xmppipe_stanza_set_attribute(iq, "to", jid);
 
-    id = xmpp_uuid_gen(state->ctx);
-    if (id == NULL) {
-      errx(EXIT_FAILURE, "unable to allocate message id");
-    }
+    id = xmppipe_uuid_gen(state->ctx);
     xmppipe_stanza_set_id(iq, id);
 
     reply = xmppipe_stanza_new(ctx);
