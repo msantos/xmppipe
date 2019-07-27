@@ -383,7 +383,16 @@ Example:
 Compatibility
 -------------
 
-Tested with ejabberd and mongooseim.
+Testing is done with ejabberd.
+
+Also confirmed to work with:
+
+* ejabberd ([creep.im](https://compliance.conversations.im/server/creep.im/))
+* prosody ([dismail.de](https://compliance.conversations.im/server/dismail.de/))
+* openfire ([jab.im](https://compliance.conversations.im/server/jab.im/))
+* tigase ([tigase.im](https://compliance.conversations.im/server/tigase.im/))
+* mongooseim
+
 
 License
 -------
