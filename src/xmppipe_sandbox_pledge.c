@@ -17,7 +17,7 @@
 #include <unistd.h>
 
 int xmppipe_sandbox_init(xmppipe_state_t *state) {
-  return pledge("stdio inet dns", NULL);
+  return pledge("stdio inet dns rpath", NULL);
 }
 
 int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
