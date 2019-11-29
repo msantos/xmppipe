@@ -86,6 +86,9 @@ int xmppipe_sandbox_init(xmppipe_state_t *state) {
 /* Syscalls to allow */
 
 /* dns */
+#ifdef __NR_madvise
+      SC_ALLOW(madvise),
+#endif
 #ifdef __NR_socket
       SC_ALLOW(socket),
 #endif
@@ -156,6 +159,9 @@ int xmppipe_sandbox_init(xmppipe_state_t *state) {
 #ifdef __NR__llseek
       SC_ALLOW(_llseek),
 #endif
+#ifdef __NR_newfstatat
+      SC_ALLOW(newfstatat),
+#endif
 
 /* uuid */
 #ifdef __NR_gettimeofday
@@ -205,6 +211,16 @@ int xmppipe_sandbox_init(xmppipe_state_t *state) {
 #ifdef __NR_getuid32
       SC_ALLOW(getuid32),
 #endif
+#ifdef __NR_geteuid
+      SC_ALLOW(geteuid),
+#endif
+#ifdef __NR_getgid
+      SC_ALLOW(getgid),
+#endif
+#ifdef __NR_getegid
+      SC_ALLOW(getegid),
+#endif
+
 #ifdef __NR_ioctl
       SC_ALLOW(ioctl),
 #endif
@@ -230,6 +246,10 @@ int xmppipe_sandbox_init(xmppipe_state_t *state) {
 #ifdef __NR_select
       SC_ALLOW(select),
 #endif
+#ifdef __NR_pselect6
+      SC_ALLOW(pselect6),
+#endif
+
 #ifdef __NR_stat
       SC_ALLOW(stat),
 #endif
@@ -238,6 +258,9 @@ int xmppipe_sandbox_init(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_write
       SC_ALLOW(write),
+#endif
+#ifdef __NR_writev
+      SC_ALLOW(writev),
 #endif
 #ifdef __NR_mmap
       SC_ALLOW(mmap),
@@ -300,6 +323,12 @@ int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
 #endif
 
 /* Syscalls to allow */
+#ifdef __NR_madvise
+      SC_ALLOW(madvise),
+#endif
+#ifdef __NR_pselect6
+      SC_ALLOW(pselect6),
+#endif
 #ifdef __NR_brk
       SC_ALLOW(brk),
 #endif
@@ -370,6 +399,9 @@ int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_write
       SC_ALLOW(write),
+#endif
+#ifdef __NR_writev
+      SC_ALLOW(writev),
 #endif
 #ifdef __NR_restart_syscall
       SC_ALLOW(restart_syscall),
