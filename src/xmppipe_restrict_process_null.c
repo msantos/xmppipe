@@ -12,31 +12,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_SANDBOX_rlimit
-#include <sys/resource.h>
-#include <sys/time.h>
-
+#ifdef XMPPIPE_RESTRICT_PROCESS_null
 #include "xmppipe.h"
 
-int xmppipe_sandbox_init(xmppipe_state_t *state) {
-  struct rlimit rl_zero = {0};
+int xmppipe_restrict_process_init(xmppipe_state_t *state) { return 0; }
 
-  return setrlimit(RLIMIT_NPROC, &rl_zero);
-}
-
-int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
-  struct rlimit rl = {0};
-
-  rl.rlim_cur = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
-  rl.rlim_max = XMPPIPE_SANDBOX_RLIMIT_NOFILE;
-
-  if (rl.rlim_cur == (rlim_t)-1) {
-    int fd = xmppipe_conn_fd(state);
-    if (fd < 0)
-      return -1;
-    rl.rlim_cur = rl.rlim_max = fd + 1;
-  }
-
-  return setrlimit(RLIMIT_NOFILE, &rl);
-}
+int xmppipe_restrict_process_stdin(xmppipe_state_t *state) { return 0; }
 #endif

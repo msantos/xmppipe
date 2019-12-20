@@ -12,7 +12,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_SANDBOX_seccomp
+#ifdef XMPPIPE_RESTRICT_PROCESS_seccomp
 #include <errno.h>
 #include <linux/audit.h>
 #include <linux/filter.h>
@@ -23,16 +23,16 @@
 
 #include "xmppipe.h"
 
-/* macros from openssh-7.2/sandbox-seccomp-filter.c */
+/* macros from openssh-7.2/restrict_process-seccomp-filter.c */
 
-/* Linux seccomp_filter sandbox */
+/* Linux seccomp_filter restrict_process */
 #define SECCOMP_FILTER_FAIL SECCOMP_RET_KILL
 
 /* Use a signal handler to emit violations when debugging */
-#ifdef SANDBOX_SECCOMP_FILTER_DEBUG
+#ifdef RESTRICT_PROCESS_SECCOMP_FILTER_DEBUG
 #undef SECCOMP_FILTER_FAIL
 #define SECCOMP_FILTER_FAIL SECCOMP_RET_TRAP
-#endif /* SANDBOX_SECCOMP_FILTER_DEBUG */
+#endif /* RESTRICT_PROCESS_SECCOMP_FILTER_DEBUG */
 
 /* Simple helpers to avoid manual errors (but larger BPF programs). */
 #define SC_DENY(_nr, _errno)                                                   \
@@ -47,10 +47,9 @@
       BPF_STMT(BPF_LD + BPF_W + BPF_ABS,                                       \
                offsetof(struct seccomp_data, args[(_arg_nr)])),                \
       BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, (_arg_val), 0, 1),                   \
-      BPF_STMT(                                                                \
-          BPF_RET + BPF_K, SECCOMP_RET_ALLOW), /* reload syscall number; all   \
-                                                  rules expect it in           \
-                                                  accumulator */               \
+      BPF_STMT(BPF_RET + BPF_K, SECCOMP_RET_ALLOW), /* reload syscall number;  \
+                                                       all rules expect it in                                                            \
+                                                       accumulator */          \
       BPF_STMT(BPF_LD + BPF_W + BPF_ABS, offsetof(struct seccomp_data, nr))
 
 /*
@@ -74,7 +73,7 @@
 #define SECCOMP_AUDIT_ARCH 0
 #endif
 
-int xmppipe_sandbox_init(xmppipe_state_t *state) {
+int xmppipe_restrict_process_init(xmppipe_state_t *state) {
   struct sock_filter filter[] = {
       /* Ensure the syscall arch convention is as expected. */
       BPF_STMT(BPF_LD + BPF_W + BPF_ABS, offsetof(struct seccomp_data, arch)),
@@ -305,7 +304,7 @@ int xmppipe_sandbox_init(xmppipe_state_t *state) {
   return prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog);
 }
 
-int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
+int xmppipe_restrict_process_stdin(xmppipe_state_t *state) {
   struct sock_filter filter[] = {
       /* Ensure the syscall arch convention is as expected. */
       BPF_STMT(BPF_LD + BPF_W + BPF_ABS, offsetof(struct seccomp_data, arch)),

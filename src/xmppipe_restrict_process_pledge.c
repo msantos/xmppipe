@@ -12,15 +12,15 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_SANDBOX_pledge
+#ifdef XMPPIPE_RESTRICT_PROCESS_pledge
 #include "xmppipe.h"
 #include <unistd.h>
 
-int xmppipe_sandbox_init(xmppipe_state_t *state) {
+int xmppipe_restrict_process_init(xmppipe_state_t *state) {
   return pledge("stdio inet dns rpath", NULL);
 }
 
-int xmppipe_sandbox_stdin(xmppipe_state_t *state) {
+int xmppipe_restrict_process_stdin(xmppipe_state_t *state) {
   return pledge("stdio", NULL);
 }
 #endif

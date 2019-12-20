@@ -12,8 +12,8 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include "xmppipe.h"
 #include "errno.h"
+#include "xmppipe.h"
 
 static unsigned char rfc3986[256];
 
