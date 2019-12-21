@@ -12,7 +12,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_RESTRICT_PROCESS_seccomp
+#ifdef RESTRICT_PROCESS_seccomp
 #include <errno.h>
 #include <linux/audit.h>
 #include <linux/filter.h>
@@ -73,7 +73,7 @@
 #define SECCOMP_AUDIT_ARCH 0
 #endif
 
-int xmppipe_restrict_process_init(xmppipe_state_t *state) {
+int restrict_process_init(xmppipe_state_t *state) {
   struct sock_filter filter[] = {
       /* Ensure the syscall arch convention is as expected. */
       BPF_STMT(BPF_LD + BPF_W + BPF_ABS, offsetof(struct seccomp_data, arch)),
@@ -304,7 +304,7 @@ int xmppipe_restrict_process_init(xmppipe_state_t *state) {
   return prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog);
 }
 
-int xmppipe_restrict_process_stdin(xmppipe_state_t *state) {
+int restrict_process_stdin(xmppipe_state_t *state) {
   struct sock_filter filter[] = {
       /* Ensure the syscall arch convention is as expected. */
       BPF_STMT(BPF_LD + BPF_W + BPF_ABS, offsetof(struct seccomp_data, arch)),

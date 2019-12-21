@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
   jid = xmppipe_getenv("XMPPIPE_USERNAME");
   pass = xmppipe_getenv("XMPPIPE_PASSWORD");
 
-  if (xmppipe_restrict_process_init(state) < 0)
+  if (restrict_process_init(state) < 0)
     err(EXIT_FAILURE, "restrict_process failed");
 
   while ((ch = getopt_long(argc, argv, "a:b:c:dDeF:hI:k:K:o:P:p:r:sS:u:U:vx",
@@ -265,9 +265,9 @@ int main(int argc, char **argv) {
 
   if (state->verbose)
     (void)fprintf(stderr, "restrict_process: stdin: %s\n",
-                  XMPPIPE_RESTRICT_PROCESS);
+                  RESTRICT_PROCESS);
 
-  if (xmppipe_restrict_process_stdin(state) < 0)
+  if (restrict_process_stdin(state) < 0)
     err(EXIT_FAILURE, "restrict_process failed");
 
   if (xmppipe_stream_init(state) < 0)
@@ -557,7 +557,7 @@ static long long xmppipe_strtonum(xmppipe_state_t *state, const char *nptr,
 
 static void usage(xmppipe_state_t *state) {
   (void)fprintf(stderr, "%s %s (using %s mode process restriction)\n",
-                __progname, XMPPIPE_VERSION, XMPPIPE_RESTRICT_PROCESS);
+                __progname, XMPPIPE_VERSION, RESTRICT_PROCESS);
   (void)fprintf(
       stderr,
       "usage: %s [OPTIONS]\n"

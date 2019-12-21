@@ -12,10 +12,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_RESTRICT_PROCESS_null
+#ifdef RESTRICT_PROCESS_null
 #include "xmppipe.h"
 
-int xmppipe_restrict_process_init(xmppipe_state_t *state) { return 0; }
+int restrict_process_init(xmppipe_state_t *state) { return 0; }
 
-int xmppipe_restrict_process_stdin(xmppipe_state_t *state) { return 0; }
+int restrict_process_stdin(xmppipe_state_t *state) { return 0; }
 #endif

@@ -12,8 +12,8 @@ ifeq ($(UNAME_SYS), Linux)
 			  -Wstrict-prototypes -Wmissing-prototypes \
 			  -pie -fPIE \
 			  -fno-strict-aliasing
-	XMPPIPE_RESTRICT_PROCESS ?= seccomp
-	XMPPIPE_RESTRICT_PROCESS_RLIMIT_NOFILE ?= 0
+	RESTRICT_PROCESS ?= seccomp
+	RESTRICT_PROCESS_RLIMIT_NOFILE ?= 0
 	LDFLAGS ?= -Wl,-z,relro,-z,now -Wl,-z,noexecstack
 else ifeq ($(UNAME_SYS), FreeBSD)
 	CFLAGS ?= -DHAVE_STRTONUM \
@@ -21,7 +21,7 @@ else ifeq ($(UNAME_SYS), FreeBSD)
 			  -Wformat -Werror=format-security \
 			  -pie -fPIE \
 			  -fno-strict-aliasing
-	XMPPIPE_RESTRICT_PROCESS ?= capsicum
+	RESTRICT_PROCESS ?= capsicum
 	LDFLAGS ?= -Wl,-z,relro,-z,now -Wl,-z,noexecstack
 else ifeq ($(UNAME_SYS), OpenBSD)
 	CFLAGS ?= -DHAVE_STRTONUM \
@@ -29,7 +29,7 @@ else ifeq ($(UNAME_SYS), OpenBSD)
 			  -Wformat -Werror=format-security \
 			  -pie -fPIE \
 			  -fno-strict-aliasing
-	XMPPIPE_RESTRICT_PROCESS ?= pledge
+	RESTRICT_PROCESS ?= pledge
 	LDFLAGS ?= -Wl,-z,relro,-z,now -Wl,-z,noexecstack
 else ifeq ($(UNAME_SYS), SunOS)
 else ifeq ($(UNAME_SYS), Darwin)
@@ -39,15 +39,15 @@ else ifeq ($(UNAME_SYS), Darwin)
 			  -fno-strict-aliasing
 endif
 
-XMPPIPE_RESTRICT_PROCESS ?= rlimit
-XMPPIPE_RESTRICT_PROCESS_RLIMIT_NOFILE ?= -1
+RESTRICT_PROCESS ?= rlimit
+RESTRICT_PROCESS_RLIMIT_NOFILE ?= -1
 
 XMPPIPE_CFLAGS ?= -g -Wall
 CFLAGS += $(XMPPIPE_CFLAGS) \
 		  -fwrapv \
-		  -DXMPPIPE_RESTRICT_PROCESS=\"$(XMPPIPE_RESTRICT_PROCESS)\" \
-		  -DXMPPIPE_RESTRICT_PROCESS_$(XMPPIPE_RESTRICT_PROCESS) \
-		  -DXMPPIPE_RESTRICT_PROCESS_RLIMIT_NOFILE=$(XMPPIPE_RESTRICT_PROCESS_RLIMIT_NOFILE)
+		  -DRESTRICT_PROCESS=\"$(RESTRICT_PROCESS)\" \
+		  -DRESTRICT_PROCESS_$(RESTRICT_PROCESS) \
+		  -DRESTRICT_PROCESS_RLIMIT_NOFILE=$(RESTRICT_PROCESS_RLIMIT_NOFILE)
 
 LDFLAGS += $(XMPPIPE_LDFLAGS)
 

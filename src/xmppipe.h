@@ -166,8 +166,8 @@ void xmppipe_stanza_set_text(xmpp_stanza_t *, const char *const);
 void xmppipe_stanza_set_type(xmpp_stanza_t *const, const char *const);
 void xmppipe_stanza_add_child(xmpp_stanza_t *, xmpp_stanza_t *);
 
-int xmppipe_restrict_process_init(xmppipe_state_t *state);
-int xmppipe_restrict_process_stdin(xmppipe_state_t *state);
+int restrict_process_init(xmppipe_state_t *state);
+int restrict_process_stdin(xmppipe_state_t *state);
 int xmppipe_conn_fd(xmppipe_state_t *state);
 
 int b64_ntop(u_char const *src, size_t srclength, char *target,

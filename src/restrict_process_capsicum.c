@@ -12,7 +12,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_RESTRICT_PROCESS_capsicum
+#ifdef RESTRICT_PROCESS_capsicum
 #include <sys/capability.h>
 #include <sys/param.h>
 #include <sys/resource.h>
@@ -23,13 +23,13 @@
 
 #include "xmppipe.h"
 
-int xmppipe_restrict_process_init(xmppipe_state_t *state) {
+int restrict_process_init(xmppipe_state_t *state) {
   struct rlimit rl = {0};
 
   return setrlimit(RLIMIT_NPROC, &rl);
 }
 
-int xmppipe_restrict_process_stdin(xmppipe_state_t *state) {
+int restrict_process_stdin(xmppipe_state_t *state) {
   struct rlimit rl = {0};
   cap_rights_t policy_read;
   cap_rights_t policy_write;

@@ -12,23 +12,23 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifdef XMPPIPE_RESTRICT_PROCESS_rlimit
+#ifdef RESTRICT_PROCESS_rlimit
 #include <sys/resource.h>
 #include <sys/time.h>
 
 #include "xmppipe.h"
 
-int xmppipe_restrict_process_init(xmppipe_state_t *state) {
+int restrict_process_init(xmppipe_state_t *state) {
   struct rlimit rl_zero = {0};
 
   return setrlimit(RLIMIT_NPROC, &rl_zero);
 }
 
-int xmppipe_restrict_process_stdin(xmppipe_state_t *state) {
+int restrict_process_stdin(xmppipe_state_t *state) {
   struct rlimit rl = {0};
 
-  rl.rlim_cur = XMPPIPE_RESTRICT_PROCESS_RLIMIT_NOFILE;
-  rl.rlim_max = XMPPIPE_RESTRICT_PROCESS_RLIMIT_NOFILE;
+  rl.rlim_cur = RESTRICT_PROCESS_RLIMIT_NOFILE;
+  rl.rlim_max = RESTRICT_PROCESS_RLIMIT_NOFILE;
 
   if (rl.rlim_cur == (rlim_t)-1) {
     int fd = xmppipe_conn_fd(state);
