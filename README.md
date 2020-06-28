@@ -363,9 +363,16 @@ Format
 Each message is terminated by a new line. Message fields are separated by
 ":" and percent encoded.
 
+Colon separated valued are accepted as input if the input format type
+is set to csv (`--format=csv`).
+
 ### Presence
 
     p:<available|unavailable>:<to jid>:<from jid>
+
+Input/Output:
+
+    Both
 
 Example:
 
@@ -375,10 +382,75 @@ Example:
 
     m:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<message body>
 
+Input/Output:
+
+    Both
+
 Example:
 
     m:groupchat:test@muc.example.com/mobile:user1@example.com/1234:Hello
     m:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here
+
+### Inline Image
+
+Inline images will add a hint so clients (notably
+[Conversations](https://github.com/iNPUTmice/Conversations) will display
+the image instead of a URL.
+
+* type, from and to are optional
+* message body: the percent escaped URL
+
+    I:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<url>
+
+Input/Output:
+
+    Input only
+
+Example:
+
+    I::::https%3A%2F%2Fhttpstatusdogs.com%2Fimg%2F500.jpg
+
+### XEP-0363: HTTP Upload
+
+HTTP uploads create an upload slot. The XMPP server will respond with
+`get` and `put` URLs. The `put` URL can be used to upload the file using,
+e.g., `curl`. The `get` URL is used by clients for downloading the file.
+
+Note: currently xmppipe creates the slot but does not upload the file.
+
+The input format is:
+
+* type, from and to are optional
+* message body: percent escaped, pipe separated value
+    * filename
+    * size
+    * optional: MIME type
+
+    u:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<filename>|<size (bytes)>[|<content-type>]
+
+The output format is:
+
+* type, from and to are optional
+* message body: percent escaped, pipe separated value
+    * get URL
+    * put URL
+
+    U:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<get URL>|<put URL>
+
+Example:
+
+    # $ stat --format="%s" example.png
+    # 16698
+    u::::example.png%7C16698
+
+    # also specify content type
+    u::::example.png%7C16698%7Cimage%2Fpng
+
+    # server response: slot created
+    U:groupchat:upload.example.com:user@example.com/123:https%3A//example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png%7chttps%3A//example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png
+
+    # to upload the file
+    curl https://example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png --upload-file example.png
 
 Compatibility
 -------------
@@ -397,7 +469,7 @@ Also confirmed to work with:
 License
 -------
 
-Copyright (c) 2015-2018, Michael Santos <michael.santos@gmail.com>
+Copyright (c) 2015-2020, Michael Santos <michael.santos@gmail.com>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -419,3 +491,20 @@ TODO
 * support alternative input modes
 
   * "raw" mode: XML input/output
+
+* HTTP Upload
+
+  * support PUT header elements
+  * handle error conditions
+
+  Questions:
+
+  * save the maximum file size returned by the server and disallow uploads
+    larger than the value?
+
+  * xmppipe is "pinned" to the upload server returned in the IQ reply (the
+    "to" field is ignored)
+
+  * allow other upload servers?
+
+  * error if different upload server is specified in "u:<from>:<to>"?
