@@ -1,0 +1,119 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+### Example: image upload bot
+###
+### Upload and display inline images.
+###
+### * shell 1
+###
+###     export XMPPIPE_USERNAME=...
+###     export XMPPIPE_PASSWORD=...
+###
+###     image-upload -o <groupchat>
+###     image-upload --chat -o <jid>
+###
+###     # to debug
+###     image-upload -vvv -o <groupchat>
+###     bash -x image-upload -o <groupchat>
+###
+### * shell 2
+###
+###     echo "upload::::example.png" > /tmp/image_upload/stdin
+###
+
+trap cleanup 0
+
+TMPDIR="${TMPDIR-/tmp/image_upload}"
+mkdir "$TMPDIR"
+
+in="$TMPDIR/stdin"
+out="$TMPDIR/stdout"
+
+mkfifo "$in"
+mkfifo "$out"
+
+cleanup() {
+  rm -rf "$TMPDIR"
+}
+
+encode() {
+  local string="${1}"
+  local strlen=${#string}
+  local encoded=""
+
+  for ((pos = 0; pos < strlen; pos++)); do
+    c=${string:$pos:1}
+    case "$c" in
+      [@-_.~a-zA-Z0-9]) o="${c}" ;;
+      *) printf -v o '%%%02X' "'$c" ;;
+    esac
+    encoded+="${o}"
+  done
+  echo "${encoded}"
+}
+
+decode() {
+  printf '%b' "${1//%/\\x}"
+}
+
+bot() {
+  local filename
+  # shellcheck disable=SC2034
+  while IFS=: read stanza _type _from _to body; do
+    case "$stanza" in
+      upload)
+        filename="$body"
+        if [ ! -f "$filename" ]; then
+          echo "error: not found: $filename"
+          continue
+        fi
+        local content_type
+        local size
+        local encoded
+
+        content_type="$(file --brief --mime-type "$filename")"
+        size="$(stat --format="%s" "$filename")"
+        encoded="$(encode "$(basename "$filename")|$size|$content_type")"
+
+        echo "u::::$encoded"
+        ;;
+      U)
+        local decoded
+        decoded="$(decode "$body")"
+
+        OFS="$IFS"
+        IFS="|"
+        # shellcheck disable=SC2086
+        set -- $decoded
+
+        local GET
+        local PUT
+        GET="$1"
+        PUT="$2"
+
+        IFS="$OFS"
+
+        curl "$PUT" --upload-file "$filename"
+
+        echo "$GET" >/dev/stderr
+
+        local encoded
+        encoded="$(encode "$GET")"
+        echo "I::::$encoded"
+        ;;
+      *) echo "received: $stanza $_type $_from $_to $body" 1>&2 ;;
+    esac
+  done <"$in"
+}
+
+cat <<EOF
+in="$TMPDIR/stdin"
+out="$TMPDIR/stdout"
+EOF
+
+bot >"$out" &
+xmppipe --format csv "$@" <"$out" >"$in"
