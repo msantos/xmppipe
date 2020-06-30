@@ -17,7 +17,7 @@ set -o nounset
 set -o pipefail
 
 if [ "$DEBUG" ]; then
-set -x
+  set -x
 fi
 
 PROGNAME=$0
@@ -25,45 +25,50 @@ TMPDIR=$(mktemp -d)
 out=$TMPDIR/out
 
 atexit() {
-    rm -rf $TMPDIR
+  rm -rf "$TMPDIR"
 }
 
 decode() {
-    while IFS=: read stanza type from to body; do
-        case "$stanza" in
-            m) printf '%b' "${body//%/\\x}" ;;
-            *) ;;
-        esac
-    done
+  # shellcheck disable=SC2034
+  while IFS=: read stanza type from to body; do
+    case "$stanza" in
+      m) printf '%b' "${body//%/\\x}" ;;
+      *) ;;
+    esac
+  done
 }
 
 server() {
-    CONNECT=0
-    xmppipe -e -r server -o $1 -b 1024 -x < /dev/null | \
+  CONNECT=0
+  xmppipe -e -r server -o "$1" -b 1024 -x </dev/null |
     while IFS=: read stanza rest; do
-        case "$stanza" in
-            p)
-                CONNECT=$((CONNECT + 1))
-                if [ "$CONNECT" -gt "1" ]; then
-                    exec "$PROGNAME" session $@
-                fi
-                ;;
-            *) ;;
-        esac
-    done > /dev/null
+      case "$stanza" in
+        p)
+          CONNECT=$((CONNECT + 1))
+          if [ "$CONNECT" -gt "1" ]; then
+            # shellcheck disable=SC2068
+            exec "$PROGNAME" session $@
+          fi
+          ;;
+        *) ;;
+      esac
+    done >/dev/null
 }
 
-session(){
-    mkdir -p $TMPDIR
-    trap atexit 0
+session() {
+  mkdir -p "$TMPDIR"
+  trap atexit 0
 
-    mkfifo $out
+  mkfifo "$out"
 
-    nc $2 $3 < $out | xmppipe -P 100 -r session -o $1 -x -s | decode > $out
+  nc "$2" "$3" <"$out" |
+    xmppipe -P 100 -r session -o "$1" -x -s |
+    decode >"$out"
 }
 
 client() {
-    xmppipe -P 100 -r client -o $1 -x -s | decode
+  xmppipe -P 100 -r client -o "$1" -x -s | decode
 }
 
+# shellcheck disable=SC2068
 $@
