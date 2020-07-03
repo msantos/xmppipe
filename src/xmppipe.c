@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2020, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -59,6 +59,7 @@ static const struct option long_options[] = {
     {"username", required_argument, NULL, 'u'},
     {"unacked-requests", required_argument, NULL, 'U'},
     {"verbose", no_argument, NULL, 'v'},
+    {"version", no_argument, NULL, 'V'},
     {"base64", no_argument, NULL, 'x'},
     {"help", no_argument, NULL, 'h'},
 
@@ -100,7 +101,7 @@ int main(int argc, char **argv) {
   if (restrict_process_init(state) < 0)
     err(EXIT_FAILURE, "restrict_process failed");
 
-  while ((ch = getopt_long(argc, argv, "a:b:c:dDeF:hI:k:K:o:P:p:r:sS:u:U:vx",
+  while ((ch = getopt_long(argc, argv, "a:b:c:dDeF:hI:k:K:o:P:p:r:sS:u:U:vVx",
                            long_options, NULL)) != -1) {
     switch (ch) {
     case 'u':
@@ -139,6 +140,10 @@ int main(int argc, char **argv) {
       break;
     case 'v':
       state->verbose++;
+      break;
+    case 'V':
+      (void)printf("%s (%s)\n", XMPPIPE_VERSION, RESTRICT_PROCESS);
+      exit(0);
       break;
     case 'F':
       if (strcmp(optarg, "text") == 0)
@@ -264,8 +269,7 @@ int main(int argc, char **argv) {
     errx(EXIT_FAILURE, "XMPP handshake failed");
 
   if (state->verbose)
-    (void)fprintf(stderr, "restrict_process: stdin: %s\n",
-                  RESTRICT_PROCESS);
+    (void)fprintf(stderr, "restrict_process: stdin: %s\n", RESTRICT_PROCESS);
 
   if (restrict_process_stdin(state) < 0)
     err(EXIT_FAILURE, "restrict_process failed");
