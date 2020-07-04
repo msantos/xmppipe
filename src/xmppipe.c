@@ -590,6 +590,7 @@ static void usage(xmppipe_state_t *state) {
       "before exiting\n"
       "   -P, --poll-delay <ms>               poll delay\n"
       "   -v, --verbose                       verbose\n"
+      "   -V, --version                       display version\n"
 
       "       --chat                          use one to one chat\n"
       "       --no-tls-verify                 disable TLS certificate "

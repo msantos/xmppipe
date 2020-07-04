@@ -145,6 +145,9 @@ Options
 -v, --verbose
 :   Increase verbosity
 
+-V, --version
+:   Display version
+
 --chat
 :   Use one to one chat
 
