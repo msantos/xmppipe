@@ -161,7 +161,7 @@ Using bash:
 
 ~~~ shell
 decode() {
-    printf '%b' "${1//%/\\x}"
+  printf '%b' "${1//%/\\x}"
 }
 ~~~
 
@@ -190,52 +190,53 @@ mkfifo $in
 mkfifo $out
 
 cleanup() {
-    rm -rf $TMPDIR
+  rm -rf $TMPDIR
 }
 
 decode() {
-    printf '%b' "${1//%/\\x}"
+  printf '%b' "${1//%/\\x}"
 }
 
 bot() {
-    while IFS=: read -r stanza type from to body; do
-        case "$stanza" in
-            m) ;;
+  while IFS=: read -r stanza type from to body; do
+    case "$stanza" in
+      m) ;;
 
-            p) decode "$stanza:$type:$from:$to" 1>&2
-               echo 1>&2
-               continue
-               ;;
+      p)
+        decode "$stanza:$type:$from:$to" 1>&2
+        echo 1>&2
+        continue
+        ;;
 
-            *) continue ;;
-        esac
+      *) continue ;;
+    esac
 
-        USER="$(decode ${from#*/})"
-        MSG="$(decode ${body})"
+    USER="$(decode ${from#*/})"
+    MSG="$(decode ${body})"
 
-        case $MSG in
-            *"has set the subject to:"*) ;;
-            "sudo make me a sandwich")
-                echo "$USER: you're a sandwich"
-                ;;
-            sudo*)
-                echo "I'm sorry, $USER. I'm afraid I can't do that."
-                ;;
-            uptime)
-                uptime
-                ;;
-            exit)
-                echo "exiting ..."
-                exit 0
-                ;;
-            *)
-                echo "$MSG"
-                ;;
-        esac
-    done < $out
+    case $MSG in
+      *"has set the subject to:"*) ;;
+      "sudo make me a sandwich")
+        echo "$USER: you're a sandwich"
+        ;;
+      sudo*)
+        echo "I'm sorry, $USER. I'm afraid I can't do that."
+        ;;
+      uptime)
+        uptime
+        ;;
+      exit)
+        echo "exiting ..."
+        exit 0
+        ;;
+      *)
+        echo "$MSG"
+        ;;
+    esac
+  done <$out
 }
 
-bot > $in &
+bot >$in &
 xmppipe "$@" <$in >$out
 ~~~
 
@@ -246,17 +247,17 @@ Start `xmppipe` attached to a pipe:
 ~~~ shell
 mkfifo /tmp/xmpp
 
-xmppipe -o groupchat <> /tmp/xmpp
+xmppipe -o groupchat <>/tmp/xmpp
 ~~~
 
 Any data written to the pipe will be sent to the groupchat:
 
 ~~~ shell
-echo "test" > /tmp/xmpp
+echo "test" >/tmp/xmpp
 
-df -h > /tmp/mpp
+df -h >/tmp/mpp
 
-git diff > /tmp/xmpp
+git diff >/tmp/xmpp
 ~~~
 
 ### SSH over XMPP
@@ -281,10 +282,10 @@ are written to a named pipe to avoid buffering.
 ~~~ shell
 mkfifo riemann
 curl -s --get --data subscribe=true \
-    --data-urlencode 'query=(service ~= "^example")' \
-    http://example.com:80/index < /dev/null > riemann &
+  --data-urlencode 'query=(service ~= "^example")' \
+  http://example.com:80/index </dev/null >riemann &
 xmppipe --verbose --verbose \
-        --discard --subject "riemann events" muc < riemann
+  --discard --subject "riemann events" muc <riemann
 ~~~
 
 ### Desktop Notifications
@@ -297,7 +298,7 @@ set -o nounset
 set -o pipefail
 
 decode() {
-    printf '%b' "${1//%/\\x}"
+  printf '%b' "${1//%/\\x}"
 }
 
 MUC=""
@@ -331,7 +332,7 @@ FIFO=$TMPDIR/console
 mkfifo $FIFO
 
 stty cols 80 rows 24
-(cat $FIFO | xmppipe --resource user -x $MUC) > /dev/null 2> $TMPDIR/stderr &
+(cat $FIFO | xmppipe --resource user -x $MUC) >/dev/null 2>$TMPDIR/stderr &
 script -q -f $FIFO
 ~~~
 
@@ -341,17 +342,32 @@ script -q -f $FIFO
 #!/bin/bash
 
 decode() {
-    printf '%b' "${1//%/\\x}"
+  printf '%b' "${1//%/\\x}"
 }
 
 stty cols 80 rows 24
-xmppipe --resource viewer --base64 console | \
+xmppipe --resource viewer --base64 console |
   while IFS=: read -r x s f t m; do
     [ "$m" = "m" ] && decode "$m"
   done
 ~~~
 
 ### Mirror a terminal session to a web page
+
+### Image Upload
+
+Upload an image using HTTP Upload (XEP-0363) then display it inline.
+
+See [examples/image-upload](https://github.com/msantos/xmppipe/blob/master/examples/image-upload):
+
+~~~
+image-upload -o groupchat
+~~~
+
+~~~
+# file must be in the same working directory as image-upload
+echo "upload::::example.png" >/tmp/image_upload/stdin
+~~~
 
 Environment Variables
 ---------------------
