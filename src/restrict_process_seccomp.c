@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2017-2020, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -236,6 +236,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_poll
       SC_ALLOW(poll),
 #endif
+#ifdef __NR_ppoll
+      SC_ALLOW(ppoll),
+#endif
 #ifdef __NR_read
       SC_ALLOW(read),
 #endif
@@ -269,6 +272,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_access
       SC_ALLOW(access),
+#endif
+#ifdef __NR_faccessat
+      SC_ALLOW(faccessat),
 #endif
 #ifdef __NR_lseek
       SC_ALLOW(lseek),
@@ -380,6 +386,9 @@ int restrict_process_stdin(xmppipe_state_t *state) {
 
 #ifdef __NR_poll
       SC_ALLOW(poll),
+#endif
+#ifdef __NR_ppoll
+      SC_ALLOW(ppoll),
 #endif
 #ifdef __NR_read
       SC_ALLOW(read),
