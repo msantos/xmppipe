@@ -569,8 +569,7 @@ static void usage(xmppipe_state_t *state) {
       "   -p, --password <password>           XMPP password\n"
       "   -r, --resource <resource>           resource (aka MUC nick)\n"
       "   -S, --subject <subject>             set MUC subject\n"
-      "   -a, --address <addr:port>           set XMPP server address (port is "
-      "optional)\n"
+      "   -a, --address <addr[:port]>         set XMPP server address\n"
       "   -F, --format <text|csv>             stdin is text (default) or colon "
       "separated values\n"
 

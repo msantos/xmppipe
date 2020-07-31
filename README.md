@@ -106,7 +106,7 @@ Options
 -S, --subject *subject*
 :   XMPP MUC subject
 
--a, --address *address:port*
+-a, --address *address[:port]*
 :   Specify the IP address and port of the XMPP server
 
 -F, --format *text:csv*
