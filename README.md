@@ -186,11 +186,11 @@ TMPDIR=$(mktemp -d)
 in="$TMPDIR/stdin"
 out="$TMPDIR/stdout"
 
-mkfifo $in
-mkfifo $out
+mkfifo "$in"
+mkfifo "$out"
 
 cleanup() {
-  rm -rf $TMPDIR
+  rm -rf "$TMPDIR"
 }
 
 decode() {
@@ -211,8 +211,8 @@ bot() {
       *) continue ;;
     esac
 
-    USER="$(decode ${from#*/})"
-    MSG="$(decode ${body})"
+    USER="$(decode "${from#*/}")"
+    MSG="$(decode "${body}")"
 
     case $MSG in
       *"has set the subject to:"*) ;;
@@ -233,11 +233,11 @@ bot() {
         echo "$MSG"
         ;;
     esac
-  done <$out
+  done <"$out"
 }
 
-bot >$in &
-xmppipe "$@" <$in >$out
+bot >"$in" &
+xmppipe "$@" <"$in" >"$out"
 ~~~
 
 ### Sending Notifications/Alerts
@@ -312,7 +312,7 @@ done
 
 xmppipe "$@" | while IFS=: read stanza type from to body; do
   case "$stanza" in
-    m) notify-send "$MUC" "$(decode $body)" ;;
+    m) notify-send "$MUC" "$(decode "$body")" ;;
     *) continue ;;
   esac
 done
@@ -329,11 +329,11 @@ MUC=console
 
 TMPDIR=$(mktemp -d)
 FIFO=$TMPDIR/console
-mkfifo $FIFO
+mkfifo "$FIFO"
 
 stty cols 80 rows 24
-(cat $FIFO | xmppipe --resource user -x $MUC) >/dev/null 2>$TMPDIR/stderr &
-script -q -f $FIFO
+xmppipe --resource user -x $MUC < "$FIFO" >/dev/null 2>"$TMPDIR/stderr" &
+script -q -f "$FIFO"
 ~~~
 
 * viewers
