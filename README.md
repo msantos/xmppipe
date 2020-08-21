@@ -255,7 +255,7 @@ Any data written to the pipe will be sent to the groupchat:
 ~~~ shell
 echo "test" >/tmp/xmpp
 
-df -h >/tmp/mpp
+df -h >/tmp/xmpp
 
 git diff >/tmp/xmpp
 ~~~
@@ -413,7 +413,7 @@ Example:
 ### Inline Image
 
 Inline images will add a hint so clients (notably
-[Conversations](https://github.com/iNPUTmice/Conversations) will display
+[Conversations](https://github.com/iNPUTmice/Conversations)) will display
 the image instead of a URL.
 
 * type, from and to are optional
@@ -435,7 +435,8 @@ HTTP uploads create an upload slot. The XMPP server will respond with
 `get` and `put` URLs. The `put` URL can be used to upload the file using,
 e.g., `curl`. The `get` URL is used by clients for downloading the file.
 
-Note: currently xmppipe creates the slot but does not upload the file.
+Note: xmppipe creates the upload slot. Another utility, such as curl,
+can be used to upload the file.
 
 The input format is:
 
