@@ -47,19 +47,19 @@ Tests
     # git clone https://github.com/sstephenson/bats.git # or from git
     make test
 
-Sandboxing
-----------
+Process Restrictions
+--------------------
 
-xmppipe applies 2 sandboxes:
+xmppipe restricts process operations at 2 points:
 
 * a permissive "init" sandbox allowing network connections to the
   XMPP server
 
 * once the connection is established, a stricter "stdio" sandbox
-  limits the process to stdio
+  limits the process to I/O operations
 
-The effectiveness of the sandbox depends on which mechanism is used. By
-default:
+The effectiveness of the process restrictions depend on which mechanism
+is used. By default:
 
 * Linux:
 
@@ -81,15 +81,16 @@ default:
     * init: setrlimit(2)
     * stdio: setrlimit(2)
 
-Selecting the sandbox is done at compile time. For example, to use the
-"rlimit" sandbox:
+Selecting which process restrictions are enforced is done at compile
+time. For example, to use the "rlimit" process restrictions:
 
-    XMPPIPE_SANDBOX=rlimit make
+    RESTRICT_PROCESS=rlimit make
 
-If a sandbox is interfering with normal operation, please open an issue.
-To disable the sandbox, compile using the "null" sandbox:
+If the process restrictions are interfering with normal operation, please
+open an issue. To disable all process restrictions, compile using the
+"null" sandbox:
 
-    XMPPIPE_SANDBOX=null make
+    RESTRICT_PROCESS=null make
 
 Options
 -------
