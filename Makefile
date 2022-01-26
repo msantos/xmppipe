@@ -58,10 +58,9 @@ $(PROG):
 
 static:
 	$(CC) $(CFLAGS) \
-		-no-pie -fno-PIE \
 		$(XMPPIPE_CFLAGS) \
 		-o xmppipe src/*.c -Wl,--no-as-needed \
-		$(LDFLAGS) -ldl -lz -lresolv \
+		$(LDFLAGS) -ldl -lpthread -lz -lresolv \
 		-l:libstrophe.a \
 		-l:libssl.a -l:libcrypto.a \
 		-l:libexpat.a

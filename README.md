@@ -383,7 +383,7 @@ Format
 Each message is terminated by a new line. Message fields are separated by
 ":" and percent encoded.
 
-Colon separated valued are accepted as input if the input format type
+Colon separated values are accepted as input if the input format type
 is set to csv (`--format=csv`).
 
 ### Presence
