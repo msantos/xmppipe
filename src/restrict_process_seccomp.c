@@ -135,6 +135,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_openat
       SC_ALLOW(openat),
 #endif
+#ifdef __NR_readlinkat
+      SC_ALLOW(readlinkat),
+#endif
 #ifdef __NR_close
       SC_ALLOW(close),
 #endif
@@ -188,6 +191,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_fstat
       SC_ALLOW(fstat),
 #endif
+#ifdef __NR_fstatfs
+      SC_ALLOW(fstatfs),
+#endif
 #ifdef __NR_fstat64
       SC_ALLOW(fstat64),
 #endif
@@ -229,6 +235,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_munmap
       SC_ALLOW(munmap),
 #endif
+#ifdef __NR_mremap
+      SC_ALLOW(mremap),
+#endif
 #ifdef __NR_mprotect
       SC_ALLOW(mprotect),
 #endif
@@ -241,6 +250,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_read
       SC_ALLOW(read),
+#endif
+#ifdef __NR_pread64
+      SC_ALLOW(pread64),
 #endif
 #ifdef __NR__newselect
       SC_ALLOW(_newselect),
@@ -266,6 +278,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_mmap
       SC_ALLOW(mmap),
+#endif
+#ifdef __NR_mremap
+      SC_ALLOW(mremap),
 #endif
 #ifdef __NR_mmap2
       SC_ALLOW(mmap2),
@@ -352,6 +367,9 @@ int restrict_process_stdin(xmppipe_state_t *state) {
 #ifdef __NR_fstat
       SC_ALLOW(fstat),
 #endif
+#ifdef __NR_fstatfs
+      SC_ALLOW(fstatfs),
+#endif
 #ifdef __NR_fstat64
       SC_ALLOW(fstat64),
 #endif
@@ -392,6 +410,9 @@ int restrict_process_stdin(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_read
       SC_ALLOW(read),
+#endif
+#ifdef __NR_pread64
+      SC_ALLOW(pread64),
 #endif
 #ifdef __NR__newselect
       SC_ALLOW(_newselect),
