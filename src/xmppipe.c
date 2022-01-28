@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2020, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
     state->out = xmppipe_strdup(state->room);
     state->mucjid = xmppipe_mucjid(state->out, state->resource);
   } else if (!(state->opt & XMPPIPE_OPT_GROUPCHAT)) {
-    state->out = xmppipe_strdup(jid);
+    state->out = xmppipe_chatjid(state->room, state->server);
   }
 
   if (xmppipe_fmt_init() < 0)

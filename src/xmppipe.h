@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,7 +27,7 @@
 #include "strtonum.h"
 #endif
 
-#define XMPPIPE_VERSION "0.14.0"
+#define XMPPIPE_VERSION "0.14.1"
 #define XMPPIPE_RESOURCE "xmppipe"
 
 #define XMPPIPE_STREQ(a, b) (strcmp((a), (b)) == 0)
@@ -141,6 +141,7 @@ char *xmppipe_servername(char *);
 char *xmppipe_roomname(char *);
 char *xmppipe_conference(char *, char *);
 char *xmppipe_mucjid(char *, char *);
+char *xmppipe_chatjid(char *, char *);
 
 void xmppipe_next_state(xmppipe_state_t *state, int status);
 void xmppipe_stream_close(xmppipe_state_t *);

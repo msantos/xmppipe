@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -230,6 +230,15 @@ char *xmppipe_mucjid(char *muc, char *resource) {
   char *buf = xmppipe_malloc(len);
 
   (void)snprintf(buf, len, "%s/%s", muc, resource);
+
+  return buf;
+}
+
+char *xmppipe_chatjid(char *jid, char *servername) {
+  size_t len = strlen(jid) + 1 + strlen(servername) + 1;
+  char *buf = xmppipe_malloc(len);
+
+  (void)snprintf(buf, len, "%s@%s", jid, servername);
 
   return buf;
 }
