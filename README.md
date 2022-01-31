@@ -1,20 +1,25 @@
-xmppipe: stdio over XMPP
-========================
+# SYNOPSIS
+
+xmppipe [*options*] [*jid*]
+
+# DESCRIPTION
+
+xmppipe - stdio over XMPP
 
 xmppipe redirects stdin/stdout in a shell pipeline to an XMPP MUC
-(XEP-0045). xmppipe supports flow control using stream management
-(XEP-0198) and can optionally deal with overload by acting as a circuit
-breaker or by discarding messages.
+(XEP-0045) or a one to one chat:
 
-xmppipe works with line oriented tools like grep, sed and
-awk by outputting each message as a newline terminated,
-[percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding) string.
+* supports flow control using stream management (XEP-0198)
+* optionally deals with overload by acting as a circuit breaker or by
+  discarding messages
+* works with line oriented tools like grep, sed and
+  awk by outputting each message as a newline terminated,
+  [percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding) string
 
 xmppipe can be used in shell scripts to quickly write interactive bots
 for monitoring systems or for sending alerts.
 
-Usage
------
+# USAGE
 
     xmppipe [*options*]
 
@@ -26,29 +31,25 @@ Usage
     xmppipe muc
     xmppipe muc@example.com
 
-Requirements
-------------
+# REQUIREMENTS
 
 * [libstrophe](https://github.com/strophe/libstrophe)
 
   libstrophe 0.9.2 or later is required for [TLS certificate
   verification](https://github.com/strophe/libstrophe/issues/100).
 
-Build
------
+# BUILD
 
     $ make
 
-Tests
------
+## Tests
 
     # Install bats:
     # apt-get install bats
     # git clone https://github.com/sstephenson/bats.git # or from git
     make test
 
-Process Restrictions
---------------------
+# PROCESS RESTRICTIONS
 
 xmppipe restricts process operations at 2 points:
 
@@ -92,8 +93,7 @@ open an issue. To disable all process restrictions, compile using the
 
     RESTRICT_PROCESS=null make
 
-Options
--------
+# OPTIONS
 
 -u, --username *JID*
 :   XMPP username: takes precedence over environment variable
@@ -155,8 +155,15 @@ Options
 --no-tls-verify
 :   Disable TLS certificate verification
 
-Decoding Percent-Encoded Strings
---------------------------------
+# ENVIRONMENT VARIABLES
+
+XMPPIPE_USERNAME
+: XMPP jid
+
+XMPPIPE_PASSWORD
+: XMPP password
+
+# DECODING PERCENT-ENCODED STRINGS
 
 Using bash:
 
@@ -166,10 +173,9 @@ decode() {
 }
 ~~~
 
-Examples
---------
+# EXAMPLES
 
-### Shell Bot
+## Shell Bot
 
 An interactive XMPP bot written in the shell:
 
@@ -241,7 +247,7 @@ bot >"$in" &
 xmppipe "$@" <"$in" >"$out"
 ~~~
 
-### Sending Notifications/Alerts
+## Sending Notifications/Alerts
 
 Start `xmppipe` attached to a pipe:
 
@@ -261,7 +267,7 @@ df -h >/tmp/xmpp
 git diff >/tmp/xmpp
 ~~~
 
-### SSH over XMPP
+## SSH over XMPP
 
 See [examples/ssh-over-xmpp](https://github.com/msantos/xmppipe/blob/master/examples/ssh-over-xmpp):
 
@@ -274,7 +280,7 @@ ssh-over-xmpp server sshxmpp 1.2.3.4 22
 ssh -o ProxyCommand="ssh-over-xmpp client sshxmpp" 127.0.0.1
 ~~~
 
-### Stream Events from Riemann
+## Stream Events from Riemann
 
 This example will stream events from a query to an XMPP MUC using
 [Riemann's](https://github.com/riemann/riemann) SSE interface. The events
@@ -353,9 +359,7 @@ xmppipe --resource viewer --base64 console |
   done
 ~~~
 
-### Mirror a terminal session to a web page
-
-### Image Upload
+## Image Upload
 
 Upload an image using HTTP Upload (XEP-0363) then display it inline.
 
@@ -370,15 +374,7 @@ image-upload -o groupchat
 echo "upload::::example.png" >/tmp/image_upload/stdin
 ~~~
 
-Environment Variables
----------------------
-
-* XMPPIPE_USERNAME: XMPP jid
-
-* XMPPIPE_PASSWORD: XMPP password
-
-Format
-------
+# FORMAT
 
 Each message is terminated by a new line. Message fields are separated by
 ":" and percent encoded.
@@ -386,7 +382,7 @@ Each message is terminated by a new line. Message fields are separated by
 Colon separated values are accepted as input if the input format type
 is set to csv (`--format=csv`).
 
-### Presence
+## Presence
 
     p:<available|unavailable>:<to jid>:<from jid>
 
@@ -398,7 +394,7 @@ Example:
 
     p:available:test@muc.example.com/xmppipe:occupant@example.com/1234
 
-### Message
+## Message
 
     m:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<message body>
 
@@ -411,7 +407,7 @@ Example:
     m:groupchat:test@muc.example.com/mobile:user1@example.com/1234:Hello
     m:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here
 
-### Inline Image
+## Inline Image
 
 Inline images will add a hint so clients (notably
 [Conversations](https://github.com/iNPUTmice/Conversations)) will display
@@ -430,7 +426,7 @@ Example:
 
     I::::https%3A%2F%2Fhttpstatusdogs.com%2Fimg%2F500.jpg
 
-### XEP-0363: HTTP Upload
+## XEP-0363: HTTP Upload
 
 HTTP uploads create an upload slot. The XMPP server will respond with
 `get` and `put` URLs. The `put` URL can be used to upload the file using,
@@ -473,8 +469,7 @@ Example:
     # to upload the file
     curl https://example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png --upload-file example.png
 
-Compatibility
--------------
+# COMPATIBILITY
 
 Testing is done with ejabberd.
 
@@ -486,11 +481,9 @@ Also confirmed to work with:
 * tigase ([tigase.im](https://compliance.conversations.im/server/tigase.im/))
 * mongooseim
 
+# LICENSE
 
-License
--------
-
-Copyright (c) 2015-2020, Michael Santos <michael.santos@gmail.com>
+Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -504,8 +497,7 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-TODO
-----
+# TODO
 
 * support [XEP-0384: OMEMO Encryption](https://xmpp.org/extensions/xep-0384.html)
 
