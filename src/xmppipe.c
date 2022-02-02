@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
   state->sm_fc = 15;
   state->sm_unacked = 5;
   state->room = xmppipe_roomname("stdout");
-  state->resource = xmppipe_strdup(XMPPIPE_RESOURCE);
+  state->resource = xmppipe_resource();
   state->opt |= XMPPIPE_OPT_GROUPCHAT;
 
   jid = xmppipe_getenv("XMPPIPE_USERNAME");

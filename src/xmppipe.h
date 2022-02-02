@@ -137,6 +137,7 @@ char *xmppipe_fmt_decode(const char *);
 char *xmppipe_nfmt_decode(const char *, size_t);
 int xmppipe_set_nonblock(int fd);
 
+char *xmppipe_resource(void);
 char *xmppipe_servername(char *);
 char *xmppipe_roomname(char *);
 char *xmppipe_conference(char *, char *);
@@ -170,7 +171,3 @@ void xmppipe_stanza_add_child(xmpp_stanza_t *, xmpp_stanza_t *);
 int restrict_process_init(xmppipe_state_t *state);
 int restrict_process_stdin(xmppipe_state_t *state);
 int xmppipe_conn_fd(xmppipe_state_t *state);
-
-int b64_ntop(u_char const *src, size_t srclength, char *target,
-             size_t targsize);
-int b64_pton(char const *src, u_char *target, size_t targsize);

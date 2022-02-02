@@ -216,6 +216,15 @@ char *xmppipe_servername(char *jid) {
   return q;
 }
 
+char *xmppipe_resource() {
+  size_t len = sizeof(XMPPIPE_RESOURCE) + 1 + 10 + 1;
+  char *buf = xmppipe_malloc(len);
+
+  (void)snprintf(buf, len, "%s.%d", XMPPIPE_RESOURCE, getpid());
+
+  return buf;
+}
+
 char *xmppipe_conference(char *room, char *mucservice) {
   size_t len = strlen(room) + 1 + strlen(mucservice) + 1;
   char *buf = xmppipe_malloc(len);
