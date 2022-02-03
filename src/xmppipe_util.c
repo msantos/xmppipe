@@ -36,6 +36,8 @@ const char *const xmppipe_states[] = {"XMPPIPE_S_DISCONNECTED",
                                       "XMPPIPE_S_READY_AVAIL",
                                       "XMPPIPE_S_READY_EMPTY"};
 
+static char *xmppipe_join(char *prefix, char *delimiter, char *suffix);
+
 int xmppipe_set_nonblock(int fd) {
   int flags = 0;
 
@@ -217,37 +219,33 @@ char *xmppipe_servername(char *jid) {
 }
 
 char *xmppipe_resource() {
-  size_t len = sizeof(XMPPIPE_RESOURCE) + 1 + 10 + 1;
-  char *buf = xmppipe_malloc(len);
+  char buf[11];
 
-  (void)snprintf(buf, len, "%s.%d", XMPPIPE_RESOURCE, getpid());
+  (void)snprintf(buf, sizeof(buf), "%d", getpid());
 
-  return buf;
+  return xmppipe_join(XMPPIPE_RESOURCE, ".", buf);
 }
 
 char *xmppipe_conference(char *room, char *mucservice) {
-  size_t len = strlen(room) + 1 + strlen(mucservice) + 1;
-  char *buf = xmppipe_malloc(len);
-
-  (void)snprintf(buf, len, "%s@%s", room, mucservice);
-
-  return buf;
+  return xmppipe_join(room, "@", mucservice);
 }
 
 char *xmppipe_mucjid(char *muc, char *resource) {
-  size_t len = strlen(muc) + 1 + strlen(resource) + 1;
-  char *buf = xmppipe_malloc(len);
-
-  (void)snprintf(buf, len, "%s/%s", muc, resource);
-
-  return buf;
+  return xmppipe_join(muc, "/", resource);
 }
 
 char *xmppipe_chatjid(char *jid, char *servername) {
-  size_t len = strlen(jid) + 1 + strlen(servername) + 1;
-  char *buf = xmppipe_malloc(len);
+  return xmppipe_join(jid, "@", servername);
+}
 
-  (void)snprintf(buf, len, "%s@%s", jid, servername);
+static char *xmppipe_join(char *prefix, char *delimiter, char *suffix) {
+  size_t len = strlen(prefix) + strlen(delimiter) + strlen(suffix) + 1;
+  char *buf = xmppipe_malloc(len);
+  int rv;
+
+  rv = snprintf(buf, len, "%s%s%s", prefix, delimiter, suffix);
+  if (rv < 0 || (unsigned)rv > len)
+    errx(2, "invalid size: %d", rv);
 
   return buf;
 }
