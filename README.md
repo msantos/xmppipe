@@ -509,15 +509,3 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
   * support PUT header elements
   * handle error conditions
-
-  Questions:
-
-  * save the maximum file size returned by the server and disallow uploads
-    larger than the value?
-
-  * xmppipe is "pinned" to the upload server returned in the IQ reply (the
-    "to" field is ignored)
-
-  * allow other upload servers?
-
-  * error if different upload server is specified in "u:<from>:<to>"?
