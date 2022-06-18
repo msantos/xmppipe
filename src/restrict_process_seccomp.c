@@ -179,6 +179,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_clock_gettime
       SC_ALLOW(clock_gettime),
 #endif
+#ifdef __NR_clock_gettime64
+      SC_ALLOW(clock_gettime64),
+#endif
 #ifdef __NR_exit_group
       SC_ALLOW(exit_group),
 #endif
@@ -354,6 +357,9 @@ int restrict_process_stdin(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_clock_gettime
       SC_ALLOW(clock_gettime),
+#endif
+#ifdef __NR_clock_gettime64
+      SC_ALLOW(clock_gettime64),
 #endif
 #ifdef __NR_exit_group
       SC_ALLOW(exit_group),
