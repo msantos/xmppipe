@@ -1,4 +1,4 @@
-/* Copyright (c) 2017-2020, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2017-2022, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -48,7 +48,7 @@
                offsetof(struct seccomp_data, args[(_arg_nr)])),                \
       BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, (_arg_val), 0, 1),                   \
       BPF_STMT(BPF_RET + BPF_K, SECCOMP_RET_ALLOW), /* reload syscall number;  \
-                                                       all rules expect it in                                                            \
+                                                       all rules expect it in  \
                                                        accumulator */          \
       BPF_STMT(BPF_LD + BPF_W + BPF_ABS, offsetof(struct seccomp_data, nr))
 
@@ -164,6 +164,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_newfstatat
       SC_ALLOW(newfstatat),
 #endif
+#ifdef __NR_getdents64
+      SC_ALLOW(getdents64),
+#endif
 
 /* uuid */
 #ifdef __NR_gettimeofday
@@ -200,12 +203,12 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_fstat64
       SC_ALLOW(fstat64),
 #endif
-#ifdef __NR_getrandom
-      SC_ALLOW(getrandom),
-#endif
 
 #ifdef __NR_getppid
       SC_ALLOW(getppid),
+#endif
+#ifdef __NR_getrandom
+      SC_ALLOW(getrandom),
 #endif
 #ifdef __NR_gettid
       SC_ALLOW(gettid),
@@ -379,9 +382,18 @@ int restrict_process_stdin(xmppipe_state_t *state) {
 #ifdef __NR_fstat64
       SC_ALLOW(fstat64),
 #endif
+#ifdef __NR_newfstatat
+      SC_ALLOW(newfstatat),
+#endif
+#ifdef __NR_getdents64
+      SC_ALLOW(getdents64),
+#endif
 
 #ifdef __NR_getppid
       SC_ALLOW(getppid),
+#endif
+#ifdef __NR_getrandom
+      SC_ALLOW(getrandom),
 #endif
 #ifdef __NR_gettid
       SC_ALLOW(gettid),
