@@ -150,8 +150,10 @@ int main(int argc, char **argv) {
         state->format = XMPPIPE_FMT_TEXT;
       else if (strcmp(optarg, "csv") == 0)
         state->format = XMPPIPE_FMT_CSV;
-      else
+      else {
         usage(state);
+        exit(2);
+      }
 
       break;
     case 'x':
@@ -214,6 +216,7 @@ int main(int argc, char **argv) {
     case 'h':
     default:
       usage(state);
+      exit(0);
     }
   }
 
@@ -225,11 +228,15 @@ int main(int argc, char **argv) {
     state->room = xmppipe_strdup(argv[0]);
   }
 
-  if (jid == NULL)
+  if (jid == NULL) {
     usage(state);
+    exit(2);
+  }
 
-  if (state->encode && BASE64_LENGTH(state->bufsz) + 1 > 0xffff)
+  if (state->encode && BASE64_LENGTH(state->bufsz) + 1 > 0xffff) {
     usage(state);
+    exit(2);
+  }
 
   state->server = xmppipe_servername(jid);
 
@@ -595,6 +602,4 @@ static void usage(xmppipe_state_t *state) {
       "       --no-tls-verify                 disable TLS certificate "
       "verification\n",
       __progname);
-
-  exit(EXIT_FAILURE);
 }
