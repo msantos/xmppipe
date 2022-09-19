@@ -214,9 +214,11 @@ int main(int argc, char **argv) {
       break;
 
     case 'h':
-    default:
       usage(state);
       exit(0);
+    default:
+      usage(state);
+      exit(2);
     }
   }
 
@@ -567,10 +569,9 @@ static long long xmppipe_strtonum(xmppipe_state_t *state, const char *nptr,
 }
 
 static void usage(xmppipe_state_t *state) {
-  (void)fprintf(stderr, "%s %s (using %s mode process restriction)\n",
-                __progname, XMPPIPE_VERSION, RESTRICT_PROCESS);
   (void)fprintf(
       stderr,
+      "%s %s (using %s mode process restriction)\n"
       "usage: %s [OPTIONS]\n"
       "   -u, --username <jid>                XMPP username (aka JID)\n"
       "   -p, --password <password>           XMPP password\n"
@@ -601,5 +602,5 @@ static void usage(xmppipe_state_t *state) {
       "       --chat                          use one to one chat\n"
       "       --no-tls-verify                 disable TLS certificate "
       "verification\n",
-      __progname);
+      __progname, XMPPIPE_VERSION, RESTRICT_PROCESS, __progname);
 }
