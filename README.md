@@ -186,20 +186,6 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-trap cleanup EXIT
-
-TMPDIR=$(mktemp -d)
-
-in="$TMPDIR/stdin"
-out="$TMPDIR/stdout"
-
-mkfifo "$in"
-mkfifo "$out"
-
-cleanup() {
-  rm -rf "$TMPDIR"
-}
-
 decode() {
   printf '%b' "${1//%/\\x}"
 }
@@ -240,11 +226,11 @@ bot() {
         echo "$MSG"
         ;;
     esac
-  done <"$out"
+  done
 }
 
-bot >"$in" &
-xmppipe "$@" <"$in" >"$out"
+coproc bot
+xmppipe "$@" <&"${COPROC[0]}" >&"${COPROC[1]}"
 ~~~
 
 ## Sending Notifications/Alerts
@@ -287,12 +273,11 @@ This example will stream events from a query to an XMPP MUC using
 are written to a named pipe to avoid buffering.
 
 ~~~ shell
-mkfifo riemann
-curl -s --get --data subscribe=true \
+coproc curl -s --get --data subscribe=true \
   --data-urlencode 'query=(service ~= "^example")' \
-  http://example.com:80/index </dev/null >riemann &
+  http://example.com:80/index </dev/null
 xmppipe --verbose --verbose \
-  --discard --subject "riemann events" muc <riemann
+  --discard --subject "riemann events" muc <&"${COPROC[0]}"
 ~~~
 
 ### Desktop Notifications

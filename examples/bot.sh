@@ -4,25 +4,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-trap cleanup 0
-
-BOT_DEBUG=${BOT_DEBUG-""}
-
 if [ "$BOT_DEBUG" ]; then
   set -x
 fi
-
-TMPDIR=$(mktemp -d)
-
-in="$TMPDIR/stdin"
-out="$TMPDIR/stdout"
-
-mkfifo "$in"
-mkfifo "$out"
-
-cleanup() {
-  rm -rf "$TMPDIR"
-}
 
 decode() {
   printf '%b' "${1//%/\\x}"
@@ -73,8 +57,8 @@ bot() {
         fi
         ;;
     esac
-  done <"$out"
+  done
 }
 
-bot >"$in" &
-xmppipe "$@" <"$in" >"$out"
+coproc bot
+xmppipe "$@" <&"${COPROC[0]}" >&"${COPROC[1]}"
