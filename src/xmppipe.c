@@ -346,7 +346,7 @@ int xmppipe_stream_init(xmppipe_state_t *state) {
 
   /* XXX multiple handlers can be called for each event
    * XXX
-   * XXX * is the order handlers are called determinisitc?
+   * XXX * is the order handlers are called deterministic?
    * XXX * the NULL handler needs to installed as soon as stream management is
    * enabled
    * XXX * a handler has to exist for unsupported events
