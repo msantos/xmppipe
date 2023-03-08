@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -218,7 +218,7 @@ char *xmppipe_servername(char *jid) {
   return q;
 }
 
-char *xmppipe_resource() {
+char *xmppipe_resource(void) {
   char buf[11];
 
   (void)snprintf(buf, sizeof(buf), "%d", getpid());

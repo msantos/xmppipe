@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2016, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,7 +17,7 @@
 
 static unsigned char rfc3986[256];
 
-int xmppipe_fmt_init() {
+int xmppipe_fmt_init(void) {
   int i = 0;
 
   for (i = 0; i < 256; i++)
