@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,7 +27,7 @@
 #include "strtonum.h"
 #endif
 
-#define XMPPIPE_VERSION "0.14.5"
+#define XMPPIPE_VERSION "0.14.6"
 #define XMPPIPE_RESOURCE "xmppipe"
 
 #define XMPPIPE_STREQ(a, b) (strcmp((a), (b)) == 0)

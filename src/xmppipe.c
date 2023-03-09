@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -77,6 +77,10 @@ int main(int argc, char **argv) {
   long flags = 0;
 
   int ch = 0;
+
+#ifdef XMPP_CONN_FLAG_DISABLE_SM
+  flags |= XMPP_CONN_FLAG_DISABLE_SM;
+#endif
 
   if (setvbuf(stdout, NULL, _IOLBF, 0) < 0)
     err(EXIT_FAILURE, "setvbuf");
