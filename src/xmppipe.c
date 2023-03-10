@@ -439,17 +439,24 @@ void handle_connection(xmpp_conn_t *const conn, const xmpp_conn_event_t status,
   xmppipe_state_t *state = userdata;
 
   switch (status) {
+#ifdef XMPP_CONN_RAW_CONNECT
+  case XMPP_CONN_RAW_CONNECT:
+#endif
   case XMPP_CONN_CONNECT:
     if (state->verbose)
       fprintf(stderr, "DEBUG: connected\n");
     xmppipe_next_state(state, XMPPIPE_S_CONNECTED);
     break;
 
-  default:
+  case XMPP_CONN_DISCONNECT:
     xmppipe_next_state(state, XMPPIPE_S_DISCONNECTED);
     if (state->verbose)
       fprintf(stderr, "DEBUG: disconnected\n");
-    errx(EXIT_FAILURE, "handle_connection: disconnected");
+    break;
+
+  default:
+    xmppipe_next_state(state, XMPPIPE_S_DISCONNECTED);
+    errx(EXIT_FAILURE, "handle_connection: disconnected (%d)", status);
   }
 }
 
