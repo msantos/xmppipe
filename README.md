@@ -21,15 +21,17 @@ for monitoring systems or for sending alerts.
 
 # USAGE
 
-    xmppipe [*options*]
+```
+xmppipe [*options*]
 
-    XMPPIPE_USERNAME=me@example.com
-    XMPPIPE_PASSWORD="password"
+XMPPIPE_USERNAME=me@example.com
+XMPPIPE_PASSWORD="password"
 
-    # default name: stdout-*hostname*-*uid*
-    xmpipe
-    xmppipe muc
-    xmppipe muc@example.com
+# default name: stdout-*hostname*-*uid*
+xmpipe
+xmppipe muc
+xmppipe muc@example.com
+```
 
 # REQUIREMENTS
 
@@ -40,14 +42,18 @@ for monitoring systems or for sending alerts.
 
 # BUILD
 
-    $ make
+```
+$ make
+```
 
 ## Tests
 
-    # Install bats:
-    # apt-get install bats
-    # git clone https://github.com/sstephenson/bats.git # or from git
-    make test
+```
+# Install bats:
+# apt-get install bats
+# git clone https://github.com/sstephenson/bats.git # or from git
+make test
+```
 
 # PROCESS RESTRICTIONS
 
@@ -64,96 +70,100 @@ is used. By default:
 
 * Linux:
 
-    * init: seccomp(2)
-    * stdio: seccomp(2)
+  * init: seccomp(2)
+  * stdio: seccomp(2)
 
 * OpenBSD:
 
-    * init: pledge(2)
-    * stdio: pledge(2)
+  * init: pledge(2)
+  * stdio: pledge(2)
 
 * FreeBSD:
 
-    * init: setrlimit(2)
-    * stdio: setrlimit(2)/capsicum(4)
+  * init: setrlimit(2)
+  * stdio: setrlimit(2)/capsicum(4)
 
 * other: setrlimit(2)
 
-    * init: setrlimit(2)
-    * stdio: setrlimit(2)
+  * init: setrlimit(2)
+  * stdio: setrlimit(2)
 
 Selecting which process restrictions are enforced is done at compile
 time. For example, to use the "rlimit" process restrictions:
 
-    RESTRICT_PROCESS=rlimit make
+```
+RESTRICT_PROCESS=rlimit make
+```
 
 If the process restrictions are interfering with normal operation, please
 open an issue. To disable all process restrictions, compile using the
 "null" sandbox:
 
-    RESTRICT_PROCESS=null make
+```
+RESTRICT_PROCESS=null make
+```
 
 # OPTIONS
 
 -u, --username *JID*
-:   XMPP username: takes precedence over environment variable
+: XMPP username: takes precedence over environment variable
 
 -p, --password *password*
-:   XMPP password: takes precedence over environment variable
+: XMPP password: takes precedence over environment variable
 
 -r, --resource *resource*
-:   XMPP resource, used as the nickname in the MUC
+: XMPP resource, used as the nickname in the MUC
 
 -S, --subject *subject*
-:   XMPP MUC subject
+: XMPP MUC subject
 
 -a, --address *address[:port]*
-:   Specify the IP address and port of the XMPP server
+: Specify the IP address and port of the XMPP server
 
 -F, --format *text:csv*
-:   stdin is text (default) or colon separated values
+: stdin is text (default) or colon separated values
 
 -d, --discard
-:   Discard stdin when MUC is empty
+: Discard stdin when MUC is empty
 
 -D, --discard-to-stdout
-:   Discard stdin and print to local stdout
+: Discard stdin and print to local stdout
 
 -e, --ignore-eof
-:   Ignore stdin EOF
+: Ignore stdin EOF
 
 -s, --exit-when-empty
-:   Exit when MUC is empty
+: Exit when MUC is empty
 
 -x, --base64
-:   Base64 encode/decode data
+: Base64 encode/decode data
 
 -b, --buffer-size *size*
-:   Size of read buffer
+: Size of read buffer
 
 -I, --interval *interval*
-:   Request stream management status every interval messages
+: Request stream management status every interval messages
 
 -k, --keepalive *seconds*
-:   Periodically send a keepalive
+: Periodically send a keepalive
 
 -K, --keepalive-failures *count*
-:   Number of keepalive failures before exiting
+: Number of keepalive failures before exiting
 
 -P, --poll-delay *ms*
-:   Poll delay
+: Poll delay
 
 -v, --verbose
-:   Increase verbosity
+: Increase verbosity
 
 -V, --version
-:   Display version
+: Display version
 
 --chat
-:   Use one to one chat
+: Use one to one chat
 
 --no-tls-verify
-:   Disable TLS certificate verification
+: Disable TLS certificate verification
 
 # ENVIRONMENT VARIABLES
 
@@ -167,11 +177,11 @@ XMPPIPE_PASSWORD
 
 Using bash:
 
-~~~ shell
+```shell
 decode() {
   printf '%b' "${1//%/\\x}"
 }
-~~~
+```
 
 # EXAMPLES
 
@@ -179,7 +189,7 @@ decode() {
 
 An interactive XMPP bot written in the shell:
 
-~~~ shell
+```shell
 #!/bin/bash
 
 set -o errexit
@@ -231,40 +241,40 @@ bot() {
 
 coproc bot
 xmppipe "$@" <&"${COPROC[0]}" >&"${COPROC[1]}"
-~~~
+```
 
 ## Sending Notifications/Alerts
 
 Start `xmppipe` attached to a pipe:
 
-~~~ shell
+```shell
 mkfifo /tmp/xmpp
 
 xmppipe -o groupchat <>/tmp/xmpp
-~~~
+```
 
 Any data written to the pipe will be sent to the groupchat:
 
-~~~ shell
+```shell
 echo "test" >/tmp/xmpp
 
 df -h >/tmp/xmpp
 
 git diff >/tmp/xmpp
-~~~
+```
 
 ## SSH over XMPP
 
 See [examples/ssh-over-xmpp](https://github.com/msantos/xmppipe/blob/master/examples/ssh-over-xmpp):
 
-~~~ shell
+```shell
 # Server: has access to the destination SSH server
 # ssh-over-xmpp server <conference> <IP address> <port>
 ssh-over-xmpp server sshxmpp 1.2.3.4 22
 
 ## Client: has access to the XMPP server
 ssh -o ProxyCommand="ssh-over-xmpp client sshxmpp" 127.0.0.1
-~~~
+```
 
 ## Stream Events from Riemann
 
@@ -272,17 +282,17 @@ This example will stream events from a query to an XMPP MUC using
 [Riemann's](https://github.com/riemann/riemann) SSE interface. The events
 are written to a named pipe to avoid buffering.
 
-~~~ shell
+```shell
 coproc curl -s --get --data subscribe=true \
   --data-urlencode 'query=(service ~= "^example")' \
   http://example.com:80/index </dev/null
 xmppipe --verbose --verbose \
   --discard --subject "riemann events" muc <&"${COPROC[0]}"
-~~~
+```
 
 ### Desktop Notifications
 
-~~~ shell
+```shell
 #!/bin/bash
 
 set -o errexit
@@ -308,13 +318,13 @@ xmppipe "$@" | while IFS=: read stanza type from to body; do
     *) continue ;;
   esac
 done
-~~~
+```
 
 ### Mirror a terminal session using script(1)
 
 * user
 
-~~~ shell
+```shell
 #!/bin/bash
 
 MUC=console
@@ -326,11 +336,11 @@ mkfifo "$FIFO"
 stty cols 80 rows 24
 xmppipe --resource user -x $MUC < "$FIFO" >/dev/null 2>"$TMPDIR/stderr" &
 script -q -f "$FIFO"
-~~~
+```
 
 * viewers
 
-~~~ shell
+```shell
 #!/bin/bash
 
 decode() {
@@ -342,7 +352,7 @@ xmppipe --resource viewer --base64 console |
   while IFS=: read -r x s f t m; do
     [ "$m" = "m" ] && decode "$m"
   done
-~~~
+```
 
 ## Image Upload
 
@@ -350,14 +360,14 @@ Upload an image using HTTP Upload (XEP-0363) then display it inline.
 
 See [examples/image-upload](https://github.com/msantos/xmppipe/blob/master/examples/image-upload):
 
-~~~
+```
 image-upload -o groupchat
-~~~
+```
 
-~~~
+```
 # file must be in the same working directory as image-upload
 echo "upload::::example.png" >/tmp/image_upload/stdin
-~~~
+```
 
 # FORMAT
 
@@ -369,28 +379,36 @@ is set to csv (`--format=csv`).
 
 ## Presence
 
-    p:<available|unavailable>:<to jid>:<from jid>
+```
+p:<available|unavailable>:<to jid>:<from jid>
+```
 
-Input/Output:
+### Input/Output
 
-    Both
+Both
 
-Example:
+### Example
 
-    p:available:test@muc.example.com/xmppipe:occupant@example.com/1234
+```
+p:available:test@muc.example.com/xmppipe:occupant@example.com/1234
+```
 
 ## Message
 
-    m:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<message body>
+```
+m:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<message body>
+```
 
-Input/Output:
+### Input/Output
 
-    Both
+Both
 
-Example:
+### Example
 
-    m:groupchat:test@muc.example.com/mobile:user1@example.com/1234:Hello
-    m:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here
+```
+m:groupchat:test@muc.example.com/mobile:user1@example.com/1234:Hello
+m:chat:user1@example.com/mobile:user2@example.com:Message%20goes%20here
+```
 
 ## Inline Image
 
@@ -401,15 +419,19 @@ the image instead of a URL.
 * type, from and to are optional
 * message body: the percent escaped URL
 
-    I:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<url>
+```
+I:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<url>
+```
 
-Input/Output:
+### Input/Output
 
-    Input only
+Input only
 
-Example:
+### Example
 
-    I::::https%3A%2F%2Fhttpstatusdogs.com%2Fimg%2F500.jpg
+```
+I::::https%3A%2F%2Fhttpstatusdogs.com%2Fimg%2F500.jpg
+```
 
 ## XEP-0363: HTTP Upload
 
@@ -424,35 +446,41 @@ The input format is:
 
 * type, from and to are optional
 * message body: percent escaped, pipe separated value
-    * filename
-    * size
-    * optional: MIME type
+  * filename
+  * size
+  * optional: MIME type
 
-    u:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<filename>|<size (bytes)>[|<content-type>]
+```
+u:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<filename>|<size (bytes)>[|<content-type>]
+```
 
 The output format is:
 
 * type, from and to are optional
 * message body: percent escaped, pipe separated value
-    * get URL
-    * put URL
+  * get URL
+  * put URL
 
-    U:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<get URL>|<put URL>
+```
+U:<chat|groupchat|normal|headline>:<from jid>:<to jid>:<get URL>|<put URL>
+```
 
-Example:
+### Example
 
-    # $ stat --format="%s" example.png
-    # 16698
-    u::::example.png%7C16698
+```
+# $ stat --format="%s" example.png
+# 16698
+u::::example.png%7C16698
 
-    # also specify content type
-    u::::example.png%7C16698%7Cimage%2Fpng
+# also specify content type
+u::::example.png%7C16698%7Cimage%2Fpng
 
-    # server response: slot created
-    U:groupchat:upload.example.com:user@example.com/123:https%3A//example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png%7chttps%3A//example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png
+# server response: slot created
+U:groupchat:upload.example.com:user@example.com/123:https%3A//example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png%7chttps%3A//example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png
 
-    # to upload the file
-    curl https://example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png --upload-file example.png
+# to upload the file
+curl https://example.com/upload/0b9da82fea20a78778cbeddeab0472286cc35ed1/xyEaWFVZv3sv5ay9AGH5qBU02gglZRyUeGbjQg3k/example.png --upload-file example.png
+```
 
 # COMPATIBILITY
 
@@ -468,7 +496,7 @@ Also confirmed to work with:
 
 # LICENSE
 
-Copyright (c) 2015-2022, Michael Santos <michael.santos@gmail.com>
+Copyright (c) 2015-2023, Michael Santos michael.santos@gmail.com
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
