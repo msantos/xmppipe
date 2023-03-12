@@ -1,4 +1,4 @@
-/* Copyright (c) 2017-2022, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2017-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -238,6 +238,9 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_mmap
       SC_ALLOW(mmap),
 #endif
+#ifdef __NR_mmap2
+      SC_ALLOW(mmap2),
+#endif
 #ifdef __NR_munmap
       SC_ALLOW(munmap),
 #endif
@@ -269,7 +272,6 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_pselect6
       SC_ALLOW(pselect6),
 #endif
-
 #ifdef __NR_stat
       SC_ALLOW(stat),
 #endif
@@ -282,15 +284,7 @@ int restrict_process_init(xmppipe_state_t *state) {
 #ifdef __NR_writev
       SC_ALLOW(writev),
 #endif
-#ifdef __NR_mmap
-      SC_ALLOW(mmap),
-#endif
-#ifdef __NR_mremap
-      SC_ALLOW(mremap),
-#endif
-#ifdef __NR_mmap2
-      SC_ALLOW(mmap2),
-#endif
+
 #ifdef __NR_access
       SC_ALLOW(access),
 #endif
@@ -412,6 +406,9 @@ int restrict_process_stdin(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_mmap
       SC_ALLOW(mmap),
+#endif
+#ifdef __NR_mremap
+      SC_ALLOW(mremap),
 #endif
 #ifdef __NR_munmap
       SC_ALLOW(munmap),
