@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2017-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,6 +15,7 @@
 #ifdef RESTRICT_PROCESS_rlimit
 #include <sys/resource.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #include "xmppipe.h"
 
@@ -26,6 +27,11 @@ int restrict_process_init(xmppipe_state_t *state) {
 
 int restrict_process_stdin(xmppipe_state_t *state) {
   struct rlimit rl = {0};
+
+  if (isatty(STDOUT_FILENO)) {
+    if (setrlimit(RLIMIT_FSIZE, &rl_zero) != 0)
+      return -1;
+  }
 
   rl.rlim_cur = RESTRICT_PROCESS_RLIMIT_NOFILE;
   rl.rlim_max = RESTRICT_PROCESS_RLIMIT_NOFILE;
