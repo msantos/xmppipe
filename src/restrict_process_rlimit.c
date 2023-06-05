@@ -17,21 +17,28 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include "xmppipe.h"
 
 int restrict_process_init(xmppipe_state_t *state) {
   struct rlimit rl_zero = {0};
+  struct stat sb = {0};
+
+  if (fstat(STDOUT_FILENO, &sb) < 0)
+    return -1;
+
+  if (!S_ISREG(sb.st_mode)) {
+    if (setrlimit(RLIMIT_FSIZE, &rl_zero) < 0)
+      return -1;
+  }
 
   return setrlimit(RLIMIT_NPROC, &rl_zero);
 }
 
 int restrict_process_stdin(xmppipe_state_t *state) {
   struct rlimit rl = {0};
-
-  if (isatty(STDOUT_FILENO)) {
-    if (setrlimit(RLIMIT_FSIZE, &rl_zero) != 0)
-      return -1;
-  }
 
   rl.rlim_cur = RESTRICT_PROCESS_RLIMIT_NOFILE;
   rl.rlim_max = RESTRICT_PROCESS_RLIMIT_NOFILE;
