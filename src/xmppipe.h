@@ -27,7 +27,7 @@
 #include "strtonum.h"
 #endif
 
-#define XMPPIPE_VERSION "0.14.7"
+#define XMPPIPE_VERSION "0.14.8"
 #define XMPPIPE_RESOURCE "xmppipe"
 
 #define XMPPIPE_STREQ(a, b) (strcmp((a), (b)) == 0)
