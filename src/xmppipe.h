@@ -12,7 +12,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <ctype.h>
 #include <err.h>
 #include <limits.h>
 #include <stdio.h>
@@ -27,7 +26,7 @@
 #include "strtonum.h"
 #endif
 
-#define XMPPIPE_VERSION "0.14.8"
+#define XMPPIPE_VERSION "0.14.9"
 #define XMPPIPE_RESOURCE "xmppipe"
 
 #define XMPPIPE_STREQ(a, b) (strcmp((a), (b)) == 0)
