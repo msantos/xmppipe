@@ -44,6 +44,7 @@ RESTRICT_PROCESS_RLIMIT_NOFILE ?= -1
 
 XMPPIPE_CFLAGS ?= -g -Wall
 CFLAGS += $(XMPPIPE_CFLAGS) \
+		  -Wextra -Wno-unused-parameter \
 		  -fwrapv \
 		  -DRESTRICT_PROCESS=\"$(RESTRICT_PROCESS)\" \
 		  -DRESTRICT_PROCESS_$(RESTRICT_PROCESS) \
