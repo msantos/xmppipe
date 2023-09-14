@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -43,4 +43,35 @@ void xmppipe_ping(xmppipe_state_t *state) {
   (void)xmpp_stanza_release(iq);
 
   state->keepalive_fail++;
+}
+
+// <iq from='juliet@capulet.lit/balcony' to='capulet.lit' id='s2c1'
+// type='result'/>
+int handle_pong(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
+                void *const userdata) {
+  xmppipe_state_t *state = userdata;
+  xmpp_stanza_t *iq;
+  const char *from;
+  const char *id;
+
+  from = xmpp_stanza_get_attribute(stanza, "from");
+  if (from == NULL)
+    return 1;
+
+  id = xmpp_stanza_get_attribute(stanza, "id");
+  if (id == NULL)
+    return 1;
+
+  iq = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(iq, "iq");
+  xmppipe_stanza_set_type(iq, "result");
+  xmppipe_stanza_set_id(iq, id);
+  xmppipe_stanza_set_attribute(iq, "from",
+                               xmpp_conn_get_bound_jid(state->conn));
+  xmppipe_stanza_set_attribute(iq, "to", from);
+
+  xmppipe_send(state, iq);
+  (void)xmpp_stanza_release(iq);
+
+  return 1;
 }

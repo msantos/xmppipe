@@ -26,7 +26,7 @@
 #include "strtonum.h"
 #endif
 
-#define XMPPIPE_VERSION "0.14.9"
+#define XMPPIPE_VERSION "0.15.0"
 #define XMPPIPE_RESOURCE "xmppipe"
 
 #define XMPPIPE_STREQ(a, b) (strcmp((a), (b)) == 0)
@@ -111,6 +111,7 @@ void event_loop(xmppipe_state_t *state);
 int handle_message(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 int handle_null(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 int handle_ping_reply(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
+int handle_pong(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 int handle_presence(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 void xmppipe_ping(xmppipe_state_t *);
 int handle_presence_error(xmpp_conn_t *const, xmpp_stanza_t *const,
