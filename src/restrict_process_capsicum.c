@@ -52,6 +52,8 @@ int restrict_process_stdin(xmppipe_state_t *state) {
   if (fd < 0)
     return -1;
 
+  closefrom(fd+1);
+
   rl.rlim_cur = fd;
   rl.rlim_max = fd;
 
