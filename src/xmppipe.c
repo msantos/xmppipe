@@ -575,7 +575,7 @@ static long long xmppipe_strtonum(xmppipe_state_t *state, const char *nptr,
   const char *errstr = NULL;
 
   n = strtonum(nptr, minval, maxval, &errstr);
-  if (errstr)
+  if (errstr != NULL)
     errx(EXIT_FAILURE, "%s: %s", errstr, nptr);
 
   return n;
