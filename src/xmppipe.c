@@ -68,10 +68,10 @@ static const struct option long_options[] = {
     {NULL, 0, NULL, 0}};
 
 int main(int argc, char **argv) {
-  xmppipe_state_t *state = NULL;
-  xmpp_log_t *log = NULL;
-  char *jid = NULL;
-  char *pass = NULL;
+  xmppipe_state_t *state;
+  xmpp_log_t *log;
+  char *jid;
+  char *pass;
   char *addr = NULL;
   u_int16_t port = 0;
   long flags = 0;
