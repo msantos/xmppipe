@@ -363,8 +363,8 @@ int xmppipe_stream_init(xmppipe_state_t *state) {
 }
 
 int xmppipe_muc_init(xmppipe_state_t *state) {
-  xmpp_stanza_t *iq = NULL;
-  xmpp_stanza_t *query = NULL;
+  xmpp_stanza_t *iq;
+  xmpp_stanza_t *query;
 
   xmpp_handler_add(state->conn, handle_presence_error,
                    "http://jabber.org/protocol/muc", "presence", "error",
@@ -405,7 +405,7 @@ int xmppipe_muc_init(xmppipe_state_t *state) {
 }
 
 int xmppipe_presence_init(xmppipe_state_t *state) {
-  xmpp_stanza_t *presence = NULL;
+  xmpp_stanza_t *presence;
 
   /* Send initial <presence/> so that we appear online to contacts */
   presence = xmppipe_stanza_new(state->ctx);
@@ -517,7 +517,7 @@ int handle_disco_items(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 int handle_disco_info(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                       void *const userdata) {
   xmpp_stanza_t *query, *child;
-  const char *from = NULL;
+  const char *from;
   xmppipe_state_t *state = userdata;
 
   from = xmpp_stanza_get_attribute(stanza, "from");
@@ -532,8 +532,8 @@ int handle_disco_info(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 
   for (child = xmpp_stanza_get_children(query); child != NULL;
        child = xmpp_stanza_get_next(child)) {
-    const char *feature = NULL;
-    const char *var = NULL;
+    const char *feature;
+    const char *var;
 
     feature = xmpp_stanza_get_name(child);
     if (feature == NULL)
@@ -571,7 +571,7 @@ int handle_disco_info(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 
 static long long xmppipe_strtonum(xmppipe_state_t *state, const char *nptr,
                                   long long minval, long long maxval) {
-  long long n = 0;
+  long long n;
   const char *errstr = NULL;
 
   n = strtonum(nptr, minval, maxval, &errstr);
