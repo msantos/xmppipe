@@ -324,7 +324,7 @@ int xmppipe_connect_init(xmppipe_state_t *state) {
 }
 
 int xmppipe_stream_init(xmppipe_state_t *state) {
-  xmpp_stanza_t *enable = NULL;
+  xmpp_stanza_t *enable;
 
   if (state->sm_request_interval == 0)
     return 0;
@@ -476,9 +476,9 @@ int handle_disco_items(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
   for (item = xmpp_stanza_get_children(query); item != NULL;
        item = xmpp_stanza_get_next(item)) {
     xmpp_stanza_t *iq, *reply;
-    const char *jid = NULL;
-    const char *name = NULL;
-    char *id = NULL;
+    const char *jid;
+    const char *name;
+    char *id;
 
     name = xmpp_stanza_get_name(item);
     if (name == NULL)

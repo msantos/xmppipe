@@ -39,7 +39,7 @@ const char *const xmppipe_states[] = {"XMPPIPE_S_DISCONNECTED",
 static char *xmppipe_join(char *prefix, char *delimiter, char *suffix);
 
 int xmppipe_set_nonblock(int fd) {
-  int flags = 0;
+  int flags;
 
   flags = fcntl(fd, F_GETFD);
   if (flags < 0)
@@ -61,7 +61,7 @@ char *xmppipe_getenv(const char *s) {
 }
 
 char *xmppipe_strdup(const char *s) {
-  char *buf = NULL;
+  char *buf;
 
   if (s == NULL)
     errx(2, "invalid string");
@@ -74,7 +74,7 @@ char *xmppipe_strdup(const char *s) {
 }
 
 void *xmppipe_malloc(size_t size) {
-  char *buf = NULL;
+  char *buf;
 
   if (size == 0 || size > 0xffff)
     errx(2, "invalid size: %zd", size);
@@ -87,7 +87,7 @@ void *xmppipe_malloc(size_t size) {
 }
 
 void *xmppipe_calloc(size_t nmemb, size_t size) {
-  char *buf = NULL;
+  char *buf;
 
   buf = calloc(nmemb, size);
   if (buf == NULL)
@@ -251,7 +251,7 @@ static char *xmppipe_join(char *prefix, char *delimiter, char *suffix) {
 }
 
 char *xmppipe_roomname(char *label) {
-  char *buf = NULL;
+  char *buf;
   size_t len = 64;
   char name[16] = {0};
 
