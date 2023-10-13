@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2017-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -32,7 +32,7 @@
  * The alternative is hardcoding the offsets based on the libstrophe version.
  */
 int xmppipe_conn_fd(xmppipe_state_t *state) {
-  int fd = 0;
+  int fd;
   struct rlimit rl = {0};
   struct stat st = {0};
 

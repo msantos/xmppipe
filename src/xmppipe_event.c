@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,7 +23,7 @@ static int handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len);
 void event_loop(xmppipe_state_t *state) {
   int fd = STDIN_FILENO;
   int eof = 0;
-  char *buf = NULL;
+  char *buf;
 
   if (xmppipe_set_nonblock(fd) < 0)
     return;
@@ -107,9 +107,8 @@ static int handle_stdin(xmppipe_state_t *state, int fd, char *buf, size_t len) {
   fd_set rfds;
   struct timeval tv = {0};
   ssize_t n = 0;
-  int rv = 0;
+  int rv;
 
-  tv.tv_sec = 0;
   tv.tv_usec = state->poll * 1000;
 
   FD_ZERO(&rfds);
