@@ -18,7 +18,7 @@
 static unsigned char rfc3986[256];
 
 int xmppipe_fmt_init(void) {
-  int i = 0;
+  int i;
 
   for (i = 0; i < 256; i++)
     rfc3986[i] = (i >= '0' && i <= '9') || (i >= 'a' && i <= 'z') ||
@@ -33,7 +33,7 @@ int xmppipe_fmt_init(void) {
 char *xmppipe_nfmt_encode(const char *s, size_t len) {
   char *buf = xmppipe_calloc(len * 3 + 1, 1);
   char *p = buf;
-  size_t i = 0;
+  size_t i;
 
   for (i = 0; i < len; i++) {
     unsigned char c = s[i];
@@ -55,7 +55,7 @@ char *xmppipe_fmt_encode(const char *s) {
 char *xmppipe_nfmt_decode(const char *s, size_t len) {
   char *buf;
   char *p;
-  size_t i = 0;
+  size_t i;
   char fmt[3] = {0};
   char *endptr;
 
