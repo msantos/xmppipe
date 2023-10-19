@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2019-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -164,8 +164,8 @@ XMPPIPE_DONE:
 
 static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
                                  char *buf, size_t len) {
-  xmpp_stanza_t *message = NULL;
-  char *id = NULL;
+  xmpp_stanza_t *message;
+  char *id;
 
   id = xmppipe_uuid_gen(state->ctx);
 
@@ -301,7 +301,7 @@ static void xmppipe_send_http_upload(xmppipe_state_t *state, char *to,
 }
 
 void xmppipe_send(xmppipe_state_t *state, xmpp_stanza_t *const stanza) {
-  xmpp_stanza_t *r = NULL;
+  xmpp_stanza_t *r;
 
   state->sm_request++;
 
