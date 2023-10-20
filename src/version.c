@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,15 +16,15 @@
 
 int handle_version(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                    void *const userdata) {
-  xmpp_stanza_t *reply = NULL;
-  xmpp_stanza_t *query = NULL;
-  xmpp_stanza_t *name = NULL;
-  xmpp_stanza_t *version = NULL;
-  xmpp_stanza_t *text = NULL;
-  xmpp_stanza_t *child = NULL;
+  xmpp_stanza_t *reply;
+  xmpp_stanza_t *query;
+  xmpp_stanza_t *name;
+  xmpp_stanza_t *version;
+  xmpp_stanza_t *text;
+  xmpp_stanza_t *child;
 
-  const char *ns = NULL;
-  const char *id = NULL;
+  const char *ns;
+  const char *id;
 
   xmppipe_state_t *state = userdata;
   xmpp_ctx_t *ctx = state->ctx;
