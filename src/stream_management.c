@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,7 +25,7 @@ int handle_sm_request(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                       void *const userdata) {
   xmppipe_state_t *state = userdata;
 
-  xmpp_stanza_t *a = NULL;
+  xmpp_stanza_t *a;
   char h[11] = {0};
 
   if (state->sm_request % state->sm_request_interval != 0)
@@ -48,8 +48,8 @@ int handle_sm_request(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 int handle_sm_ack(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                   void *const userdata) {
   xmppipe_state_t *state = userdata;
-  const char *h = NULL;
-  u_int32_t ack = 0;
+  const char *h;
+  u_int32_t ack;
   const char *errstr = NULL;
 
   h = xmpp_stanza_get_attribute(stanza, "h");
@@ -58,7 +58,7 @@ int handle_sm_ack(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
     return 1;
 
   ack = (u_int32_t)strtonum(h, 0, UINT_MAX - 1, &errstr);
-  if (errstr)
+  if (errstr != NULL)
     goto XMPPIPE_STREAMERR;
 
   if (state->verbose)
