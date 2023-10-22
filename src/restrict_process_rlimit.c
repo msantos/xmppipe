@@ -24,7 +24,7 @@
 
 int restrict_process_init(xmppipe_state_t *state) {
   struct rlimit rl_zero = {0};
-  struct stat sb = {0};
+  struct stat sb;
 
   if (fstat(STDOUT_FILENO, &sb) < 0)
     return -1;
@@ -38,7 +38,7 @@ int restrict_process_init(xmppipe_state_t *state) {
 }
 
 int restrict_process_stdin(xmppipe_state_t *state) {
-  struct rlimit rl = {0};
+  struct rlimit rl;
 
   rl.rlim_cur = RESTRICT_PROCESS_RLIMIT_NOFILE;
   rl.rlim_max = RESTRICT_PROCESS_RLIMIT_NOFILE;
