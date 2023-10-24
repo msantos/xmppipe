@@ -27,7 +27,7 @@
 
 int restrict_process_init(xmppipe_state_t *state) {
   struct rlimit rl = {0};
-  struct stat sb = {0};
+  struct stat sb;
 
   if (fstat(STDOUT_FILENO, &sb) < 0)
     return -1;
@@ -41,7 +41,7 @@ int restrict_process_init(xmppipe_state_t *state) {
 }
 
 int restrict_process_stdin(xmppipe_state_t *state) {
-  struct rlimit rl = {0};
+  struct rlimit rl;
   cap_rights_t policy_read;
   cap_rights_t policy_write;
   cap_rights_t policy_rw;
