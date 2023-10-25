@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,17 +17,16 @@
 int handle_presence(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                     void *const userdata) {
   xmppipe_state_t *state = userdata;
-  xmpp_stanza_t *x = NULL;
-  xmpp_stanza_t *item = NULL;
+  xmpp_stanza_t *x;
+  xmpp_stanza_t *item;
 
-  const char *from = NULL;
-  const char *to = NULL;
-  const char *type = NULL;
-  const char *code = NULL;
+  const char *from;
+  const char *to;
+  const char *type;
 
-  char *efrom = NULL;
-  char *eto = NULL;
-  char *etype = NULL;
+  char *efrom;
+  char *eto;
+  char *etype;
 
   int me = 0;
 
@@ -46,6 +45,8 @@ int handle_presence(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
       const char *name = xmpp_stanza_get_name(item);
 
       if (name && XMPPIPE_STREQ(name, "status")) {
+        const char *code;
+
         code = xmpp_stanza_get_attribute(item, "code");
         if (code && XMPPIPE_STREQ(code, "110")) {
           /* Check for nick conflict */
@@ -97,12 +98,12 @@ int handle_presence(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 int handle_presence_error(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                           void *const userdata) {
   xmppipe_state_t *state = userdata;
-  xmpp_stanza_t *error = NULL;
-  xmpp_stanza_t *child = NULL;
+  xmpp_stanza_t *error;
+  xmpp_stanza_t *child;
 
-  const char *from = NULL;
-  const char *to = NULL;
-  const char *code = NULL;
+  const char *from;
+  const char *to;
+  const char *code;
   const char *text = NULL;
 
   from = xmpp_stanza_get_attribute(stanza, "from");
