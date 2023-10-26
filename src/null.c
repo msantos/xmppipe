@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,7 +17,7 @@
 int handle_null(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                 void *const userdata) {
   xmppipe_state_t *state = userdata;
-  const char *name = NULL;
+  const char *name;
 
   name = xmpp_stanza_get_name(stanza);
   if (name == NULL)
