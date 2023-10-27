@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,8 +15,8 @@
 #include "xmppipe.h"
 
 void xmppipe_muc_join(xmppipe_state_t *state) {
-  xmpp_stanza_t *presence = NULL;
-  xmpp_stanza_t *x = NULL;
+  xmpp_stanza_t *presence;
+  xmpp_stanza_t *x;
 
   presence = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(presence, "presence");
@@ -34,9 +34,9 @@ void xmppipe_muc_join(xmppipe_state_t *state) {
 }
 
 void xmppipe_muc_subject(xmppipe_state_t *state, char *buf) {
-  xmpp_stanza_t *message = NULL;
-  xmpp_stanza_t *subject = NULL;
-  xmpp_stanza_t *text = NULL;
+  xmpp_stanza_t *message;
+  xmpp_stanza_t *subject;
+  xmpp_stanza_t *text;
 
   message = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(message, "message");
@@ -59,9 +59,9 @@ void xmppipe_muc_subject(xmppipe_state_t *state, char *buf) {
 }
 
 void xmppipe_muc_unlock(xmppipe_state_t *state) {
-  xmpp_stanza_t *iq = NULL;
-  xmpp_stanza_t *q = NULL;
-  xmpp_stanza_t *x = NULL;
+  xmpp_stanza_t *iq;
+  xmpp_stanza_t *q;
+  xmpp_stanza_t *x;
 
   iq = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(iq, "iq");
