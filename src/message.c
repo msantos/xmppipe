@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2019-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,18 +16,18 @@
 
 int handle_message(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
                    void *const userdata) {
-  xmpp_stanza_t *child = NULL;
+  xmpp_stanza_t *child;
   xmppipe_state_t *state = userdata;
 
   char *message = NULL;
-  const char *type = NULL;
-  const char *from = NULL;
-  const char *to = NULL;
+  const char *type;
+  const char *from;
+  const char *to;
   const char *ns;
 
-  char *etype = NULL;
-  char *efrom = NULL;
-  char *eto = NULL;
+  char *etype;
+  char *efrom;
+  char *eto;
   char *emessage = NULL;
 
   char *symbol = "m";
