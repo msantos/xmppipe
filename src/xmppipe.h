@@ -138,11 +138,11 @@ char *xmppipe_nfmt_decode(const char *, size_t);
 int xmppipe_set_nonblock(int fd);
 
 char *xmppipe_resource(void);
-char *xmppipe_servername(char *);
-char *xmppipe_roomname(char *);
-char *xmppipe_conference(char *, char *);
-char *xmppipe_mucjid(char *, char *);
-char *xmppipe_chatjid(char *, char *);
+char *xmppipe_servername(const char *);
+char *xmppipe_roomname(const char *);
+char *xmppipe_conference(const char *, const char *);
+char *xmppipe_mucjid(const char *, const char *);
+char *xmppipe_chatjid(const char *, const char *);
 
 void xmppipe_next_state(xmppipe_state_t *state, int status);
 void xmppipe_stream_close(xmppipe_state_t *);

@@ -36,7 +36,7 @@ const char *const xmppipe_states[] = {"XMPPIPE_S_DISCONNECTED",
                                       "XMPPIPE_S_READY_AVAIL",
                                       "XMPPIPE_S_READY_EMPTY"};
 
-static char *xmppipe_join(char *prefix, char *delimiter, char *suffix);
+static char *xmppipe_join(const char *prefix, const char *delimiter, const char *suffix);
 
 int xmppipe_set_nonblock(int fd) {
   int flags;
@@ -200,7 +200,7 @@ void xmppipe_stanza_add_child(xmpp_stanza_t *stanza, xmpp_stanza_t *child) {
     err(3, "xmppipe_stanza_add_child");
 }
 
-char *xmppipe_servername(char *jid) {
+char *xmppipe_servername(const char *jid) {
   char *buf = xmppipe_strdup(jid);
   char *p = strchr(buf, '@');
   char *q;
@@ -226,19 +226,19 @@ char *xmppipe_resource(void) {
   return xmppipe_join(XMPPIPE_RESOURCE, ".", buf);
 }
 
-char *xmppipe_conference(char *room, char *mucservice) {
+char *xmppipe_conference(const char *room, const char *mucservice) {
   return xmppipe_join(room, "@", mucservice);
 }
 
-char *xmppipe_mucjid(char *muc, char *resource) {
+char *xmppipe_mucjid(const char *muc, const char *resource) {
   return xmppipe_join(muc, "/", resource);
 }
 
-char *xmppipe_chatjid(char *jid, char *servername) {
+char *xmppipe_chatjid(const char *jid, const char *servername) {
   return xmppipe_join(jid, "@", servername);
 }
 
-static char *xmppipe_join(char *prefix, char *delimiter, char *suffix) {
+static char *xmppipe_join(const char *prefix, const char *delimiter, const char *suffix) {
   size_t len = strlen(prefix) + strlen(delimiter) + strlen(suffix) + 1;
   char *buf = xmppipe_malloc(len);
   int rv;
@@ -250,7 +250,7 @@ static char *xmppipe_join(char *prefix, char *delimiter, char *suffix) {
   return buf;
 }
 
-char *xmppipe_roomname(char *label) {
+char *xmppipe_roomname(const char *label) {
   char *buf;
   size_t len = 64;
   char name[16] = {0};
