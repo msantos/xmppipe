@@ -250,7 +250,9 @@ int main(int argc, char **argv) {
     state->out = xmppipe_strdup(state->room);
     state->mucjid = xmppipe_mucjid(state->out, state->resource);
   } else if (!(state->opt & XMPPIPE_OPT_GROUPCHAT)) {
-    state->out = xmppipe_chatjid(state->room, state->server);
+    state->out = strchr(state->room, '.')
+      ? xmppipe_strdup(state->room)
+      : xmppipe_chatjid(state->room, state->server);
   }
 
   if (xmppipe_fmt_init() < 0)
