@@ -124,10 +124,10 @@ int handle_iq(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
               void *const userdata);
 
 void xmppipe_muc_join(xmppipe_state_t *);
-void xmppipe_muc_subject(xmppipe_state_t *, char *);
+void xmppipe_muc_subject(xmppipe_state_t *, const char *);
 void xmppipe_muc_unlock(xmppipe_state_t *);
 
-void xmppipe_send_stanza(xmppipe_state_t *, char *, size_t);
+void xmppipe_send_stanza(xmppipe_state_t *, const char *, size_t);
 void xmppipe_send(xmppipe_state_t *, xmpp_stanza_t *const);
 
 int xmppipe_fmt_init(void);

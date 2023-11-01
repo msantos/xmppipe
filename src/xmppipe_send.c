@@ -14,19 +14,19 @@
  */
 #include "xmppipe.h"
 
-static void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf,
+static void xmppipe_send_stanza_fmt(xmppipe_state_t *state, const char *buf,
                                     size_t len);
 
-static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
-                                 char *buf, size_t len);
+static void xmppipe_send_message(xmppipe_state_t *state, const char *to,
+                                 const char *type, const char *buf, size_t len);
 
-static void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type,
-                             char *buf, size_t len);
+static void xmppipe_send_oob(xmppipe_state_t *state, const char *to,
+                             const char *type, const char *buf, size_t len);
 
-static void xmppipe_send_http_upload(xmppipe_state_t *state, char *to,
-                                     char *type, char *buf, size_t len);
+static void xmppipe_send_http_upload(xmppipe_state_t *state, const char *to,
+                                     const char *type, char *buf, size_t len);
 
-void xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len) {
+void xmppipe_send_stanza(xmppipe_state_t *state, const char *buf, size_t len) {
   switch (state->format) {
   case XMPPIPE_FMT_TEXT:
     xmppipe_send_message(
@@ -46,7 +46,7 @@ void xmppipe_send_stanza(xmppipe_state_t *state, char *buf, size_t len) {
   }
 }
 
-static void xmppipe_send_stanza_fmt(xmppipe_state_t *state, char *buf,
+static void xmppipe_send_stanza_fmt(xmppipe_state_t *state, const char *buf,
                                     size_t len) {
   char *to = NULL;
   char *type = NULL;
@@ -162,8 +162,9 @@ XMPPIPE_DONE:
   free(body);
 }
 
-static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
-                                 char *buf, size_t len) {
+static void xmppipe_send_message(xmppipe_state_t *state, const char *to,
+                                 const char *type, const char *buf,
+                                 size_t len) {
   xmpp_stanza_t *message;
   char *id;
 
@@ -172,7 +173,7 @@ static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
   message = xmppipe_message_new(state->ctx, type, to, id);
 
   if (state->encode) {
-    char *b64 = xmpp_base64_encode(state->ctx, (unsigned char *)buf, len);
+    char *b64 = xmpp_base64_encode(state->ctx, (const unsigned char *)buf, len);
 
     if (b64 == NULL)
       errx(EXIT_FAILURE, "encode: invalid input: %zu", len);
@@ -187,8 +188,8 @@ static void xmppipe_send_message(xmppipe_state_t *state, char *to, char *type,
   xmpp_free(state->ctx, id);
 }
 
-static void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type,
-                             char *buf, size_t len) {
+static void xmppipe_send_oob(xmppipe_state_t *state, const char *to,
+                             const char *type, const char *buf, size_t len) {
   xmpp_stanza_t *message;
   xmpp_stanza_t *x;
   xmpp_stanza_t *url;
@@ -223,8 +224,8 @@ static void xmppipe_send_oob(xmppipe_state_t *state, char *to, char *type,
   xmpp_free(state->ctx, id);
 }
 
-static void xmppipe_send_http_upload(xmppipe_state_t *state, char *to,
-                                     char *type, char *buf, size_t len) {
+static void xmppipe_send_http_upload(xmppipe_state_t *state, const char *to,
+                                     const char *type, char *buf, size_t len) {
   xmpp_stanza_t *iq;
   xmpp_stanza_t *request;
   char *id;

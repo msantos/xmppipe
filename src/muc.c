@@ -33,7 +33,7 @@ void xmppipe_muc_join(xmppipe_state_t *state) {
   (void)xmpp_stanza_release(presence);
 }
 
-void xmppipe_muc_subject(xmppipe_state_t *state, char *buf) {
+void xmppipe_muc_subject(xmppipe_state_t *state, const char *buf) {
   xmpp_stanza_t *message;
   xmpp_stanza_t *subject;
   xmpp_stanza_t *text;
