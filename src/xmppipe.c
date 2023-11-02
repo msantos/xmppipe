@@ -30,6 +30,7 @@ int handle_disco_info(xmpp_conn_t *const, xmpp_stanza_t *const, void *const);
 
 int xmppipe_connect_init(xmppipe_state_t *);
 int xmppipe_stream_init(xmppipe_state_t *);
+int xmppipe_discovery_init(xmppipe_state_t *);
 int xmppipe_muc_init(xmppipe_state_t *);
 int xmppipe_presence_init(xmppipe_state_t *);
 
@@ -251,8 +252,8 @@ int main(int argc, char **argv) {
     state->mucjid = xmppipe_mucjid(state->out, state->resource);
   } else if (!(state->opt & XMPPIPE_OPT_GROUPCHAT)) {
     state->out = strchr(state->room, '.')
-      ? xmppipe_strdup(state->room)
-      : xmppipe_chatjid(state->room, state->server);
+                     ? xmppipe_strdup(state->room)
+                     : xmppipe_chatjid(state->room, state->server);
   }
 
   if (xmppipe_fmt_init() < 0)
@@ -291,6 +292,9 @@ int main(int argc, char **argv) {
 
   if (xmppipe_stream_init(state) < 0)
     errx(EXIT_FAILURE, "enabling stream management failed");
+
+  if (xmppipe_discovery_init(state) < 0)
+    errx(EXIT_FAILURE, "service discovery failed");
 
   if ((state->opt & XMPPIPE_OPT_GROUPCHAT) && xmppipe_muc_init(state) < 0)
     errx(EXIT_FAILURE, "failed to join MUC");
@@ -352,6 +356,13 @@ int xmppipe_stream_init(xmppipe_state_t *state) {
                    state);
   xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
 
+  xmpp_handler_add(state->conn, handle_disco_items,
+                   "http://jabber.org/protocol/disco#items", "iq", "result",
+                   state);
+  xmpp_handler_add(state->conn, handle_disco_info,
+                   "http://jabber.org/protocol/disco#info", "iq", "result",
+                   state);
+
   /* XXX multiple handlers can be called for each event
    * XXX
    * XXX * is the order handlers are called deterministic?
@@ -364,10 +375,30 @@ int xmppipe_stream_init(xmppipe_state_t *state) {
   return 0;
 }
 
-int xmppipe_muc_init(xmppipe_state_t *state) {
+int xmppipe_discovery_init(xmppipe_state_t *state) {
   xmpp_stanza_t *iq;
   xmpp_stanza_t *query;
 
+  iq = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(iq, "iq");
+  xmppipe_stanza_set_type(iq, "get");
+  xmppipe_stanza_set_attribute(iq, "to", state->server);
+  xmppipe_stanza_set_id(iq, "_xmppipe_disco_init");
+
+  query = xmppipe_stanza_new(state->ctx);
+  xmppipe_stanza_set_name(query, "query");
+  xmppipe_stanza_set_ns(query, "http://jabber.org/protocol/disco#items");
+
+  xmppipe_stanza_add_child(iq, query);
+  (void)xmpp_stanza_release(query);
+
+  xmppipe_send(state, iq);
+  (void)xmpp_stanza_release(iq);
+
+  return 0;
+}
+
+int xmppipe_muc_init(xmppipe_state_t *state) {
   xmpp_handler_add(state->conn, handle_presence_error,
                    "http://jabber.org/protocol/muc", "presence", "error",
                    state);
@@ -377,29 +408,6 @@ int xmppipe_muc_init(xmppipe_state_t *state) {
 
   /* Discover the MUC service */
   if (state->out == NULL) {
-    xmpp_handler_add(state->conn, handle_disco_items,
-                     "http://jabber.org/protocol/disco#items", "iq", "result",
-                     state);
-    xmpp_handler_add(state->conn, handle_disco_info,
-                     "http://jabber.org/protocol/disco#info", "iq", "result",
-                     state);
-
-    iq = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(iq, "iq");
-    xmppipe_stanza_set_type(iq, "get");
-    xmppipe_stanza_set_attribute(iq, "to", state->server);
-    xmppipe_stanza_set_id(iq, "_xmppipe_muc_init");
-
-    query = xmppipe_stanza_new(state->ctx);
-    xmppipe_stanza_set_name(query, "query");
-    xmppipe_stanza_set_ns(query, "http://jabber.org/protocol/disco#items");
-
-    xmppipe_stanza_add_child(iq, query);
-    (void)xmpp_stanza_release(query);
-
-    xmppipe_send(state, iq);
-    (void)xmpp_stanza_release(iq);
-
     xmppipe_next_state(state, XMPPIPE_S_MUC_SERVICE_LOOKUP);
   }
 
@@ -556,11 +564,11 @@ int handle_disco_info(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
     if (XMPPIPE_STRNEQ(var, "http://jabber.org/protocol/muc"))
       continue;
 
-    state->mucservice = xmppipe_strdup(from);
-    state->out = xmppipe_conference(state->room, state->mucservice);
-    state->mucjid = xmppipe_mucjid(state->out, state->resource);
-
     if (state->opt & XMPPIPE_OPT_GROUPCHAT) {
+      state->mucservice = xmppipe_strdup(from);
+      state->out = xmppipe_conference(state->room, state->mucservice);
+      state->mucjid = xmppipe_mucjid(state->out, state->resource);
+
       xmppipe_muc_join(state);
       xmppipe_muc_unlock(state);
     }
