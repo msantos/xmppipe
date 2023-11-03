@@ -378,12 +378,15 @@ int xmppipe_stream_init(xmppipe_state_t *state) {
 int xmppipe_discovery_init(xmppipe_state_t *state) {
   xmpp_stanza_t *iq;
   xmpp_stanza_t *query;
+  char *id;
 
   iq = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(iq, "iq");
   xmppipe_stanza_set_type(iq, "get");
   xmppipe_stanza_set_attribute(iq, "to", state->server);
-  xmppipe_stanza_set_id(iq, "_xmppipe_disco_init");
+
+  id = xmppipe_uuid_gen(state->ctx);
+  xmppipe_stanza_set_id(iq, xmppipe_uuid_gen(state->ctx));
 
   query = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(query, "query");
@@ -394,6 +397,8 @@ int xmppipe_discovery_init(xmppipe_state_t *state) {
 
   xmppipe_send(state, iq);
   (void)xmpp_stanza_release(iq);
+
+  xmpp_free(state->ctx, id);
 
   return 0;
 }
