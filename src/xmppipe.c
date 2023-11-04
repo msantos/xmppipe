@@ -386,7 +386,7 @@ int xmppipe_discovery_init(xmppipe_state_t *state) {
   xmppipe_stanza_set_attribute(iq, "to", state->server);
 
   id = xmppipe_uuid_gen(state->ctx);
-  xmppipe_stanza_set_id(iq, xmppipe_uuid_gen(state->ctx));
+  xmppipe_stanza_set_id(iq, id);
 
   query = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(query, "query");
