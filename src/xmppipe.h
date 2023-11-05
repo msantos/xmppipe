@@ -28,6 +28,7 @@
 
 #define XMPPIPE_VERSION "0.15.0"
 #define XMPPIPE_RESOURCE "xmppipe"
+#define XMPPIPE_KEEPALIVE_ID "xmppipe_keepalive"
 
 #define XMPPIPE_STREQ(a, b) (strcmp((a), (b)) == 0)
 #define XMPPIPE_STRNEQ(a, b) (strcmp((a), (b)) != 0)

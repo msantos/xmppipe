@@ -354,7 +354,8 @@ int xmppipe_stream_init(xmppipe_state_t *state) {
   xmpp_handler_add(state->conn, handle_iq, NULL, "iq", "result", state);
   xmpp_handler_add(state->conn, handle_pong, "urn:xmpp:ping", "iq", "get",
                    state);
-  xmpp_id_handler_add(state->conn, handle_ping_reply, "c2s1", state);
+  xmpp_id_handler_add(state->conn, handle_ping_reply, XMPPIPE_KEEPALIVE_ID,
+                      state);
 
   xmpp_handler_add(state->conn, handle_disco_items,
                    "http://jabber.org/protocol/disco#items", "iq", "result",

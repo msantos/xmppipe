@@ -28,7 +28,7 @@ void xmppipe_ping(xmppipe_state_t *state) {
   iq = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(iq, "iq");
   xmppipe_stanza_set_type(iq, "get");
-  xmppipe_stanza_set_id(iq, "c2s1");
+  xmppipe_stanza_set_id(iq, XMPPIPE_KEEPALIVE_ID);
   xmppipe_stanza_set_attribute(iq, "from",
                                xmpp_conn_get_bound_jid(state->conn));
 
