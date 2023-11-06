@@ -22,8 +22,8 @@ int handle_ping_reply(xmpp_conn_t *const conn, xmpp_stanza_t *const stanza,
 }
 
 void xmppipe_ping(xmppipe_state_t *state) {
-  xmpp_stanza_t *iq = NULL;
-  xmpp_stanza_t *ping = NULL;
+  xmpp_stanza_t *iq;
+  xmpp_stanza_t *ping;
 
   iq = xmppipe_stanza_new(state->ctx);
   xmppipe_stanza_set_name(iq, "iq");
