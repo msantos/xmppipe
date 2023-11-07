@@ -332,15 +332,14 @@ int xmppipe_connect_init(xmppipe_state_t *state) {
 int xmppipe_stream_init(xmppipe_state_t *state) {
   xmpp_stanza_t *enable;
 
-  if (state->sm_request_interval == 0)
-    return 0;
-
-  /* <enable xmlns='urn:xmpp:sm:3'/> */
-  enable = xmppipe_stanza_new(state->ctx);
-  xmppipe_stanza_set_name(enable, "enable");
-  xmppipe_stanza_set_ns(enable, "urn:xmpp:sm:3");
-  xmpp_send(state->conn, enable);
-  (void)xmpp_stanza_release(enable);
+  if (state->sm_request_interval > 0) {
+    /* <enable xmlns='urn:xmpp:sm:3'/> */
+    enable = xmppipe_stanza_new(state->ctx);
+    xmppipe_stanza_set_name(enable, "enable");
+    xmppipe_stanza_set_ns(enable, "urn:xmpp:sm:3");
+    xmpp_send(state->conn, enable);
+    (void)xmpp_stanza_release(enable);
+  }
 
   xmpp_handler_add(state->conn, handle_sm_enabled, "urn:xmpp:sm:3", "enabled",
                    NULL, state);
