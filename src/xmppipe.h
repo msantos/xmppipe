@@ -85,7 +85,7 @@ typedef struct {
       keepalive_fail; /* number of consecutive keepalives without a reply */
   u_int32_t keepalive_limit; /* number of keepalives without a reply */
   u_int32_t interval;        /* time since last keepalive (milliseconds) */
-  size_t bufsz;              /* size of read buffer */
+  ssize_t bufsz;             /* size of read buffer */
 
   int sm_enabled; /* stanzas: iq, message, presence */
 

@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
   state = xmppipe_calloc(1, sizeof(xmppipe_state_t));
 
   xmppipe_next_state(state, XMPPIPE_S_CONNECTING);
-  state->bufsz = 2049;
+  state->bufsz = -1;
   state->poll = 10;
   state->keepalive = 60 * 1000;
   state->keepalive_limit = 3;
@@ -238,6 +238,17 @@ int main(int argc, char **argv) {
   if (jid == NULL) {
     usage(state);
     exit(2);
+  }
+
+  if (state->bufsz == -1) {
+    switch (state->format) {
+    case XMPPIPE_FMT_CSV:
+      state->bufsz = 6144 + 1;
+      break;
+    default:
+      state->bufsz = 2048 + 1;
+      break;
+    }
   }
 
   if (state->encode && BASE64_LENGTH(state->bufsz) + 1 > 0xffff) {
