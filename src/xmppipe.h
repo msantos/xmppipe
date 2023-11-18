@@ -26,7 +26,7 @@
 #include "strtonum.h"
 #endif
 
-#define XMPPIPE_VERSION "0.15.0"
+#define XMPPIPE_VERSION "0.16.0"
 #define XMPPIPE_RESOURCE "xmppipe"
 #define XMPPIPE_KEEPALIVE_ID "xmppipe_keepalive"
 
