@@ -38,19 +38,6 @@ const char *const xmppipe_states[] = {"XMPPIPE_S_DISCONNECTED",
 
 static char *xmppipe_join(const char *prefix, const char *delimiter, const char *suffix);
 
-int xmppipe_set_nonblock(int fd) {
-  int flags;
-
-  flags = fcntl(fd, F_GETFD);
-  if (flags < 0)
-    return -1;
-
-  if (fcntl(fd, F_SETFD, flags | O_NONBLOCK) < 0)
-    return -1;
-
-  return 0;
-}
-
 char *xmppipe_getenv(const char *s) {
   char *p = getenv(s);
 

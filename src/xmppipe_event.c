@@ -25,9 +25,6 @@ void event_loop(xmppipe_state_t *state) {
   int eof = 0;
   char *buf;
 
-  if (xmppipe_set_nonblock(fd) < 0)
-    return;
-
   buf = xmppipe_calloc(state->bufsz, 1);
 
   for (;;) {
