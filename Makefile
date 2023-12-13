@@ -31,7 +31,6 @@ else ifeq ($(UNAME_SYS), OpenBSD)
 			  -fno-strict-aliasing
 	RESTRICT_PROCESS ?= pledge
 	LDFLAGS ?= -Wl,-z,relro,-z,now -Wl,-z,noexecstack
-else ifeq ($(UNAME_SYS), SunOS)
 else ifeq ($(UNAME_SYS), Darwin)
 	CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
 			  -Wformat -Werror=format-security \
