@@ -1,4 +1,4 @@
-/* Copyright (c) 2017-2023, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2017-2025, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -311,6 +311,10 @@ int restrict_process_init(xmppipe_state_t *state) {
       SC_ALLOW(restart_syscall),
 #endif
 
+#ifdef __NR_rt_sigprocmask
+      SC_ALLOW(rt_sigprocmask),
+#endif
+
       /* Default deny */
       BPF_STMT(BPF_RET + BPF_K, SECCOMP_FILTER_FAIL)};
 
@@ -452,6 +456,13 @@ int restrict_process_stdin(xmppipe_state_t *state) {
 #endif
 #ifdef __NR_prctl
       SC_ALLOW(prctl),
+#endif
+
+#ifdef __NR_futex
+      SC_ALLOW(futex),
+#endif
+#ifdef __NR_rt_sigprocmask
+      SC_ALLOW(rt_sigprocmask),
 #endif
 
       /* Default deny */
