@@ -51,7 +51,6 @@ $ make
 ```
 # Install bats:
 # apt-get install bats
-# git clone https://github.com/sstephenson/bats.git # or from git
 make test
 ```
 
@@ -120,7 +119,7 @@ RESTRICT_PROCESS=null make
 -a, --address *address[:port]*
 : Specify the IP address and port of the XMPP server
 
--F, --format *text:csv*
+-F, --format *text|csv*
 : stdin is text (default) or colon separated values
 
 -d, --discard
@@ -496,7 +495,7 @@ Also confirmed to work with:
 
 # LICENSE
 
-Copyright (c) 2015-2023, Michael Santos michael.santos@gmail.com
+Copyright (c) 2015-2025, Michael Santos michael.santos@gmail.com
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
