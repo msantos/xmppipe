@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2023, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2015-2025, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -51,7 +51,7 @@ char *xmppipe_strdup(const char *s) {
   char *buf;
 
   if (s == NULL)
-    errx(2, "invalid string");
+    errx(1, "invalid string");
 
   buf = strdup(s);
   if (buf == NULL)
@@ -64,7 +64,7 @@ void *xmppipe_malloc(size_t size) {
   char *buf;
 
   if (size == 0 || size > 0xffff)
-    errx(2, "invalid size: %zd", size);
+    errx(1, "invalid size: %zd", size);
 
   buf = malloc(size);
   if (buf == NULL)
@@ -98,7 +98,7 @@ void xmppipe_message_set_body(xmpp_stanza_t *msg, const char *const text) {
 
   rv = xmpp_message_set_body(msg, text);
   if (rv != XMPP_EOK)
-    errx(EXIT_FAILURE, "xmpp_message_set_body: %u", rv);
+    errx(3, "xmpp_message_set_body: %u", rv);
 }
 
 xmpp_stanza_t *xmppipe_stanza_reply(xmpp_stanza_t *const stanza) {
@@ -232,7 +232,7 @@ static char *xmppipe_join(const char *prefix, const char *delimiter, const char 
 
   rv = snprintf(buf, len, "%s%s%s", prefix, delimiter, suffix);
   if (rv < 0 || (unsigned)rv > len)
-    errx(2, "invalid size: %d", rv);
+    errx(1, "invalid size: %d", rv);
 
   return buf;
 }
@@ -258,7 +258,7 @@ char *xmppipe_uuid_gen(xmpp_ctx_t *ctx) {
   uuid = xmpp_uuid_gen(ctx);
 
   if (uuid == NULL)
-    errx(EXIT_FAILURE, "unable to allocate message id");
+    errx(3, "unable to allocate message id");
 
   return uuid;
 }
