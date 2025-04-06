@@ -14,7 +14,7 @@ decode() {
 
 bot() {
   local DEBUG=0
-  while IFS=: read stanza type from to body; do
+  while IFS=: read -r stanza type from to body; do
     case "$stanza" in
       m) ;;
       p)
