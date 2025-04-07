@@ -63,7 +63,7 @@ decode() {
 bot() {
   local filename
   # shellcheck disable=SC2034
-  while IFS=: read stanza _type _from _to body; do
+  while IFS=: read -r stanza _type _from _to body; do
     case "$stanza" in
       upload)
         filename="$body"
