@@ -30,7 +30,7 @@ atexit() {
 
 decode() {
   # shellcheck disable=SC2034
-  while IFS=: read stanza type from to body; do
+  while IFS=: read -r stanza type from to body; do
     case "$stanza" in
       m) printf '%b' "${body//%/\\x}" ;;
       *) ;;
@@ -41,7 +41,7 @@ decode() {
 server() {
   CONNECT=0
   xmppipe -e -r server -o "$1" -b 1024 -x </dev/null |
-    while IFS=: read stanza rest; do
+    while IFS=: read -r stanza rest; do
       case "$stanza" in
         p)
           CONNECT=$((CONNECT + 1))
