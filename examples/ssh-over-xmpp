@@ -61,6 +61,7 @@ session() {
 
   mkfifo "$out"
 
+  # shellcheck disable=SC2094
   nc "$2" "$3" <"$out" |
     xmppipe -P 100 -r session -o "$1" -x -s |
     decode >"$out"
