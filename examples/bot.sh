@@ -4,6 +4,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+shopt -s nullglob
+
 if [ "$BOT_DEBUG" ]; then
   set -x
 fi
