@@ -311,7 +311,7 @@ while getopts ":o:" opt; do
   esac
 done
 
-xmppipe "$@" | while IFS=: read stanza type from to body; do
+xmppipe "$@" | while IFS=: read -r stanza type from to body; do
   case "$stanza" in
     m) notify-send "$MUC" "$(decode "$body")" ;;
     *) continue ;;
