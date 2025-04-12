@@ -348,7 +348,7 @@ decode() {
 
 stty cols 80 rows 24
 xmppipe --resource viewer --base64 console |
-  while IFS=: read -r x s f t m; do
+  while IFS=: read -r _ _ _ _ m; do
     [ "$m" = "m" ] && decode "$m"
   done
 ```
