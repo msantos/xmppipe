@@ -21,7 +21,7 @@ for monitoring systems or for sending alerts.
 
 # USAGE
 
-```
+```bash
 xmppipe [*options*]
 
 XMPPIPE_USERNAME=me@example.com
@@ -42,13 +42,13 @@ xmppipe muc@example.com
 
 # BUILD
 
-```
+```bash
 $ make
 ```
 
 ## Tests
 
-```
+```bash
 # Install bats:
 # apt-get install bats
 make test
@@ -90,7 +90,7 @@ is used. By default:
 Selecting which process restrictions are enforced is done at compile
 time. For example, to use the "rlimit" process restrictions:
 
-```
+```bash
 RESTRICT_PROCESS=rlimit make
 ```
 
@@ -98,7 +98,7 @@ If the process restrictions are interfering with normal operation, please
 open an issue. To disable all process restrictions, compile using the
 "null" sandbox:
 
-```
+```bash
 RESTRICT_PROCESS=null make
 ```
 
@@ -176,7 +176,7 @@ XMPPIPE_PASSWORD
 
 Using bash:
 
-```shell
+```bash
 decode() {
   printf '%b' "${1//%/\\x}"
 }
@@ -188,7 +188,7 @@ decode() {
 
 An interactive XMPP bot written in the shell:
 
-```shell
+```bash
 #!/bin/bash
 
 set -o errexit
@@ -246,7 +246,7 @@ xmppipe "$@" <&"${COPROC[0]}" >&"${COPROC[1]}"
 
 Start `xmppipe` attached to a pipe:
 
-```shell
+```bash
 mkfifo /tmp/xmpp
 
 xmppipe -o groupchat <>/tmp/xmpp
@@ -254,7 +254,7 @@ xmppipe -o groupchat <>/tmp/xmpp
 
 Any data written to the pipe will be sent to the groupchat:
 
-```shell
+```bash
 echo "test" >/tmp/xmpp
 
 df -h >/tmp/xmpp
@@ -266,7 +266,7 @@ git diff >/tmp/xmpp
 
 See [examples/ssh-over-xmpp](https://github.com/msantos/xmppipe/blob/master/examples/ssh-over-xmpp):
 
-```shell
+```bash
 # Server: has access to the destination SSH server
 # ssh-over-xmpp server <conference> <IP address> <port>
 ssh-over-xmpp server sshxmpp 1.2.3.4 22
@@ -281,7 +281,7 @@ This example will stream events from a query to an XMPP MUC using
 [Riemann's](https://github.com/riemann/riemann) SSE interface. The events
 are written to a named pipe to avoid buffering.
 
-```shell
+```bash
 coproc curl -s --get --data subscribe=true \
   --data-urlencode 'query=(service ~= "^example")' \
   http://example.com:80/index </dev/null
@@ -291,7 +291,7 @@ xmppipe --verbose --verbose \
 
 ### Desktop Notifications
 
-```shell
+```bash
 #!/bin/bash
 
 set -o errexit
@@ -323,7 +323,7 @@ done
 
 * user
 
-```shell
+```bash
 #!/bin/bash
 
 MUC=console
@@ -339,7 +339,7 @@ script -q -f "$FIFO"
 
 * viewers
 
-```shell
+```bash
 #!/bin/bash
 
 decode() {
@@ -359,7 +359,7 @@ Upload an image using HTTP Upload (XEP-0363) then display it inline.
 
 See [examples/image-upload](https://github.com/msantos/xmppipe/blob/master/examples/image-upload):
 
-```
+```bash
 image-upload -o groupchat
 ```
 
@@ -514,10 +514,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 * support [XEP-0384: OMEMO Encryption](https://xmpp.org/extensions/xep-0384.html)
 
 * support alternative input modes
-
   * "raw" mode: XML input/output
 
 * HTTP Upload
-
   * support PUT header elements
   * handle error conditions
